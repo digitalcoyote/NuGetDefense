@@ -1,0 +1,13 @@
+/home/codingcoyote/Code/NuGetDefense/Src/obj/Debug/netcoreapp3.1/NuGetDefense.csprojAssemblyReference.cache
+/home/codingcoyote/Code/NuGetDefense/Src/obj/Debug/netcoreapp3.1/NuGetDefense.AssemblyInfoInputs.cache
+/home/codingcoyote/Code/NuGetDefense/Src/obj/Debug/netcoreapp3.1/NuGetDefense.AssemblyInfo.cs
+/home/codingcoyote/Code/NuGetDefense/Src/bin/Debug/netcoreapp3.1/NuGetDefense
+/home/codingcoyote/Code/NuGetDefense/Src/bin/Debug/netcoreapp3.1/NuGetDefense.deps.json
+/home/codingcoyote/Code/NuGetDefense/Src/bin/Debug/netcoreapp3.1/NuGetDefense.runtimeconfig.json
+/home/codingcoyote/Code/NuGetDefense/Src/bin/Debug/netcoreapp3.1/NuGetDefense.runtimeconfig.dev.json
+/home/codingcoyote/Code/NuGetDefense/Src/bin/Debug/netcoreapp3.1/NuGetDefense.dll
+/home/codingcoyote/Code/NuGetDefense/Src/bin/Debug/netcoreapp3.1/NuGetDefense.pdb
+/home/codingcoyote/Code/NuGetDefense/Src/bin/Debug/netcoreapp3.1/System.Text.Json.dll
+/home/codingcoyote/Code/NuGetDefense/Src/obj/Debug/netcoreapp3.1/NuGetDefense.csproj.CopyComplete
+/home/codingcoyote/Code/NuGetDefense/Src/obj/Debug/netcoreapp3.1/NuGetDefense.dll
+/home/codingcoyote/Code/NuGetDefense/Src/obj/Debug/netcoreapp3.1/NuGetDefense.pdb

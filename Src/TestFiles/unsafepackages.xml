@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unsafepackages>
+  <package id="AntiXss" before="4.2.1" />
+</unsafepackages>

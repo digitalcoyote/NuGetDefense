@@ -1,0 +1,65 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/codingcoyote/Code/NuGetDefense/Src/NuGetDefense.csproj": {}
+  },
+  "projects": {
+    "/home/codingcoyote/Code/NuGetDefense/Src/NuGetDefense.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/codingcoyote/Code/NuGetDefense/Src/NuGetDefense.csproj",
+        "projectName": "NuGetDefense",
+        "projectPath": "/home/codingcoyote/Code/NuGetDefense/Src/NuGetDefense.csproj",
+        "packagesPath": "/home/codingcoyote/.nuget/packages/",
+        "outputPath": "/home/codingcoyote/Code/NuGetDefense/Src/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/codingcoyote/.config/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "/home/codingcoyote/Code/SafeNuGet/DigitalCoyote.SafeNuGet/bin/Release": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "dependencies": {
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[4.7.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/3.1.101/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
