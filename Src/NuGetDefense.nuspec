@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>NuGetDefense</id>
+    <Title>NuGetDefense</Title>
+    <version>0.0.1</version>
+    <authors>Curtis Carter</authors>
+    <owners>Curtis Carter</owners>
+    <projectUrl>https://github.com/DigitalCoyote/NuGetDefense</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>NuGetDefense ~ Check for Known Vulnerabilities at Build</summary>
+    <description>NuGetDefense was inspired by [OWASP SafeNuGet](https://nuget.org/packages/SafeNuGet/) but aims to check with multiple sources for known vulnerabilities.</description>
+    <releaseNotes>First version: OSS Index used as initial source for vulnerabilities</releaseNotes>
+    <repository type="git" url="https://github.com/digitalcoyote/NuGetDefense.git"/>
+    <license type="expression">MIT</license>
+    <tags>Security</tags>
+    <dependencies>
+      <dependency id="System.Text.Json" version="4.7.0" exclude="Build,Analyzers" />
+    </dependencies>
+  </metadata>
+
+  <files>
+    <!-- <file src="Src/bin/Release/net461/NuGetDefense.exe" target="tools/net461/NuGetDefense.exe" /> -->
+    <file src="build/" target="build" />
+    <file src="bin/Release/" target="tools" />
+    <file src="lib/" target="lib" />
+  </files>
+</package>
