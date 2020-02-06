@@ -26,17 +26,17 @@ namespace NuGetDefense
             var reports = OSSIndex.RestApi.GetVulnerabilitiesForPackages(pkgs).ToArray();
             foreach (var report in reports)
             {
-                var StdErrWriter = Console.Error;
                 var pkg = pkgs.First(p => p.PackageUrl == report.Coordinates);
                 Console.WriteLine("*************************************");
                 //Plan to use Warning: for warnings later
                 //Plan to combine messages into a single Console.Write.
-                StdErrWriter.WriteLine($"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : Vulnerabilities found for {pkg.Id} @ {pkg.Version}");
+                Console.WriteLine($"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {report.Vulnerabilities.Length} vulnerabilities found for {pkg.Id} @ {pkg.Version}");
                 Console.WriteLine($"Description: {report.Description}");
                 Console.WriteLine($"Reference: {report.Reference}");
                 foreach (var vulnerability in report.Vulnerabilities)
                 {
                     exitCode++;
+                    Console.WriteLine($"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {vulnerability.Cve}: {vulnerability.Description}");
                     Console.WriteLine($"Title: {vulnerability.Title}");
                     Console.WriteLine($"Description: {vulnerability.Description}");
                     Console.WriteLine($"Id: {vulnerability.Id}");
