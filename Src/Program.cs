@@ -19,8 +19,9 @@ namespace NuGetDefense
         static void Main(string[] args)
         {
             var exitCode = 0;
-            var pkgConfig = Path.Combine(Path.GetDirectoryName(args[0]), "packages.config");
-            var pkgs = LoadPackages(File.Exists(pkgConfig) ? pkgConfig : args[0]);
+            var pkgConfig = Path.Combine(Path.GetDirectoryName(args[0]), "packages.config");;
+            var nuGetFile = File.Exists(pkgConfig) ? pkgConfig : args[0];
+            var pkgs = LoadPackages(nuGetFile);
 
             var reports = OSSIndex.RestApi.GetVulnerabilitiesForPackages(pkgs).ToArray();
             foreach (var report in reports)
@@ -30,7 +31,7 @@ namespace NuGetDefense
                 Console.WriteLine("*************************************");
                 //Plan to use Warning: for warnings later
                 //Plan to combine messages into a single Console.Write.
-                StdErrWriter.WriteLine($"{args[0]}({pkg.LineNumber},{pkg.LinePosition}) : Error : Vulnerabilities found for {pkg.Id} @ {pkg.Version}");
+                StdErrWriter.WriteLine($"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : Vulnerabilities found for {pkg.Id} @ {pkg.Version}");
                 Console.WriteLine($"Description: {report.Description}");
                 Console.WriteLine($"Reference: {report.Reference}");
                 foreach (var vulnerability in report.Vulnerabilities)
