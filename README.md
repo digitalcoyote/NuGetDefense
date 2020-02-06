@@ -3,6 +3,7 @@
 [![Join the chat at https://gitter.im/NuGetDefense/community](https://badges.gitter.im/NuGetDefense/community.svg)](https://gitter.im/NuGetDefense/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 An MSBuildTask that checks for known vulnerabilities. Inspired by [OWASP SafeNuGet](https://github.com/OWASP/SafeNuGet).
+![Example Error Messages](https://rawcdn.githack.com/digitalcoyote/NuGetDefense/c5e153a627cde0d194daf8500ffb8cab7020e903/ErrorMessages.png)
 
 ## Why a new Project?
   1. SafeNuGet hasn't seen a new commit in years  and isn't able to keep up with vulnerable packages.
@@ -27,4 +28,4 @@ An MSBuildTask that checks for known vulnerabilities. Inspired by [OWASP SafeNuG
 
     
 ## Love it? Support it!
-You can click the sponsor button at the top of this repo or sponsor this project on [Github](https://github.com/sponsors/digitalcoyote) and [Patreon](https://www.patreon.com/codingcoyote). The funds will be used to pay for software licenses and cloud/hardware costs that keep my projects running.
+You can sponsor this project on [Github](https://github.com/sponsors/digitalcoyote) and [Patreon](https://www.patreon.com/codingcoyote). The funds will be used to pay for software licenses and cloud/hardware costs that keep my projects running.
