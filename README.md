@@ -3,7 +3,10 @@
 [![Join the chat at https://gitter.im/NuGetDefense/community](https://badges.gitter.im/NuGetDefense/community.svg)](https://gitter.im/NuGetDefense/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 An MSBuildTask that checks for known vulnerabilities. Inspired by [OWASP SafeNuGet](https://github.com/OWASP/SafeNuGet).
-![Example Error Messages](https://rawcdn.githack.com/digitalcoyote/NuGetDefense/c5e153a627cde0d194daf8500ffb8cab7020e903/ErrorMessages.png)
+#### Rider
+![Example Error Messages in Rider](https://rawcdn.githack.com/digitalcoyote/NuGetDefense/c5e153a627cde0d194daf8500ffb8cab7020e903/ErrorMessages.png)
+#### Visual Studio
+![Example Error Messages in Visual Studio 2019](https://rawcdn.githack.com/digitalcoyote/NuGetDefense/16150e955e89e21d24c54bb4a03888e9a7b896e5/VSErrorMessages.png)
 
 ## Why a new Project?
   1. SafeNuGet hasn't seen a new commit in years  and isn't able to keep up with vulnerable packages.
