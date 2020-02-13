@@ -1,70 +1,81 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Xml;
 using System.Xml.Linq;
 using NuGetDefense.OSSIndex;
 
 namespace NuGetDefense
 {
-    class Program
+    internal class Program
     {
+        private static string nuGetFile;
+        private static NuGetPackage[] pkgs;
+
         /// <summary>
-        /// args[0] is expected to be the path to the project file.
+        ///     args[0] is expected to be the path to the project file.
         /// </summary>
         /// <param name="args"></param>
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            var exitCode = 0;
-            var pkgConfig = Path.Combine(Path.GetDirectoryName(args[0]), "packages.config");;
-            var nuGetFile = File.Exists(pkgConfig) ? pkgConfig : args[0];
-            var pkgs = LoadPackages(nuGetFile);
+            var pkgConfig = Path.Combine(Path.GetDirectoryName(args[0]), "packages.config");
+            nuGetFile = File.Exists(pkgConfig) ? pkgConfig : args[0];
+            pkgs = LoadPackages(nuGetFile);
 
-            var reports = OSSIndex.RestApi.GetVulnerabilitiesForPackages(pkgs).ToArray();
-            foreach (var report in reports)
+            var vulnDict = new Scanner().GetVulnerabilitiesForPackages(pkgs);
+            vulnDict = new NVD.Scanner().GetVulnerabilitiesForPackages(pkgs, vulnDict);
+
+            ReportVulnerabilities(vulnDict);
+        }
+
+        private static void ReportVulnerabilities(Dictionary<string, Dictionary<string, Vulnerability>> vulnDict)
+        {
+            foreach (var pkg in pkgs.Where(p => vulnDict.ContainsKey(p.Id)))
             {
-                var pkg = pkgs.First(p => p.PackageUrl == report.Coordinates);
                 Console.WriteLine("*************************************");
                 //Plan to use Warning: for warnings later
                 //Plan to combine messages into a single Console.Write.
-                Console.WriteLine($"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {report.Vulnerabilities.Length} vulnerabilities found for {pkg.Id} @ {pkg.Version}");
-                Console.WriteLine($"Description: {report.Description}");
-                Console.WriteLine($"Reference: {report.Reference}");
-                foreach (var vulnerability in report.Vulnerabilities)
+                Console.WriteLine(
+                    $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {vulnDict[pkg.Id].Count} vulnerabilities found for {pkg.Id} @ {pkg.Version}");
+                var vulnerabilities = vulnDict[pkg.Id];
+                foreach (var cve in vulnerabilities.Keys)
                 {
-                    exitCode++;
-                    Console.WriteLine($"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {vulnerability.Cve}: {vulnerability.Description}");
-                    Console.WriteLine($"Title: {vulnerability.Title}");
-                    Console.WriteLine($"Description: {vulnerability.Description}");
-                    Console.WriteLine($"Id: {vulnerability.Id}");
-                    Console.WriteLine($"CVE: {vulnerability.Cve}");
-                    Console.WriteLine($"CWE: {vulnerability.Cwe}");
-                    Console.WriteLine($"CVSS Score: {vulnerability.CvssScore.ToString(CultureInfo.InvariantCulture)}");
-                    Console.WriteLine($"CVSS Vector: {vulnerability.CvssVector}");
-                    if(vulnerability.VersionRanges?.Length > 0)Console.Error.WriteLine($"Affected Versions: {vulnerability.VersionRanges}");
+                    Console.WriteLine(
+                        $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {cve}: {vulnerabilities[cve].Description}");
+                    Console.WriteLine($"Description: {vulnerabilities[cve].Description}");
+                    Console.WriteLine($"CVE: {cve}");
+                    Console.WriteLine($"CWE: {vulnerabilities[cve].Cwe}");
+                    Console.WriteLine($"CVSS Score: {vulnerabilities[cve].CvssScore}");
+                    Console.WriteLine($"CVSS Vector: {vulnerabilities[cve].Vector}");
+                    // if (vulnerabilities[cve].Version?.Length > 0)
+                    //     Console.WriteLine($"Affected Version: {vulnerabilities[cve].Version}");
                     Console.WriteLine("---------------------------");
                 }
             }
         }
-        
-        
+
+
         /// <summary>
-        /// Loads NuGet packages in use form packages.config or PackageReferences in the project file
+        ///     Loads NuGet packages in use form packages.config or PackageReferences in the project file
         /// </summary>
         /// <returns></returns>
         public static NuGetPackage[] LoadPackages(string packageSource)
         {
-            if(Path.GetFileName(packageSource) == "packages.config")
-            {
-                return XElement.Load(packageSource, LoadOptions.SetLineInfo).DescendantsAndSelf("package").Select(x => new NuGetPackage()
-                    {Id = x.Attribute("id").Value, Version = x.Attribute("version").Value, LineNumber = ((IXmlLineInfo)x).LineNumber, LinePosition = ((IXmlLineInfo)x).LinePosition}).ToArray();
-            }
+            if (Path.GetFileName(packageSource) == "packages.config")
+                return XElement.Load(packageSource, LoadOptions.SetLineInfo).DescendantsAndSelf("package").Select(x =>
+                    new NuGetPackage
+                    {
+                        Id = x.Attribute("id").Value.ToLower(), Version = x.Attribute("version").Value,
+                        LineNumber = ((IXmlLineInfo) x).LineNumber, LinePosition = ((IXmlLineInfo) x).LinePosition
+                    }).ToArray();
 
-            return XElement.Load(packageSource, LoadOptions.SetLineInfo).DescendantsAndSelf("PackageReference").Select(x => new NuGetPackage()
-                {Id = x.Attribute("Include").Value, Version = x.Attribute("Version").Value, LineNumber = ((IXmlLineInfo)x).LineNumber, LinePosition = ((IXmlLineInfo)x).LinePosition}).ToArray();
+            return XElement.Load(packageSource, LoadOptions.SetLineInfo).DescendantsAndSelf("PackageReference").Select(
+                x => new NuGetPackage
+                {
+                    Id = x.Attribute("Include").Value.ToLower(), Version = x.Attribute("Version").Value,
+                    LineNumber = ((IXmlLineInfo) x).LineNumber, LinePosition = ((IXmlLineInfo) x).LinePosition
+                }).ToArray();
         }
     }
 }
