@@ -66,14 +66,14 @@ namespace NuGetDefense
                 return XElement.Load(packageSource, LoadOptions.SetLineInfo).DescendantsAndSelf("package").Select(x =>
                     new NuGetPackage
                     {
-                        Id = x.Attribute("id").Value.ToLower(), Version = x.Attribute("version").Value,
+                        Id = x.Attribute("id").Value, Version = x.Attribute("version").Value,
                         LineNumber = ((IXmlLineInfo) x).LineNumber, LinePosition = ((IXmlLineInfo) x).LinePosition
                     }).ToArray();
 
             return XElement.Load(packageSource, LoadOptions.SetLineInfo).DescendantsAndSelf("PackageReference").Select(
                 x => new NuGetPackage
                 {
-                    Id = x.Attribute("Include").Value.ToLower(), Version = x.Attribute("Version").Value,
+                    Id = x.Attribute("Include").Value, Version = x.Attribute("Version").Value,
                     LineNumber = ((IXmlLineInfo) x).LineNumber, LinePosition = ((IXmlLineInfo) x).LinePosition
                 }).ToArray();
         }

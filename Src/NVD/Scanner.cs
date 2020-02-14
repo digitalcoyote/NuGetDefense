@@ -31,7 +31,7 @@ namespace NuGetDefense.NVD
             if (vulnDict == null) vulnDict = new Dictionary<string, Dictionary<string, Vulnerability>>();
             foreach (var pkg in pkgs)
             {
-                var pkgId = pkg.Id;
+                var pkgId = pkg.Id.ToLower();
                 if (!nvdDict.ContainsKey(pkgId)) continue;
                 if (!vulnDict.ContainsKey(pkgId)) vulnDict.Add(pkgId, new Dictionary<string, Vulnerability>());
                 foreach (var cve in nvdDict[pkgId].Keys.Where(cve => nvdDict[pkgId][cve].versions.Any(v =>
