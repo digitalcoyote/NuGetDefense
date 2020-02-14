@@ -14,12 +14,13 @@ An MSBuildTask that checks for known vulnerabilities. Inspired by [OWASP SafeNuG
   3. A pure MSBuild task [should not use dependencies](https://natemcmaster.com/blog/2017/11/11/msbuild-task-with-dependencies/) and cannot get the desired results without them.
   
 ## Features  
-* Uses [OSS Index](https://ossindex.sonatype.org/) to check for Open Source Software culnerabilities.
+* Uses Multiple Sources to check for Open Source Software culnerabilities.
+  * [OSS Index](https://ossindex.sonatype.org/)
+  * [National Vulnerability Database](https://nvd.nist.gov/).
 * MIT Licensed
 * Simple Installation/Configurationa simple [NuGet Package](https://www.nuget.org/packages/NuGetDefense/) is all you need.
 
 ## Planned Features
-* Reference the [National Vulnerability Database](https://nvd.nist.gov/).
 * Allow breaking the build based on severity of vulnerability.
 * Ignore specific vulnerabilities/packages.
 
