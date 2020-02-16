@@ -244,7 +244,7 @@ namespace NVDFeedImporter
         [J("impactScore", NullValueHandling = N.Ignore)]
         public double? ImpactScore { get; set; }
     }
-    
+
     public enum AccessVectorType
     {
         LOCAL,

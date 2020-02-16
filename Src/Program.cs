@@ -21,7 +21,7 @@ namespace NuGetDefense
         {
             var pkgConfig = Path.Combine(Path.GetDirectoryName(args[0]), "packages.config");
             nuGetFile = File.Exists(pkgConfig) ? pkgConfig : args[0];
-            pkgs = LoadPackages(nuGetFile);
+            pkgs = LoadPackages(nuGetFile, args[1]);
 
             var vulnDict = new Scanner().GetVulnerabilitiesForPackages(pkgs);
             vulnDict = new NVD.Scanner().GetVulnerabilitiesForPackages(pkgs, vulnDict);
@@ -60,22 +60,27 @@ namespace NuGetDefense
         ///     Loads NuGet packages in use form packages.config or PackageReferences in the project file
         /// </summary>
         /// <returns></returns>
-        public static NuGetPackage[] LoadPackages(string packageSource)
+        public static NuGetPackage[] LoadPackages(string packageSource, string framework)
         {
+            IEnumerable<NuGetPackage> pkgs;
             if (Path.GetFileName(packageSource) == "packages.config")
-                return XElement.Load(packageSource, LoadOptions.SetLineInfo).DescendantsAndSelf("package").Select(x =>
+                pkgs = XElement.Load(packageSource, LoadOptions.SetLineInfo).DescendantsAndSelf("package").Select(x =>
                     new NuGetPackage
                     {
                         Id = x.Attribute("id").Value, Version = x.Attribute("version").Value,
                         LineNumber = ((IXmlLineInfo) x).LineNumber, LinePosition = ((IXmlLineInfo) x).LinePosition
-                    }).ToArray();
+                    });
+            else
+                pkgs = XElement.Load(packageSource, LoadOptions.SetLineInfo).DescendantsAndSelf("PackageReference")
+                    .Select(
+                        x => new NuGetPackage
+                        {
+                            Id = x.Attribute("Include").Value, Version = x.Attribute("Version").Value,
+                            LineNumber = ((IXmlLineInfo) x).LineNumber, LinePosition = ((IXmlLineInfo) x).LinePosition
+                        });
 
-            return XElement.Load(packageSource, LoadOptions.SetLineInfo).DescendantsAndSelf("PackageReference").Select(
-                x => new NuGetPackage
-                {
-                    Id = x.Attribute("Include").Value, Version = x.Attribute("Version").Value,
-                    LineNumber = ((IXmlLineInfo) x).LineNumber, LinePosition = ((IXmlLineInfo) x).LinePosition
-                }).ToArray();
+            return NuGetClient.GetAllPackageDependencies(pkgs.Where(p => p.Id != "NuGetDefense").ToList(), framework)
+                .Result.ToArray();
         }
     }
 }

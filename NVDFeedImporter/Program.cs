@@ -17,7 +17,8 @@ namespace NVDFeedImporter
         {
             var binName = "VulnerabilityData.bin";
             var nvdDict =
-                new Dictionary<string, Dictionary<string, (string[] versions, string description, string cwe, string vendor, double? score, AccessVectorType vector)>>();
+                new Dictionary<string, Dictionary<string, (string[] versions, string description, string cwe, string
+                    vendor, double? score, AccessVectorType vector)>>();
             foreach (var link in GetJsonLinks())
             {
                 Console.WriteLine(link);
@@ -42,8 +43,8 @@ namespace NVDFeedImporter
                     {
                         NuGetVersion Start = null;
                         NuGetVersion End = null;
-                        bool includeStart = false;
-                        bool includeEnd = false;
+                        var includeStart = false;
+                        var includeEnd = false;
                         if (!string.IsNullOrWhiteSpace(match.VersionStartIncluding))
                         {
                             Start = NuGetVersion.Parse(match.VersionStartIncluding);
@@ -59,7 +60,7 @@ namespace NVDFeedImporter
                         {
                             End = NuGetVersion.Parse(match.VersionEndExcluding);
                         }
-                        
+
                         var range = new VersionRange(Start, includeStart, End, includeEnd);
 
                         cpe.ProductVersion = string.IsNullOrWhiteSpace(range.ToString()) ? "*" : range.ToString();
@@ -84,7 +85,7 @@ namespace NVDFeedImporter
                             $"Descritption: {feedVuln.Cve.Description.DescriptionData.First().Value}");
                         description = feedVuln.Cve.Description.DescriptionData.First().Value;
                     }
-                    
+
                     //TODO: Multiple Version Ranges need to be supported which means getting a more complicated range instead of replacing.
 
                     Console.WriteLine($"Vendor: {cpe.Vendor}");
@@ -96,10 +97,14 @@ namespace NVDFeedImporter
                             new Dictionary<string, (string[] versions, string description, string cwe, string vendor,
                                 double? score, AccessVectorType vector)>());
                     if (!nvdDict[cpe.Product].ContainsKey(feedVuln.Cve.CveDataMeta.Id))
+                    {
                         nvdDict[cpe.Product].Add(feedVuln.Cve.CveDataMeta.Id, (
-                            new[]{cpe.ProductVersion}, description, cwe, cpe.Vendor, feedVuln.Impact.BaseMetricV3?.CvssV3
-                                ?.BaseScore, feedVuln.Impact.BaseMetricV3?.CvssV3?.AttackVector ?? AccessVectorType.UNSPECIFIED
+                            new[] {cpe.ProductVersion}, description, cwe, cpe.Vendor, feedVuln.Impact.BaseMetricV3
+                                ?.CvssV3
+                                ?.BaseScore,
+                            feedVuln.Impact.BaseMetricV3?.CvssV3?.AttackVector ?? AccessVectorType.UNSPECIFIED
                         ));
+                    }
                     else
                     {
                         Console.WriteLine(
@@ -113,6 +118,7 @@ namespace NVDFeedImporter
                     }
                 }
             }
+
             var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray)
                 .WithSecurity(MessagePackSecurity.UntrustedData);
 

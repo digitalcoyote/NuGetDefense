@@ -9,7 +9,17 @@ namespace NuGetDefense.NVD
 {
     public class Scanner
     {
-        private readonly Dictionary<string, Dictionary<string, (string[] versions, string description, string cwe, string vendor, double? score, AccessVectorType vector)>> nvdDict;
+        public enum AccessVectorType
+        {
+            LOCAL,
+            NETWORK,
+            ADJACENT_NETWORK,
+            PHYSICAL,
+            UNSPECIFIED
+        }
+
+        private readonly Dictionary<string, Dictionary<string, (string[] versions, string description, string cwe,
+            string vendor, double? score, AccessVectorType vector)>> nvdDict;
 
         public Scanner()
         {
@@ -21,7 +31,8 @@ namespace NuGetDefense.NVD
             var nvdData = File.Open(vulnDataFile, FileMode.Open, FileAccess.Read);
             nvdDict = MessagePackSerializer
                 .Deserialize<
-                    Dictionary<string, Dictionary<string, (string[] versions, string description, string cwe, string vendor
+                    Dictionary<string, Dictionary<string, (string[] versions, string description, string cwe, string
+                        vendor
                         , double? score, AccessVectorType vector)>>>(nvdData, lz4Options);
         }
 
@@ -40,15 +51,6 @@ namespace NuGetDefense.NVD
             }
 
             return vulnDict;
-        }
-        
-        public enum AccessVectorType
-        {
-            LOCAL,
-            NETWORK,
-            ADJACENT_NETWORK,
-            PHYSICAL,
-            UNSPECIFIED
         }
     }
 }
