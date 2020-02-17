@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>NuGetDefense ~ Check for Known Vulnerabilities at Build</summary>
     <description>NuGetDefense was inspired by [OWASP SafeNuGet](https://nuget.org/packages/SafeNuGet/) but aims to check with multiple sources for known vulnerabilities.</description>
-    <releaseNotes>0.0.5: Added NVD Source</releaseNotes>
+    <releaseNotes>https://github.com/digitalcoyote/NuGetDefense/releases</releaseNotes>
     <repository type="git" url="https://github.com/digitalcoyote/NuGetDefense.git"/>
     <license type="expression">MIT</license>
     <tags>Security</tags>
