@@ -65,7 +65,7 @@ namespace NuGetDefense
             }
 
             var resolverContext = new PackageResolverContext(
-                DependencyBehavior.Lowest,
+                DependencyBehavior.Highest,
                 pkgs.Select(p => p.Id).ToArray(),
                 Enumerable.Empty<string>(),
                 Enumerable.Empty<PackageReference>(),

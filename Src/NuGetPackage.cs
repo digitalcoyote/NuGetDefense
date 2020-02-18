@@ -7,7 +7,9 @@
         public string Version { get; set; }
 
         internal string PackageUrl => $@"pkg:nuget/{Id}@{Version}";
-        internal int LinePosition { get; set; }
-        internal int LineNumber { get; set; }
+        internal int LinePosition;
+        internal int LineNumber;
+
+        internal NuGetPackage[] Dependencies = {};
     }
 }

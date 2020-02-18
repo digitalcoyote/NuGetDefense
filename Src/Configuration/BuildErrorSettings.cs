@@ -35,7 +35,28 @@ namespace NuGetDefense
             set => _cvss3Threshold = value;
         }
 
-        public NuGetPackage[] WhiteListedPackages { get; set; } = new NuGetPackage[0];
-        public NuGetPackage[] BlackListedPackages { get; set; } = new NuGetPackage[0];
+        /// <summary>
+        /// List Package Id and Version/Range to be ignored (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
+        /// Version is "any" if omitted
+        /// </summary>
+        public NuGetPackage[] IgnoredPackages { get; set; } =
+        {
+            new NuGetPackage
+            {
+                Id = "NugetDefense"
+            }
+        };
+        
+        /// <summary>
+        /// List Package Id and Version/Range to be Whitelisted (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
+        /// Version is "any" if omitted
+        /// </summary>
+        public NuGetPackage[] WhiteListedPackages { get; set; } = {};
+        
+        /// <summary>
+        /// List Package Id and Version/Range to be Blacklisted (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
+        /// Version is "any" if omitted
+        /// </summary>
+        public NuGetPackage[] BlackListedPackages { get; set; } = { };
     }
 }

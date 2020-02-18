@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using NuGet.Packaging;
+using NuGet.Versioning;
 using NuGetDefense.OSSIndex;
 
 namespace NuGetDefense
@@ -12,7 +14,7 @@ namespace NuGetDefense
     {
         private static string nuGetFile;
         private static NuGetPackage[] pkgs;
-        private static Settings _settings;
+        internal static Settings Settings;
 
         /// <summary>
         ///     args[0] is expected to be the path to the project file.
@@ -20,13 +22,28 @@ namespace NuGetDefense
         /// <param name="args"></param>
         private static void Main(string[] args)
         {
-            _settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
+            Settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
             var pkgConfig = Path.Combine(Path.GetDirectoryName(args[0]), "packages.config");
             nuGetFile = File.Exists(pkgConfig) ? pkgConfig : args[0];
             pkgs = LoadPackages(nuGetFile, args[1]);
-
-            var vulnDict = new Scanner().GetVulnerabilitiesForPackages(pkgs);
-            vulnDict = new NVD.Scanner().GetVulnerabilitiesForPackages(pkgs, vulnDict);
+            if (Settings.ErrorSettings.BlackListedPackages.Length > 0)
+            {
+                foreach (var pkg in pkgs.Where(p => Settings.ErrorSettings.BlackListedPackages.Any(b => b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
+                {
+                    Console.WriteLine(
+                        $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {pkg.Id} has been blacklisted and may not be used in this project");
+                }
+            }
+            if(Settings.ErrorSettings.WhiteListedPackages.Length > 0){
+                foreach (var pkg in pkgs.Where(p => !Settings.ErrorSettings.WhiteListedPackages.Any(b => b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
+                {
+                    Console.WriteLine(
+                        $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {pkg.Id} has not been whitelisted and may not be used in this project");
+                }
+            }
+            Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null;
+            if(Settings.OssIndex.Enabled) vulnDict = new Scanner().GetVulnerabilitiesForPackages(pkgs);
+            if(Settings.NVD.Enabled)vulnDict = new NVD.Scanner().GetVulnerabilitiesForPackages(pkgs, vulnDict);
 
             ReportVulnerabilities(vulnDict);
         }
@@ -39,7 +56,7 @@ namespace NuGetDefense
                 //Plan to use Warning: for warnings later
                 //Plan to combine messages into a single Console.Write.
                 Console.WriteLine(
-                    $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {vulnDict[pkg.Id].Count} vulnerabilities found for {pkg.Id} @ {pkg.Version}");
+                    $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : {(Settings.WarnOnly ? "Warning" : "Error")} : {vulnDict[pkg.Id].Count} vulnerabilities found for {pkg.Id} @ {pkg.Version}");
                 var vulnerabilities = vulnDict[pkg.Id];
                 foreach (var cve in vulnerabilities.Keys)
                 {

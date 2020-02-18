@@ -5,6 +5,8 @@ namespace NuGetDefense
 {
     public class Settings
     {
+        public bool WarnOnly { get; set; } = false;
+
         public BuildErrorSettings ErrorSettings { get; set; } = new BuildErrorSettings();
 
         public VulnerabilitySourceConfiguration OssIndex { get; set; }  = new VulnerabilitySourceConfiguration();
@@ -28,7 +30,7 @@ namespace NuGetDefense
 
         internal static void SaveSettings(Settings settings, string directory)
         {
-            File.WriteAllText(Path.Combine(directory, "NuGetDefense.json"), JsonSerializer.Serialize(settings));
+            File.WriteAllText(Path.Combine(directory, "NuGetDefense.json"), JsonSerializer.Serialize(settings, new JsonSerializerOptions(){WriteIndented = true}));
         }
     }
 }
