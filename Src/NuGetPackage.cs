@@ -6,8 +6,8 @@
 
         public string Version { get; set; }
 
-        public string PackageUrl => $@"pkg:nuget/{Id}@{Version}";
-        public int LinePosition { get; set; }
-        public int LineNumber { get; set; }
+        internal string PackageUrl => $@"pkg:nuget/{Id}@{Version}";
+        internal int LinePosition { get; set; }
+        internal int LineNumber { get; set; }
     }
 }

@@ -12,6 +12,7 @@ namespace NuGetDefense
     {
         private static string nuGetFile;
         private static NuGetPackage[] pkgs;
+        private static Settings _settings;
 
         /// <summary>
         ///     args[0] is expected to be the path to the project file.
@@ -19,6 +20,7 @@ namespace NuGetDefense
         /// <param name="args"></param>
         private static void Main(string[] args)
         {
+            _settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
             var pkgConfig = Path.Combine(Path.GetDirectoryName(args[0]), "packages.config");
             nuGetFile = File.Exists(pkgConfig) ? pkgConfig : args[0];
             pkgs = LoadPackages(nuGetFile, args[1]);

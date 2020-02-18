@@ -47,7 +47,7 @@ namespace NuGetDefense
 
             var packagesToInstall = new List<SourcePackageDependencyInfo>();
 
-            var settings = Settings.LoadDefaultSettings(null);
+            var settings = NuGet.Configuration.Settings.LoadDefaultSettings(null);
             var sourceRepositoryProvider =
                 new SourceRepositoryProvider(new PackageSourceProvider(settings), Repository.Provider.GetCoreV3());
 
