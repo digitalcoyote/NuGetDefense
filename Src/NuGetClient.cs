@@ -78,9 +78,15 @@ namespace NuGetDefense
             packagesToInstall.AddRange(resolver.Resolve(resolverContext, CancellationToken.None)
                 .Select(p => availablePackages.Single(x => PackageIdentityComparer.Default.Equals(x, p))));
             allPkgs.AddRange(
-                packagesToInstall.Select(p => new NuGetPackage {Id = p.Id, Version = p.Version.ToString()}));
+                packagesToInstall.Select(p => new NuGetPackage
+                    {
+                        Dependencies = p.Dependencies.Select(dep => dep.Id).ToArray(),
+                        Id = p.Id,
+                        Version = p.Version.ToString()
+                    }
+                ));
 
-            return pkgs;
+            return allPkgs;
         }
     }
 }

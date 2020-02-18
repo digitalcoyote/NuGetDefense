@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
-using NuGet.Packaging;
 using NuGet.Versioning;
 using NuGetDefense.OSSIndex;
 
@@ -27,41 +26,43 @@ namespace NuGetDefense
             nuGetFile = File.Exists(pkgConfig) ? pkgConfig : args[0];
             pkgs = LoadPackages(nuGetFile, args[1]);
             if (Settings.ErrorSettings.BlackListedPackages.Length > 0)
-            {
-                foreach (var pkg in pkgs.Where(p => Settings.ErrorSettings.BlackListedPackages.Any(b => b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
-                {
+                foreach (var pkg in pkgs.Where(p => Settings.ErrorSettings.BlackListedPackages.Any(b =>
+                    b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
                     Console.WriteLine(
                         $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {pkg.Id} has been blacklisted and may not be used in this project");
-                }
-            }
-            if(Settings.ErrorSettings.WhiteListedPackages.Length > 0){
-                foreach (var pkg in pkgs.Where(p => !Settings.ErrorSettings.WhiteListedPackages.Any(b => b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
-                {
+            if (Settings.ErrorSettings.WhiteListedPackages.Length > 0)
+                foreach (var pkg in pkgs.Where(p => !Settings.ErrorSettings.WhiteListedPackages.Any(b =>
+                    b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
                     Console.WriteLine(
                         $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {pkg.Id} has not been whitelisted and may not be used in this project");
-                }
-            }
             Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null;
-            if(Settings.OssIndex.Enabled) vulnDict = new Scanner().GetVulnerabilitiesForPackages(pkgs);
-            if(Settings.NVD.Enabled)vulnDict = new NVD.Scanner().GetVulnerabilitiesForPackages(pkgs, vulnDict);
+            if (Settings.OssIndex.Enabled) vulnDict = new Scanner().GetVulnerabilitiesForPackages(pkgs);
+            if (Settings.NVD.Enabled) vulnDict = new NVD.Scanner().GetVulnerabilitiesForPackages(pkgs, vulnDict);
 
             ReportVulnerabilities(vulnDict);
         }
 
         private static void ReportVulnerabilities(Dictionary<string, Dictionary<string, Vulnerability>> vulnDict)
         {
-            foreach (var pkg in pkgs.Where(p => vulnDict.ContainsKey(p.Id)))
+            foreach (var pkg in pkgs.Where(p => p.LineNumber != null && vulnDict.ContainsKey(p.Id)))
             {
                 Console.WriteLine("*************************************");
                 //Plan to use Warning: for warnings later
                 //Plan to combine messages into a single Console.Write.
+
+                var dependantVulnerabilities = pkg.Dependencies.Where(dep => vulnDict.ContainsKey(dep));
                 Console.WriteLine(
                     $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : {(Settings.WarnOnly ? "Warning" : "Error")} : {vulnDict[pkg.Id].Count} vulnerabilities found for {pkg.Id} @ {pkg.Version}");
+                Console.WriteLine(
+                    $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : {(Settings.WarnOnly ? "Warning" : "Error")} : {dependantVulnerabilities.Count()} vulnerabilities found for dependencies of {pkg.Id} @ {pkg.Version}");
+
                 var vulnerabilities = vulnDict[pkg.Id];
                 foreach (var cve in vulnerabilities.Keys)
                 {
+                    bool warnOnly = Settings.WarnOnly ||
+                                    vulnerabilities[cve].CvssScore <= Settings.ErrorSettings.CVSS3Threshold;
                     Console.WriteLine(
-                        $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {cve}: {vulnerabilities[cve].Description}");
+                        $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : {(warnOnly ? "Warning" : "Error")} : {cve}: {vulnerabilities[cve].Description}");
                     Console.WriteLine($"Description: {vulnerabilities[cve].Description}");
                     Console.WriteLine($"CVE: {cve}");
                     Console.WriteLine($"CWE: {vulnerabilities[cve].Cwe}");
@@ -70,6 +71,26 @@ namespace NuGetDefense
                     // if (vulnerabilities[cve].Version?.Length > 0)
                     //     Console.WriteLine($"Affected Version: {vulnerabilities[cve].Version}");
                     Console.WriteLine("---------------------------");
+                }
+
+                foreach (var dependancy in dependantVulnerabilities)
+                {
+                    vulnerabilities = vulnDict[dependancy];
+                    foreach (var cve in vulnerabilities.Keys)
+                    {
+                        bool warnOnly = Settings.WarnOnly ||
+                                        vulnerabilities[cve].CvssScore <= Settings.ErrorSettings.CVSS3Threshold;
+                        Console.WriteLine(
+                            $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : {(warnOnly ? "Warning" : "Error")} : {cve}: {dependancy}: {vulnerabilities[cve].Description}");
+                        Console.WriteLine($"Description: {vulnerabilities[cve].Description}");
+                        Console.WriteLine($"CVE: {cve}");
+                        Console.WriteLine($"CWE: {vulnerabilities[cve].Cwe}");
+                        Console.WriteLine($"CVSS Score: {vulnerabilities[cve].CvssScore}");
+                        Console.WriteLine($"CVSS Vector: {vulnerabilities[cve].Vector}");
+                        // if (vulnerabilities[cve].Version?.Length > 0)
+                        //     Console.WriteLine($"Affected Version: {vulnerabilities[cve].Version}");
+                        Console.WriteLine("---------------------------");
+                    }
                 }
             }
         }
