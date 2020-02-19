@@ -11,7 +11,7 @@ namespace NuGetDefense
 {
     internal class Program
     {
-        private static string nuGetFile;
+        internal static string nuGetFile;
         private static NuGetPackage[] pkgs;
         internal static Settings Settings;
 

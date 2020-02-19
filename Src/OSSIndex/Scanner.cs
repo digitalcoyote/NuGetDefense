@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -74,18 +75,28 @@ namespace NuGetDefense.OSSIndex
             Dictionary<string, Dictionary<string, Vulnerability>> vulnDict =
                 null)
         {
-            var reports = GetReportsForPackagesAsync(pkgs).Result.Where(report => report.Vulnerabilities.Length > 0);
-            if (vulnDict == null) vulnDict = new Dictionary<string, Dictionary<string, Vulnerability>>();
-            foreach (var report in reports)
+            try
             {
-                var pkgId = pkgs.First(p => p.PackageUrl == report.Coordinates).Id;
-                if (!vulnDict.ContainsKey(pkgId)) vulnDict.Add(pkgId, new Dictionary<string, Vulnerability>());
-                foreach (var vulnerability in report.Vulnerabilities)
-                    vulnDict[pkgId].Add(vulnerability.Cve ?? $"OSS Index ID: {vulnerability.Id}",
-                        new Vulnerability(vulnerability));
+                var reports = GetReportsForPackagesAsync(pkgs).Result
+                    .Where(report => report.Vulnerabilities.Length > 0);
+                if (vulnDict == null) vulnDict = new Dictionary<string, Dictionary<string, Vulnerability>>();
+                foreach (var report in reports)
+                {
+                    var pkgId = pkgs.First(p => p.PackageUrl == report.Coordinates).Id;
+                    if (!vulnDict.ContainsKey(pkgId)) vulnDict.Add(pkgId, new Dictionary<string, Vulnerability>());
+                    foreach (var vulnerability in report.Vulnerabilities)
+                        vulnDict[pkgId].Add(vulnerability.Cve ?? $"OSS Index ID: {vulnerability.Id}",
+                            new Vulnerability(vulnerability));
+                }
             }
-
+            catch (Exception e)
+            {
+                Console.WriteLine(
+                    $"{Program.nuGetFile} : {(Program.Settings.OssIndex.BreakIfCannotRun ? "Error" : "Warning")} : NuGetDefense : OSS Index scan failed with exception: {e}");
+            }
+            
             return vulnDict;
+
         }
     }
 }
