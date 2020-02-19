@@ -48,6 +48,13 @@ namespace NuGetDefense
         };
         
         /// <summary>
+        /// List CVE to be ignored (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
+        /// </summary>
+        public string[] IgnoredCVEs { get; set; } =
+        {
+        };
+        
+        /// <summary>
         /// List Package Id and Version/Range to be Whitelisted (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
         /// Version is "any" if omitted
         /// </summary>

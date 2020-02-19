@@ -25,6 +25,8 @@ namespace NuGetDefense
             var pkgConfig = Path.Combine(Path.GetDirectoryName(args[0]), "packages.config");
             nuGetFile = File.Exists(pkgConfig) ? pkgConfig : args[0];
             pkgs = LoadPackages(nuGetFile, args[1]);
+            if (Settings.ErrorSettings.IgnoredPackages.Length > 0) pkgs = IgnorePackages(pkgs);
+
             if (Settings.ErrorSettings.BlackListedPackages.Length > 0)
                 foreach (var pkg in pkgs.Where(p => Settings.ErrorSettings.BlackListedPackages.Any(b =>
                     b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
@@ -38,28 +40,55 @@ namespace NuGetDefense
             Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null;
             if (Settings.OssIndex.Enabled) vulnDict = new Scanner().GetVulnerabilitiesForPackages(pkgs);
             if (Settings.NVD.Enabled) vulnDict = new NVD.Scanner().GetVulnerabilitiesForPackages(pkgs, vulnDict);
-
+            if (Settings.ErrorSettings.IgnoredCVEs.Length > 0) IgnoreCVEs(vulnDict);
             ReportVulnerabilities(vulnDict);
+        }
+
+        private static void IgnoreCVEs(Dictionary<string, Dictionary<string, Vulnerability>> vulnDict)
+        {
+            foreach (var vuln in vulnDict.Values)
+            {
+                foreach (var cve in Settings.ErrorSettings.IgnoredCVEs.Where(cve => vuln.Remove(cve)))
+                {
+                    Console.WriteLine($"Ignoring {cve}");
+                }
+
+                
+            }
+        }
+
+        /// <summary>
+/// Removes any Packages from the list before they are checked for Vulnerabilities
+/// </summary>
+/// <param name="nuGetPackages"> Array of Packages used as the source</param>
+/// <returns>Filtered list of packages</returns>
+        private static NuGetPackage[] IgnorePackages(NuGetPackage[] nuGetPackages)
+        {
+            return nuGetPackages.Where(nuget => !Settings.ErrorSettings.IgnoredPackages
+                .Where(ignoredNupkg => ignoredNupkg.Id == nuget.Id)
+                .Any(ignoredNupkg => !VersionRange.TryParse(ignoredNupkg.Version, out var versionRange) ||
+                          versionRange.Satisfies(new NuGetVersion(nuget.Version)))).ToArray();
         }
 
         private static void ReportVulnerabilities(Dictionary<string, Dictionary<string, Vulnerability>> vulnDict)
         {
             foreach (var pkg in pkgs.Where(p => p.LineNumber != null && vulnDict.ContainsKey(p.Id)))
             {
+                var vulnerabilities = vulnDict[pkg.Id];
+
                 Console.WriteLine("*************************************");
                 //Plan to use Warning: for warnings later
                 //Plan to combine messages into a single Console.Write.
-
+                bool warnOnly = Settings.WarnOnly || !vulnerabilities.Any(v => v.Value.CvssScore >= Settings.ErrorSettings.CVSS3Threshold);
                 var dependantVulnerabilities = pkg.Dependencies.Where(dep => vulnDict.ContainsKey(dep));
                 Console.WriteLine(
-                    $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : {(Settings.WarnOnly ? "Warning" : "Error")} : {vulnDict[pkg.Id].Count} vulnerabilities found for {pkg.Id} @ {pkg.Version}");
+                    $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : {(warnOnly ? "Warning" : "Error")} : {vulnerabilities.Count} vulnerabilities found for {pkg.Id} @ {pkg.Version}");
                 Console.WriteLine(
-                    $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : {(Settings.WarnOnly ? "Warning" : "Error")} : {dependantVulnerabilities.Count()} vulnerabilities found for dependencies of {pkg.Id} @ {pkg.Version}");
+                    $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : {(warnOnly  ? "Warning" : "Error")} : {dependantVulnerabilities.Count()} vulnerabilities found for dependencies of {pkg.Id} @ {pkg.Version}");
 
-                var vulnerabilities = vulnDict[pkg.Id];
                 foreach (var cve in vulnerabilities.Keys)
                 {
-                    bool warnOnly = Settings.WarnOnly ||
+                    warnOnly = Settings.WarnOnly ||
                                     vulnerabilities[cve].CvssScore <= Settings.ErrorSettings.CVSS3Threshold;
                     Console.WriteLine(
                         $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : {(warnOnly ? "Warning" : "Error")} : {cve}: {vulnerabilities[cve].Description}");
@@ -78,7 +107,7 @@ namespace NuGetDefense
                     vulnerabilities = vulnDict[dependancy];
                     foreach (var cve in vulnerabilities.Keys)
                     {
-                        bool warnOnly = Settings.WarnOnly ||
+                        warnOnly = Settings.WarnOnly ||
                                         vulnerabilities[cve].CvssScore <= Settings.ErrorSettings.CVSS3Threshold;
                         Console.WriteLine(
                             $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : {(warnOnly ? "Warning" : "Error")} : {cve}: {dependancy}: {vulnerabilities[cve].Description}");
