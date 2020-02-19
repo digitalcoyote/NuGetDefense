@@ -27,11 +27,7 @@ namespace NuGetDefense
             pkgs = LoadPackages(nuGetFile, args[1]);
             if (Settings.ErrorSettings.IgnoredPackages.Length > 0) pkgs = IgnorePackages(pkgs);
 
-            if (Settings.ErrorSettings.BlackListedPackages.Length > 0)
-                foreach (var pkg in pkgs.Where(p => Settings.ErrorSettings.BlackListedPackages.Any(b =>
-                    b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
-                    Console.WriteLine(
-                        $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {pkg.Id} has been blacklisted and may not be used in this project");
+            if (Settings.ErrorSettings.BlackListedPackages.Length > 0) CheckForBlacklistedPackages();
             if (Settings.ErrorSettings.WhiteListedPackages.Length > 0)
                 foreach (var pkg in pkgs.Where(p => !Settings.ErrorSettings.WhiteListedPackages.Any(b =>
                     b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
@@ -40,15 +36,28 @@ namespace NuGetDefense
             Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null;
             if (Settings.OssIndex.Enabled) vulnDict = new Scanner().GetVulnerabilitiesForPackages(pkgs);
             if (Settings.NVD.Enabled) vulnDict = new NVD.Scanner().GetVulnerabilitiesForPackages(pkgs, vulnDict);
-            if (Settings.ErrorSettings.IgnoredCVEs.Length > 0) IgnoreCVEs(vulnDict);
+            if (Settings.ErrorSettings.IgnoredCvEs.Length > 0) IgnoreCVEs(vulnDict);
             ReportVulnerabilities(vulnDict);
+        }
+
+        private static void CheckForBlacklistedPackages()
+        {
+            foreach (var pkg in pkgs)
+            {
+                var blacklistedPackage = Settings.ErrorSettings.BlackListedPackages.FirstOrDefault(b =>
+                    b.Package.Id == pkg.Id &&
+                    VersionRange.Parse(pkg.Version).Satisfies(new NuGetVersion(b.Package.Version)));
+                if(blacklistedPackage != null)
+                    Console.WriteLine(
+                        $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {pkg.Id} : {(string.IsNullOrEmpty(blacklistedPackage.CustomErrorMessage) ? blacklistedPackage.CustomErrorMessage : "has been blacklisted and may not be used in this project")}");
+            }
         }
 
         private static void IgnoreCVEs(Dictionary<string, Dictionary<string, Vulnerability>> vulnDict)
         {
             foreach (var vuln in vulnDict.Values)
             {
-                foreach (var cve in Settings.ErrorSettings.IgnoredCVEs.Where(cve => vuln.Remove(cve)))
+                foreach (var cve in Settings.ErrorSettings.IgnoredCvEs.Where(cve => vuln.Remove(cve)))
                 {
                     Console.WriteLine($"Ignoring {cve}");
                 }

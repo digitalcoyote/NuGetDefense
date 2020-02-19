@@ -2,7 +2,7 @@ namespace NuGetDefense
 {
     public class BuildErrorSettings
     {
-        internal double _cvss3Threshold = -1;
+        private double _cvss3Threshold = -1;
 
         public Severity ErrorSeverityThreshold
         {
@@ -50,7 +50,7 @@ namespace NuGetDefense
         /// <summary>
         /// List CVE to be ignored (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
         /// </summary>
-        public string[] IgnoredCVEs { get; set; } =
+        public string[] IgnoredCvEs { get; set; } =
         {
         };
         
@@ -64,6 +64,6 @@ namespace NuGetDefense
         /// List Package Id and Version/Range to be Blacklisted (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
         /// Version is "any" if omitted
         /// </summary>
-        public NuGetPackage[] BlackListedPackages { get; set; } = { };
+        public BlacklistedPackage[] BlackListedPackages { get; set; } = { };
     }
 }
