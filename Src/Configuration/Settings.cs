@@ -9,15 +9,16 @@ namespace NuGetDefense
 
         public BuildErrorSettings ErrorSettings { get; set; } = new BuildErrorSettings();
 
-        public VulnerabilitySourceConfiguration OssIndex { get; set; }  = new VulnerabilitySourceConfiguration();
+        public VulnerabilitySourceConfiguration OssIndex { get; set; } = new VulnerabilitySourceConfiguration();
         public VulnerabilitySourceConfiguration NVD { get; set; } = new VulnerabilitySourceConfiguration();
-        
+
         internal static Settings LoadSettings(string directory)
         {
             Settings settings;
-            if(File.Exists(Path.Combine(directory, "NuGetDefense.json")))
+            if (File.Exists(Path.Combine(directory, "NuGetDefense.json")))
             {
-                settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText(Path.Combine(directory, "NuGetDefense.json")));
+                settings = JsonSerializer.Deserialize<Settings>(
+                    File.ReadAllText(Path.Combine(directory, "NuGetDefense.json")));
             }
             else
             {
@@ -30,7 +31,8 @@ namespace NuGetDefense
 
         internal static void SaveSettings(Settings settings, string directory)
         {
-            File.WriteAllText(Path.Combine(directory, "NuGetDefense.json"), JsonSerializer.Serialize(settings, new JsonSerializerOptions(){WriteIndented = true}));
+            File.WriteAllText(Path.Combine(directory, "NuGetDefense.json"),
+                JsonSerializer.Serialize(settings, new JsonSerializerOptions {WriteIndented = true}));
         }
     }
 }

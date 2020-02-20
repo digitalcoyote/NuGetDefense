@@ -94,9 +94,8 @@ namespace NuGetDefense.OSSIndex
                 Console.WriteLine(
                     $"{Program.nuGetFile} : {(Program.Settings.OssIndex.BreakIfCannotRun ? "Error" : "Warning")} : NuGetDefense : OSS Index scan failed with exception: {e}");
             }
-            
-            return vulnDict;
 
+            return vulnDict;
         }
     }
 }

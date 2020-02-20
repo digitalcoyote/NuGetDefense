@@ -20,7 +20,7 @@ namespace NuGetDefense.NVD
         }
 
         private readonly Dictionary<string, Dictionary<string, (string[] versions, string description, string cwe,
-            string vendor, double? score, AccessVectorType vector)>> nvdDict;
+            string vendor, double? score, AccessVectorType vector, string[] references)>> nvdDict;
 
         public Scanner()
         {
@@ -34,7 +34,7 @@ namespace NuGetDefense.NVD
                 .Deserialize<
                     Dictionary<string, Dictionary<string, (string[] versions, string description, string cwe, string
                         vendor
-                        , double? score, AccessVectorType vector)>>>(nvdData, lz4Options);
+                        , double? score, AccessVectorType vector, string[] references)>>>(nvdData, lz4Options);
         }
 
         public Dictionary<string, Dictionary<string, Vulnerability>> GetVulnerabilitiesForPackages(NuGetPackage[] pkgs,

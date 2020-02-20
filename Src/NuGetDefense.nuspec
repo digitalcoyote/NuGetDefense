@@ -19,8 +19,8 @@
   <files>
     <!-- <file src="Src/bin/Release/net461/NuGetDefense.exe" target="tools/net461/NuGetDefense.exe" /> -->
     <file src="build/nugetdefense.targets" target="build/nugetdefense.targets" />
-    <file src="bin/Release/netcoreapp3.1/NuGetDefense.deps.json" target="tools/netcoreapp3.1/runtimes/unix/lib/netstandard1.3/System.Security.Cryptography.ProtectedData.dll" />
-    <file src="bin/Release/netcoreapp3.1/NuGetDefense.deps.json" target="tools/netcoreapp3.1/runtimes/win/lib/netstandard1.3/System.Security.Cryptography.ProtectedData.dll" />
+    <file src="bin/Release/netcoreapp3.1/runtimes/unix/lib/netstandard1.3/System.Security.Cryptography.ProtectedData.dll" target="tools/netcoreapp3.1/runtimes/unix/lib/netstandard1.3/System.Security.Cryptography.ProtectedData.dll" />
+    <file src="bin/Release/netcoreapp3.1/runtimes/win/lib/netstandard1.3/System.Security.Cryptography.ProtectedData.dll" target="tools/netcoreapp3.1/runtimes/win/lib/netstandard1.3/System.Security.Cryptography.ProtectedData.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGetDefense.deps.json" target="tools/netcoreapp3.1/NuGetDefense.deps.json" />
     <file src="bin/Release/netcoreapp3.1/Newtonsoft.Json.dll" target="tools/netcoreapp3.1/Newtonsoft.Json.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGetDefense.dll" target="tools/netcoreapp3.1/NuGetDefense.dll" />
