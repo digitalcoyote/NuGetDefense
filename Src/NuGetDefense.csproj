@@ -26,7 +26,7 @@
       <PackageReference Include="NuGet.Protocol" Version="5.4.0" />
       <PackageReference Include="NuGet.Resolver" Version="5.4.0" />
       <PackageReference Include="NuGet.Versioning" Version="5.4.0" />
-      <PackageReference Include="System.Text.Json" Version="4.7.0" />
+      <PackageReference Include="System.Text.Json" Version="4.7.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -39,6 +39,7 @@
 
     <ItemGroup>
       <None Remove="Tests\**" />
+      <None Include="TestFiles\test.csproj" />
     </ItemGroup>
 
     <ItemGroup>

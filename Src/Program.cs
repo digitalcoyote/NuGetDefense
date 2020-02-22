@@ -24,7 +24,37 @@ namespace NuGetDefense
             Settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
             var pkgConfig = Path.Combine(Path.GetDirectoryName(args[0]), "packages.config");
             nuGetFile = File.Exists(pkgConfig) ? pkgConfig : args[0];
-            pkgs = LoadPackages(nuGetFile, args[1]);
+
+            string framework;
+            if(args.Length > 1)
+            {
+                framework = args[1];
+            }
+            else
+            {
+                var targetFrameworkVersion = XElement.Load(File.OpenRead(args[0])).Descendants()
+                    .First(x => x.Name.LocalName == "TargetFrameworkVersion").Value;
+
+                framework = targetFrameworkVersion switch
+                {
+                    "v2.0" => "net20",
+                    "v3.0" => "net30",
+                    "v3.5" => "net35",
+                    "v4.5" => "net45",
+                    "v4.5.1" => "net451",
+                    "v4.5.2" => "net452",
+                    "v4.6" => "net46",
+                    "v4.6.1" => "net461",
+                    "v4.6.2" => "net462",
+                    "v4.7" => "net27",
+                    "v4.7.1" => "net471",
+                    "v4.7.2" => "net472",
+                    "v4.8" => "net48",
+                    _ => "netstandard2.0"
+                };
+            }
+            
+            pkgs = LoadPackages(nuGetFile, framework);
             if (Settings.ErrorSettings.IgnoredPackages.Length > 0) pkgs = IgnorePackages(pkgs);
 
             if (Settings.ErrorSettings.BlackListedPackages.Length > 0) CheckForBlacklistedPackages();
