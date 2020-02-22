@@ -1,4 +1,4 @@
-namespace NuGetDefense
+namespace NuGetDefense.Configuration
 {
     public enum Severity
     {

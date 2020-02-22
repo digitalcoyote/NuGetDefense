@@ -5,6 +5,8 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using NuGet.Versioning;
+using NuGetDefense.Configuration;
+using NuGetDefense.Core;
 using NuGetDefense.OSSIndex;
 
 namespace NuGetDefense
@@ -64,8 +66,8 @@ namespace NuGetDefense
                     Console.WriteLine(
                         $"{nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {pkg.Id} has not been whitelisted and may not be used in this project");
             Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null;
-            if (Settings.OssIndex.Enabled) vulnDict = new Scanner().GetVulnerabilitiesForPackages(pkgs);
-            if (Settings.NVD.Enabled) vulnDict = new NVD.Scanner().GetVulnerabilitiesForPackages(pkgs, vulnDict);
+            if (Settings.OssIndex.Enabled) vulnDict = new Scanner(nuGetFile, Settings.OssIndex.BreakIfCannotRun).GetVulnerabilitiesForPackages(pkgs);
+            if (Settings.NVD.Enabled) vulnDict = new NVD.Scanner(nuGetFile, Settings.NVD.BreakIfCannotRun).GetVulnerabilitiesForPackages(pkgs, vulnDict);
             if (Settings.ErrorSettings.IgnoredCvEs.Length > 0) IgnoreCVEs(vulnDict);
             ReportVulnerabilities(vulnDict);
         }

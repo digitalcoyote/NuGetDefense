@@ -47,6 +47,12 @@
       <Content Include="NuGetDefense.nuspec" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\NuGetDefense.Core\NuGetDefense.Core.csproj" />
+      <ProjectReference Include="..\NuGetDefense.NVD\NuGetDefense.NVD.csproj" />
+      <ProjectReference Include="..\NuGetDefense.OSSIndex\NuGetDefense.OSSIndex.csproj" />
+    </ItemGroup>
+
     <PropertyGroup>
         <!-- <NuGetDefenseExe Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">"$(MSBuildThisFileDirectory)/net46/NuGetDefense.exe"</TsGenFileExe> -->
         <!-- <NuGetDefenseExe Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' OR '$(TargetFrameworkIdentifier)' == '.NETStandard'">dotnet "$(MSBuildThisFileDirectory)/netcoreapp3.1/NuGetDefense.dll"</TsGenFileExe> -->

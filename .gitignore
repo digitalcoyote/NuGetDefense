@@ -1,13 +1,7 @@
-*/bin/*
-*/obj/*
+**/bin/*
+**/obj/*
 *.dll
-
 *.pdb
-
 *.cache
-
-Src/.idea/.idea.NuGetDefense/.idea/
-
 *.blob
-
-Src/.idea/.idea.NuGetDefense/
+**/.idea/**/*

@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text.Json;
 
-namespace NuGetDefense
+namespace NuGetDefense.Configuration
 {
     public class Settings
     {
