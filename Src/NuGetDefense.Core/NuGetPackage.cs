@@ -5,7 +5,7 @@
         public string[] Dependencies = { };
         public int? LineNumber;
         public int? LinePosition;
-        
+
         public string Id { get; set; }
 
         public string Version { get; set; }

@@ -3,6 +3,8 @@
     <PropertyGroup>
         <LangVersion>8</LangVersion>
         <TargetFramework>netstandard2.0</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <AssemblyVersion></AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
@@ -15,6 +17,10 @@
 
     <ItemGroup>
       <PackageReference Include="MessagePack" Version="2.1.90" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="NuGetDefense.Core.nuspec" />
     </ItemGroup>
 
 </Project>

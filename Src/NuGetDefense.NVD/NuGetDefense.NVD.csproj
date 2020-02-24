@@ -2,15 +2,21 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <LangVersion>8</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="MessagePack" Version="2.1.90" />
-      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+      <PackageReference Include="System.Text.Json" Version="4.7.1" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\NuGetDefense.Core\NuGetDefense.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="NuGetDefense.NVD.nuspec" />
     </ItemGroup>
 
 </Project>

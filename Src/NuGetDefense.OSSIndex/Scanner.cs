@@ -26,7 +26,7 @@ namespace NuGetDefense.OSSIndex
         }
 
         private string NugetFile { get; }
-        private bool BreakIfCannotRun { get;}
+        private bool BreakIfCannotRun { get; }
 
         /// <summary>
         ///     Gets vulnerabilities for a single NuGet Package.
@@ -96,7 +96,7 @@ namespace NuGetDefense.OSSIndex
                     if (!vulnDict.ContainsKey(pkgId)) vulnDict.Add(pkgId, new Dictionary<string, Vulnerability>());
                     foreach (var vulnerability in report.Vulnerabilities)
                         vulnDict[pkgId].Add(vulnerability.Cve ?? $"OSS Index ID: {vulnerability.Id}",
-                           vulnerability.ToVulnerability());
+                            vulnerability.ToVulnerability());
                 }
             }
             catch (Exception e)

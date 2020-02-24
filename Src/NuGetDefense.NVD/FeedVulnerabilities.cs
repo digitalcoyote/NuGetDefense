@@ -7,315 +7,226 @@
 //    var feedVulnerabilities = FeedVulnerabilities.FromJson(jsonString);
 
 using System;
-using System.Globalization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
-namespace NVDFeedImporter
+namespace NuGetDefense.NVD
 {
-
     public partial class FeedVulnerabilities
     {
-        [JsonProperty("cve", NullValueHandling = NullValueHandling.Ignore)]
-        public Cve Cve { get; set; }
+        [JsonPropertyName("cve")] public Cve Cve { get; set; }
 
-        [JsonProperty("configurations", NullValueHandling = NullValueHandling.Ignore)]
-        public Configurations Configurations { get; set; }
+        [JsonPropertyName("configurations")] public Configurations Configurations { get; set; }
 
-        [JsonProperty("impact", NullValueHandling = NullValueHandling.Ignore)]
-        public Impact Impact { get; set; }
+        [JsonPropertyName("impact")] public Impact Impact { get; set; }
 
-        [JsonProperty("publishedDate", NullValueHandling = NullValueHandling.Ignore)]
-        public string PublishedDate { get; set; }
+        [JsonPropertyName("publishedDate")] public string PublishedDate { get; set; }
 
-        [JsonProperty("lastModifiedDate", NullValueHandling = NullValueHandling.Ignore)]
-        public string LastModifiedDate { get; set; }
+        [JsonPropertyName("lastModifiedDate")] public string LastModifiedDate { get; set; }
     }
 
     public class Configurations
     {
-        [JsonProperty("CVE_data_version", NullValueHandling = NullValueHandling.Ignore)]
-        public string CveDataVersion { get; set; }
+        [JsonPropertyName("CVE_data_version")] public string CveDataVersion { get; set; }
 
-        [JsonProperty("nodes", NullValueHandling = NullValueHandling.Ignore)]
-        public Node[] Nodes { get; set; }
+        [JsonPropertyName("nodes")] public Node[] Nodes { get; set; }
     }
 
     public class Node
     {
-        [JsonProperty("operator", NullValueHandling = NullValueHandling.Ignore)]
-        public string Operator { get; set; }
+        [JsonPropertyName("operator")] public string Operator { get; set; }
 
-        [JsonProperty("cpe_match", NullValueHandling = NullValueHandling.Ignore)]
-        public CpeMatch[] CpeMatch { get; set; }
+        [JsonPropertyName("cpe_match")] public CpeMatch[] CpeMatch { get; set; }
 
-        [JsonProperty("children", NullValueHandling = NullValueHandling.Ignore)]
-        public Child[] Children { get; set; }
+        [JsonPropertyName("children")] public Child[] Children { get; set; }
     }
 
     public class Child
     {
-        [JsonProperty("operator", NullValueHandling = NullValueHandling.Ignore)]
-        public string Operator { get; set; }
+        [JsonPropertyName("operator")] public string Operator { get; set; }
 
-        [JsonProperty("cpe_match", NullValueHandling = NullValueHandling.Ignore)]
-        public CpeMatch[] CpeMatch { get; set; }
+        [JsonPropertyName("cpe_match")] public CpeMatch[] CpeMatch { get; set; }
     }
 
     public class CpeMatch
     {
-        [JsonProperty("vulnerable", NullValueHandling = NullValueHandling.Ignore)]
-        public bool? Vulnerable { get; set; }
+        [JsonPropertyName("vulnerable")] public bool? Vulnerable { get; set; }
 
-        [JsonProperty("cpe23Uri", NullValueHandling = NullValueHandling.Ignore)]
-        public string Cpe23Uri { get; set; }
+        [JsonPropertyName("cpe23Uri")] public string Cpe23Uri { get; set; }
 
-        [JsonProperty("versionStartIncluding", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("versionStartIncluding")]
         public string VersionStartIncluding { get; set; }
 
-        [JsonProperty("versionEndIncluding", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("versionEndIncluding")]
         public string VersionEndIncluding { get; set; }
 
-        [JsonProperty("versionEndExcluding", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("versionEndExcluding")]
         public string VersionEndExcluding { get; set; }
     }
 
     public class Cve
     {
-        [JsonProperty("data_type", NullValueHandling = NullValueHandling.Ignore)]
-        public string DataType { get; set; }
+        [JsonPropertyName("data_type")] public string DataType { get; set; }
 
-        [JsonProperty("data_format", NullValueHandling = NullValueHandling.Ignore)]
-        public string DataFormat { get; set; }
+        [JsonPropertyName("data_format")] public string DataFormat { get; set; }
 
-        [JsonProperty("data_version", NullValueHandling = NullValueHandling.Ignore)]
-        public string DataVersion { get; set; }
+        [JsonPropertyName("data_version")] public string DataVersion { get; set; }
 
-        [JsonProperty("CVE_data_meta", NullValueHandling = NullValueHandling.Ignore)]
-        public CveDataMeta CveDataMeta { get; set; }
+        [JsonPropertyName("CVE_data_meta")] public CveDataMeta CveDataMeta { get; set; }
 
-        [JsonProperty("problemtype", NullValueHandling = NullValueHandling.Ignore)]
-        public Problemtype Problemtype { get; set; }
+        [JsonPropertyName("problemtype")] public Problemtype Problemtype { get; set; }
 
-        [JsonProperty("references", NullValueHandling = NullValueHandling.Ignore)]
-        public References References { get; set; }
+        [JsonPropertyName("references")] public References References { get; set; }
 
-        [JsonProperty("description", NullValueHandling = NullValueHandling.Ignore)]
-        public CveDescription Description { get; set; }
+        [JsonPropertyName("description")] public CveDescription Description { get; set; }
     }
 
     public class CveDataMeta
     {
-        [JsonProperty("ID", NullValueHandling = NullValueHandling.Ignore)]
-        public string Id { get; set; }
+        [JsonPropertyName("ID")] public string Id { get; set; }
 
-        [JsonProperty("ASSIGNER", NullValueHandling = NullValueHandling.Ignore)]
-        public string Assigner { get; set; }
+        [JsonPropertyName("ASSIGNER")] public string Assigner { get; set; }
     }
 
     public class CveDescription
     {
-        [JsonProperty("description_data", NullValueHandling = NullValueHandling.Ignore)]
-        public DescriptionDatumElement[] DescriptionData { get; set; }
+        [JsonPropertyName("description_data")] public DescriptionDatumElement[] DescriptionData { get; set; }
     }
 
     public class DescriptionDatumElement
     {
-        [JsonProperty("lang", NullValueHandling = NullValueHandling.Ignore)]
-        public string Lang { get; set; }
+        [JsonPropertyName("lang")] public string Lang { get; set; }
 
-        [JsonProperty("value", NullValueHandling = NullValueHandling.Ignore)]
-        public string Value { get; set; }
+        [JsonPropertyName("value")] public string Value { get; set; }
     }
 
     public class Problemtype
     {
-        [JsonProperty("problemtype_data", NullValueHandling = NullValueHandling.Ignore)]
-        public ProblemtypeDatum[] ProblemtypeData { get; set; }
+        [JsonPropertyName("problemtype_data")] public ProblemtypeDatum[] ProblemtypeData { get; set; }
     }
 
     public class ProblemtypeDatum
     {
-        [JsonProperty("description", NullValueHandling = NullValueHandling.Ignore)]
-        public DescriptionDatumElement[] Description { get; set; }
+        [JsonPropertyName("description")] public DescriptionDatumElement[] Description { get; set; }
     }
 
     public class References
     {
-        [JsonProperty("reference_data", NullValueHandling = NullValueHandling.Ignore)]
-        public ReferenceDatum[] ReferenceData { get; set; }
+        [JsonPropertyName("reference_data")] public ReferenceDatum[] ReferenceData { get; set; }
     }
 
     public class ReferenceDatum
     {
-        [JsonProperty("url", NullValueHandling = NullValueHandling.Ignore)]
-        public Uri Url { get; set; }
+        [JsonPropertyName("url")] public Uri Url { get; set; }
 
-        [JsonProperty("name", NullValueHandling = NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        [JsonPropertyName("name")] public string Name { get; set; }
 
-        [JsonProperty("refsource", NullValueHandling = NullValueHandling.Ignore)]
-        public string Refsource { get; set; }
+        [JsonPropertyName("refsource")] public string Refsource { get; set; }
 
-        [JsonProperty("tags", NullValueHandling = NullValueHandling.Ignore)]
-        public string[] Tags { get; set; }
+        [JsonPropertyName("tags")] public string[] Tags { get; set; }
     }
 
     public class Impact
     {
-        [JsonProperty("baseMetricV3", NullValueHandling = NullValueHandling.Ignore)]
-        public BaseMetricV3 BaseMetricV3 { get; set; }
+        [JsonPropertyName("baseMetricV3")] public BaseMetricV3 BaseMetricV3 { get; set; }
 
-        [JsonProperty("baseMetricV2", NullValueHandling = NullValueHandling.Ignore)]
-        public BaseMetricV2 BaseMetricV2 { get; set; }
+        [JsonPropertyName("baseMetricV2")] public BaseMetricV2 BaseMetricV2 { get; set; }
     }
 
     public class BaseMetricV2
     {
-        [JsonProperty("cvssV2", NullValueHandling = NullValueHandling.Ignore)]
-        public CvssV2 CvssV2 { get; set; }
+        [JsonPropertyName("cvssV2")] public CvssV2 CvssV2 { get; set; }
 
-        [JsonProperty("severity", NullValueHandling = NullValueHandling.Ignore)]
-        public string Severity { get; set; }
+        [JsonPropertyName("severity")] public string Severity { get; set; }
 
-        [JsonProperty("exploitabilityScore", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("exploitabilityScore")]
         public double? ExploitabilityScore { get; set; }
 
-        [JsonProperty("impactScore", NullValueHandling = NullValueHandling.Ignore)]
-        public double? ImpactScore { get; set; }
+        [JsonPropertyName("impactScore")] public double? ImpactScore { get; set; }
 
-        [JsonProperty("acInsufInfo", NullValueHandling = NullValueHandling.Ignore)]
-        public bool? AcInsufInfo { get; set; }
+        [JsonPropertyName("acInsufInfo")] public bool? AcInsufInfo { get; set; }
 
-        [JsonProperty("obtainAllPrivilege", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("obtainAllPrivilege")]
         public bool? ObtainAllPrivilege { get; set; }
 
-        [JsonProperty("obtainUserPrivilege", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("obtainUserPrivilege")]
         public bool? ObtainUserPrivilege { get; set; }
 
-        [JsonProperty("obtainOtherPrivilege", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("obtainOtherPrivilege")]
         public bool? ObtainOtherPrivilege { get; set; }
 
-        [JsonProperty("userInteractionRequired", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("userInteractionRequired")]
         public bool? UserInteractionRequired { get; set; }
     }
 
     public class CvssV2
     {
-        [JsonProperty("version", NullValueHandling = NullValueHandling.Ignore)]
-        public string Version { get; set; }
+        [JsonPropertyName("version")] public string Version { get; set; }
 
-        [JsonProperty("vectorString", NullValueHandling = NullValueHandling.Ignore)]
-        public string VectorString { get; set; }
+        [JsonPropertyName("vectorString")] public string VectorString { get; set; }
 
-        [JsonProperty("accessVector", NullValueHandling = NullValueHandling.Ignore)]
-        public string AccessVector { get; set; }
+        [JsonPropertyName("accessVector")] public string AccessVector { get; set; }
 
-        [JsonProperty("accessComplexity", NullValueHandling = NullValueHandling.Ignore)]
-        public string AccessComplexity { get; set; }
+        [JsonPropertyName("accessComplexity")] public string AccessComplexity { get; set; }
 
-        [JsonProperty("authentication", NullValueHandling = NullValueHandling.Ignore)]
-        public string Authentication { get; set; }
+        [JsonPropertyName("authentication")] public string Authentication { get; set; }
 
-        [JsonProperty("confidentialityImpact", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("confidentialityImpact")]
         public string ConfidentialityImpact { get; set; }
 
-        [JsonProperty("integrityImpact", NullValueHandling = NullValueHandling.Ignore)]
-        public string IntegrityImpact { get; set; }
+        [JsonPropertyName("integrityImpact")] public string IntegrityImpact { get; set; }
 
-        [JsonProperty("availabilityImpact", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("availabilityImpact")]
         public string AvailabilityImpact { get; set; }
 
-        [JsonProperty("baseScore", NullValueHandling = NullValueHandling.Ignore)]
-        public double? BaseScore { get; set; }
+        [JsonPropertyName("baseScore")] public double? BaseScore { get; set; }
     }
 
     public class BaseMetricV3
     {
-        [JsonProperty("cvssV3", NullValueHandling = NullValueHandling.Ignore)]
-        public CvssV3 CvssV3 { get; set; }
+        [JsonPropertyName("cvssV3")] public CvssV3 CvssV3 { get; set; }
 
-        [JsonProperty("exploitabilityScore", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("exploitabilityScore")]
         public double? ExploitabilityScore { get; set; }
 
-        [JsonProperty("impactScore", NullValueHandling = NullValueHandling.Ignore)]
-        public double? ImpactScore { get; set; }
-    }
-
-    public enum AccessVectorType
-    {
-        LOCAL,
-        NETWORK,
-        ADJACENT_NETWORK,
-        PHYSICAL,
-        UNSPECIFIED
+        [JsonPropertyName("impactScore")] public double? ImpactScore { get; set; }
     }
 
     public class CvssV3
     {
-        [JsonProperty("version", NullValueHandling = NullValueHandling.Ignore)]
-        public string Version { get; set; }
+        [JsonPropertyName("version")] public string Version { get; set; }
 
-        [JsonProperty("vectorString", NullValueHandling = NullValueHandling.Ignore)]
-        public string VectorString { get; set; }
+        [JsonPropertyName("vectorString")] public string VectorString { get; set; }
 
-        [JsonProperty("attackVector", NullValueHandling = NullValueHandling.Ignore)]
-        public AccessVectorType AttackVector { get; set; }
+        [JsonPropertyName("attackVector")] public string AttackVector { get; set; }
 
-        [JsonProperty("attackComplexity", NullValueHandling = NullValueHandling.Ignore)]
-        public string AttackComplexity { get; set; }
+        [JsonPropertyName("attackComplexity")] public string AttackComplexity { get; set; }
 
-        [JsonProperty("privilegesRequired", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("privilegesRequired")]
         public string PrivilegesRequired { get; set; }
 
-        [JsonProperty("userInteraction", NullValueHandling = NullValueHandling.Ignore)]
-        public string UserInteraction { get; set; }
+        [JsonPropertyName("userInteraction")] public string UserInteraction { get; set; }
 
-        [JsonProperty("scope", NullValueHandling = NullValueHandling.Ignore)]
-        public string Scope { get; set; }
+        [JsonPropertyName("scope")] public string Scope { get; set; }
 
-        [JsonProperty("confidentialityImpact", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("confidentialityImpact")]
         public string ConfidentialityImpact { get; set; }
 
-        [JsonProperty("integrityImpact", NullValueHandling = NullValueHandling.Ignore)]
-        public string IntegrityImpact { get; set; }
+        [JsonPropertyName("integrityImpact")] public string IntegrityImpact { get; set; }
 
-        [JsonProperty("availabilityImpact", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("availabilityImpact")]
         public string AvailabilityImpact { get; set; }
 
-        [JsonProperty("baseScore", NullValueHandling = NullValueHandling.Ignore)]
-        public double? BaseScore { get; set; }
+        [JsonPropertyName("baseScore")] public double? BaseScore { get; set; }
 
-        [JsonProperty("baseSeverity", NullValueHandling = NullValueHandling.Ignore)]
-        public string BaseSeverity { get; set; }
+        [JsonPropertyName("baseSeverity")] public string BaseSeverity { get; set; }
     }
 
     public partial class FeedVulnerabilities
     {
         public static FeedVulnerabilities[] FromJson(string json)
         {
-            return JsonConvert.DeserializeObject<FeedVulnerabilities[]>(json, Converter.Settings);
+            return JsonSerializer.Deserialize<FeedVulnerabilities[]>(json);
         }
-    }
-
-    public static class Serialize
-    {
-        public static string ToJson(this FeedVulnerabilities[] self)
-        {
-            return JsonConvert.SerializeObject(self, Converter.Settings);
-        }
-    }
-
-    internal static class Converter
-    {
-        public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
-        {
-            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-            DateParseHandling = DateParseHandling.None,
-            Converters =
-            {
-                new IsoDateTimeConverter {DateTimeStyles = DateTimeStyles.AssumeUniversal}
-            }
-        };
     }
 }
