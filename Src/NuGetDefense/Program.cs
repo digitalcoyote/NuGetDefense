@@ -71,7 +71,7 @@ namespace NuGetDefense
                     new Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun).GetVulnerabilitiesForPackages(_pkgs);
             if (_settings.NVD.Enabled)
                 vulnDict =
-                    new NVD.Scanner(_nuGetFile, _settings.NVD.BreakIfCannotRun).GetVulnerabilitiesForPackages(_pkgs,
+                    new NVD.Scanner(_nuGetFile, _settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate).GetVulnerabilitiesForPackages(_pkgs,
                         vulnDict);
             if (_settings.ErrorSettings.IgnoredCvEs.Length > 0) IgnoreCVEs(vulnDict);
             VulnerabilityReports.ReportVulnerabilities(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,

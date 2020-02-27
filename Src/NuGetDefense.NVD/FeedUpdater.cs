@@ -110,14 +110,18 @@ namespace NuGetDefense.NVD
             }
         }
 
-        public static IEnumerable<string> GetJsonLinks(bool AllLinks = false)
+        public static IEnumerable<string> GetJsonLinks(string linkRegex = "")
         {
             using var client = new WebClient();
-            var pattern = !AllLinks ? @"https:\/\/nvd\.nist\.gov\/feeds\/json\/cve\/\d{0,4}\.?\d{0,4}\.?\/nvdcve-\d{0,4}\.?\d{0,4}\.?-\d{4}\.json\.zip" : @"https:\/\/nvd\.nist\.gov\/feeds\/json\/cve\/\d{0,4}\.?\d{0,4}\.?\/nvdcve-.*\.json\.zip";
+            if(string.IsNullOrWhiteSpace(linkRegex))
+            {
+                linkRegex =
+                    @"https:\/\/nvd\.nist\.gov\/feeds\/json\/cve\/\d{0,4}\.?\d{0,4}\.?\/nvdcve-\d{0,4}\.?\d{0,4}\.?-\d{4}\.json\.zip";
+            }
 
             var feedsPage = client.DownloadString("https://nvd.nist.gov/vuln/data-feeds");
             var ls = Regex.Matches(feedsPage,
-                pattern,
+                linkRegex,
                 RegexOptions.Singleline).Cast<Match>().Select(m => m.ToString());
             return ls;
         }
@@ -131,16 +135,16 @@ namespace NuGetDefense.NVD
         {
             return GetFeedAsync(link).Result;
         }
-        
-        private static async Task<NVDFeed> GetRecentFeedAsync()
+
+        public static async Task<NVDFeed> GetRecentFeedAsync()
         {
-            var link = GetJsonLinks().FirstOrDefault(link => link.ToLower().Contains("recent"));
+            var link = GetJsonLinks(@"https:\/\/nvd\.nist\.gov\/feeds\/json\/cve\/\d{0,4}\.?\d{0,4}\.?\/nvdcve-\d{0,4}\.?\d{0,4}\.?-modified\.json\.zip").FirstOrDefault();
             return await GetFeedAsync(link);
-        }        
-        
-        private static async Task<NVDFeed> GetModifiedFeedAsync()
+        }
+
+        public static async Task<NVDFeed> GetModifiedFeedAsync()
         {
-            var link = GetJsonLinks().FirstOrDefault(link => link.ToLower().Contains("modified"));
+            var link = GetJsonLinks(@"https:\/\/nvd\.nist\.gov\/feeds\/json\/cve\/\d{0,4}\.?\d{0,4}\.?\/nvdcve-\d{0,4}\.?\d{0,4}\.?-recent\.json\.zip").FirstOrDefault();
             return await GetFeedAsync(link);
         }
 

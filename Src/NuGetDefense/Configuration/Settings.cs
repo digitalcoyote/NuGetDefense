@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 
@@ -10,7 +11,7 @@ namespace NuGetDefense.Configuration
         public BuildErrorSettings ErrorSettings { get; set; } = new BuildErrorSettings();
 
         public VulnerabilitySourceConfiguration OssIndex { get; set; } = new VulnerabilitySourceConfiguration();
-        public VulnerabilitySourceConfiguration NVD { get; set; } = new VulnerabilitySourceConfiguration();
+        public OfflineVulnerabilitySourceConfiguration NVD { get; set; } = new OfflineVulnerabilitySourceConfiguration();
 
         internal static Settings LoadSettings(string directory)
         {
@@ -29,7 +30,7 @@ namespace NuGetDefense.Configuration
             return settings;
         }
 
-        internal static void SaveSettings(Settings settings, string directory)
+        public static void SaveSettings(Settings settings, string directory)
         {
             File.WriteAllText(Path.Combine(directory, "NuGetDefense.json"),
                 JsonSerializer.Serialize(settings, new JsonSerializerOptions {WriteIndented = true}));

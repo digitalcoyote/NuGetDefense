@@ -13,7 +13,7 @@ namespace NuGetDefense.NVD
     {
         private readonly Dictionary<string, Dictionary<string, VulnerabilityEntry>> nvdDict;
 
-        public Scanner(string nugetFile, bool breakIfCannotRun = false)
+        public Scanner(string nugetFile, bool breakIfCannotRun = false, bool selfUpdate = false)
         {
             var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray)
                 .WithSecurity(MessagePackSecurity.UntrustedData);
@@ -24,9 +24,16 @@ namespace NuGetDefense.NVD
             nvdDict = MessagePackSerializer
                 .Deserialize<
                     Dictionary<string, Dictionary<string, VulnerabilityEntry>>>(nvdData, lz4Options);
-
+            nvdData.Close();
             NugetFile = nugetFile;
             BreakIfCannotRun = breakIfCannotRun;
+            
+            if (!selfUpdate) return;
+            var recentFeed = FeedUpdater.GetRecentFeedAsync().Result;
+            var modifiedFeed = FeedUpdater.GetModifiedFeedAsync().Result;
+            FeedUpdater.AddFeedToVulnerabilityData(recentFeed, nvdDict);
+            FeedUpdater.AddFeedToVulnerabilityData(modifiedFeed, nvdDict);
+            VulnerabilityData.SaveToBinFile(nvdDict, "VulnerabilityData.bin");
         }
 
         private string NugetFile { get; }
