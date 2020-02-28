@@ -16,7 +16,7 @@ An MSBuildTask that checks for known vulnerabilities. Inspired by [OWASP SafeNuG
 ## Features  
 * Uses Multiple Sources to check for known vulnerabilities in third-party libraries (NuGet packages)
   * [OSS Index](https://ossindex.sonatype.org/)
-  * [National Vulnerability Database](https://nvd.nist.gov/).
+  * [National Vulnerability Database](https://nvd.nist.gov/) (Optionally Self-Updating)
 * Simple installation/configuration: the [NuGet Package](https://www.nuget.org/packages/NuGetDefense/) is all you need.
 * Checks dependencies of installed packages based on the target framework.
 * Allow breaking the build based on severity of vulnerability.
@@ -24,10 +24,6 @@ An MSBuildTask that checks for known vulnerabilities. Inspired by [OWASP SafeNuG
 * Blacklisting NuGet Packages
 * Whitelisting NuGet Packages
 * MIT Licensed
-
-
-## Planned Features
-* Self-Updating NVD Feed
 
 ## Requirements
   Currently NuGetDefense is built only in .Net Core 3.1 so you will need the runtime/SDK installed.
