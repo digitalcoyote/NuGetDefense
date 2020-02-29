@@ -3,13 +3,13 @@
   <metadata>
     <id>NuGetDefense</id>
     <title>NuGetDefense</title>
-    <version>1.0.0</version>
+    <version>1.0.0.1</version>
     <authors>Curtis Carter</authors>
     <owners>Curtis Carter</owners>
     <projectUrl>https://github.com/DigitalCoyote/NuGetDefense</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>NuGetDefense ~ Check for Known Vulnerabilities at Build</summary>
-    <description>NuGetDefense was inspired by [OWASP SafeNuGet](https://nuget.org/packages/SafeNuGet/) but aims to check with multiple sources for known vulnerabilities.</description>
+    <description>NuGetDefense was inspired by OWASP SafeNuGet but checks with multiple sources for known vulnerabilities.</description>
     <releaseNotes>https://github.com/digitalcoyote/NuGetDefense/releases</releaseNotes>
     <repository type="git" url="https://github.com/digitalcoyote/NuGetDefense.git"/>
     <license type="expression">MIT</license>
@@ -24,6 +24,9 @@
     <file src="bin/Release/netcoreapp3.1/NuGetDefense.deps.json" target="tools/netcoreapp3.1/NuGetDefense.deps.json" />
     <file src="bin/Release/netcoreapp3.1/Newtonsoft.Json.dll" target="tools/netcoreapp3.1/Newtonsoft.Json.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGetDefense.dll" target="tools/netcoreapp3.1/NuGetDefense.dll" />
+    <file src="bin/Release/netcoreapp3.1/NuGetDefense.Core.dll" target="tools/netcoreapp3.1/NuGetDefense.Core.dll" />
+    <file src="bin/Release/netcoreapp3.1/NuGetDefense.NVD.dll" target="tools/netcoreapp3.1/NuGetDefense.NVD.dll" />
+    <file src="bin/Release/netcoreapp3.1/NuGetDefense.OSSIndex.dll" target="tools/netcoreapp3.1/NuGetDefense.OSSIndex.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGetDefense.runtimeconfig.json" target="tools/netcoreapp3.1/NuGetDefense.runtimeconfig.json" />
     <file src="bin/Release/netcoreapp3.1/NuGet.Common.dll" target="tools/netcoreapp3.1/NuGet.Common.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGet.Configuration.dll" target="tools/netcoreapp3.1/NuGet.Configuration.dll" />

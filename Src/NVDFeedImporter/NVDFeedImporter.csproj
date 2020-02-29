@@ -8,10 +8,7 @@
     <ItemGroup>
       <PackageReference Include="MessagePack" Version="2.1.90" />
       <PackageReference Include="NuGet.Versioning" Version="5.4.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\NuGetDefense.NVD\NuGetDefense.NVD.csproj" />
+      <PackageReference Include="NuGetDefense.NVD" Version="1.0.0" />
     </ItemGroup>
 
 </Project>

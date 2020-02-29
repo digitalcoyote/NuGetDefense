@@ -26,6 +26,9 @@
       <PackageReference Include="NuGet.Protocol" Version="5.4.0" />
       <PackageReference Include="NuGet.Resolver" Version="5.4.0" />
       <PackageReference Include="NuGet.Versioning" Version="5.4.0" />
+      <PackageReference Include="NuGetDefense.Core" Version="1.0.0" />
+      <PackageReference Include="NuGetDefense.NVD" Version="1.0.0" />
+      <PackageReference Include="NuGetDefense.OSSIndex" Version="1.0.0" />
       <PackageReference Include="System.Text.Json" Version="4.7.1" />
     </ItemGroup>
 
@@ -45,12 +48,6 @@
     <ItemGroup>
       <None Remove="NuGetDefense.nuspec" />
       <Content Include="NuGetDefense.nuspec" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\NuGetDefense.Core\NuGetDefense.Core.csproj" />
-      <ProjectReference Include="..\NuGetDefense.NVD\NuGetDefense.NVD.csproj" />
-      <ProjectReference Include="..\NuGetDefense.OSSIndex\NuGetDefense.OSSIndex.csproj" />
     </ItemGroup>
 
     <PropertyGroup>

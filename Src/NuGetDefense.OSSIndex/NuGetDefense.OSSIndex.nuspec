@@ -16,7 +16,8 @@
     <tags>Security</tags>
     <dependencies>
       <group targetFramework=".NETStandard2.0">
-        <depenceny id="System.Text.Json" version="4.7.1" />
+        <dependency id="System.Text.Json" version="4.7.1" />        
+        <dependency id="NuGetDefense.Core" version="[1.0.0]" />
       </group>
     </dependencies>
   </metadata>

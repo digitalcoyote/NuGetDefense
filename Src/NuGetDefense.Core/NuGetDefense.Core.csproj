@@ -5,6 +5,7 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <AssemblyVersion></AssemblyVersion>
+        <NuspecFile>NuGetDefense.Core.nuspec</NuspecFile>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
