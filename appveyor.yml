@@ -1,0 +1,42 @@
+version: '1.0.{build}'
+image: Ubuntu 1804
+branches:
+  only:
+  - master
+dotnet_csproj:
+  patch: true
+  file: '**\NuGetDefense.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+init:
+  # Good practise, because Windows line endings are different from Unix/Linux ones
+  - cmd: git config --global core.autocrlf true
+install:
+  # Install repo specific stuff here
+before_build:
+  # Display .NET Core version
+  - cmd: dotnet --version
+  # Display minimal restore text
+  - cmd: dotnet restore ./Src/NuGetDefense/NuGetDefense.csproj --verbosity m
+build_script:
+  # output will be in ./src/bin/debug/netcoreapp1.1/publish
+  - cmd: dotnet publish ./Src/NuGetDefense/NuGetDefense.csproj
+after_build:
+  # For once the build has completed
+artifacts:
+ - path: './Src/NuGetDefense/bin/Release/*.nupkg'
+   name: NuGetDefense
+   type: zip
+clone_depth: 1
+test_script:
+  # restore packages for our unit tests
+  - cmd: dotnet restore ./tests/tests.csproj --verbosity m
+  # run the unit tests (requires changing into the test directory)
+  - cmd: cd tests
+  - cmd: dotnet xunit
+on_finish :
+  # any cleanup in here
+deploy: off
