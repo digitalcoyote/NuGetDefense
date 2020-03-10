@@ -57,8 +57,6 @@ namespace NuGetDefense
             }
 
             _pkgs = LoadPackages(_nuGetFile, framework);
-            if (_settings.ErrorSettings.IgnoredPackages.Length > 0) _pkgs = IgnorePackages(_pkgs);
-
             if (_settings.ErrorSettings.BlackListedPackages.Length > 0) CheckForBlacklistedPackages();
             if (_settings.ErrorSettings.WhiteListedPackages.Length > 0)
                 foreach (var pkg in _pkgs.Where(p => !_settings.ErrorSettings.WhiteListedPackages.Any(b =>
@@ -71,8 +69,9 @@ namespace NuGetDefense
                     new Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun).GetVulnerabilitiesForPackages(_pkgs);
             if (_settings.NVD.Enabled)
                 vulnDict =
-                    new NVD.Scanner(_nuGetFile, _settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate).GetVulnerabilitiesForPackages(_pkgs,
-                        vulnDict);
+                    new NVD.Scanner(_nuGetFile, _settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate)
+                        .GetVulnerabilitiesForPackages(_pkgs,
+                            vulnDict);
             if (_settings.ErrorSettings.IgnoredCvEs.Length > 0) IgnoreCVEs(vulnDict);
             VulnerabilityReports.ReportVulnerabilities(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
                 _settings.ErrorSettings.CVSS3Threshold);
@@ -103,7 +102,7 @@ namespace NuGetDefense
         /// </summary>
         /// <param name="nuGetPackages"> Array of Packages used as the source</param>
         /// <returns>Filtered list of packages</returns>
-        private static NuGetPackage[] IgnorePackages(NuGetPackage[] nuGetPackages)
+        private static NuGetPackage[] IgnorePackages(IEnumerable<NuGetPackage> nuGetPackages)
         {
             return nuGetPackages.Where(nuget => !_settings.ErrorSettings.IgnoredPackages
                 .Where(ignoredNupkg => ignoredNupkg.Id == nuget.Id)
@@ -134,8 +133,20 @@ namespace NuGetDefense
                             LineNumber = ((IXmlLineInfo) x).LineNumber, LinePosition = ((IXmlLineInfo) x).LinePosition
                         });
 
-            return NuGetClient.GetAllPackageDependencies(pkgs.Where(p => p.Id != "NuGetDefense").ToList(), framework)
-                .Result.ToArray();
+            if (_settings.ErrorSettings.IgnoredPackages.Length > 0) pkgs = IgnorePackages(pkgs);
+            try
+            {
+                pkgs = NuGetClient
+                    .GetAllPackageDependencies(pkgs.Where(p => p.Id != "NuGetDefense").ToList(), framework)
+                    .Result.ToArray();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(
+                    $"{_nuGetFile} : Warning : Error getting package dependencies: {e}");
+            }
+
+            return pkgs as NuGetPackage[] ?? pkgs.ToArray();
         }
     }
 }
