@@ -56,8 +56,4 @@
         <NuGetDefenseExe Condition="'$(OS)' == Unix">dotnet "$(MSBuildThisFileDirectory)../tools/netcoreapp3.1/NuGetDefense.dll"</NuGetDefenseExe>
         <NuGetDefenseExe Condition="'$(OS)' == 'Windows_NT'">dotnet "$(MSBuildThisFileDirectory)..\tools\netcoreapp3.1\NuGetDefense.dll"</NuGetDefenseExe>
     </PropertyGroup>
-
-    <Target Name="CheckForVulnerableNuGetPkgs" BeforeTargets="Build">
-        <Exec Command="$(NuGetDefenseExe) $(MSBuildProjectFullPath) $(TargetFramework)" IgnoreExitCode="true" />
-    </Target>
 </Project>
