@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -10,14 +11,14 @@ namespace NuGetDefense.PackageSources
     {
         public static bool TryReadFromFile(string path, out IEnumerable<NuGetPackage> nugetPackages)
         {
-            var packagesConfigPath = new FileInfo(path);
-            if (!packagesConfigPath.Exists)
+            var projectFile = new FileInfo(path);
+            if (!(projectFile.Exists && projectFile.Extension.EndsWith("proj", StringComparison.InvariantCultureIgnoreCase)))
             {
                 nugetPackages = Enumerable.Empty<NuGetPackage>();
                 return false;
             }
 
-            nugetPackages = PackagesReferencesFromProjectFile(packagesConfigPath)
+            nugetPackages = PackagesReferencesFromProjectFile(projectFile)
                 .Select(ToNugetPackage)
                 .AsEnumerable();
 

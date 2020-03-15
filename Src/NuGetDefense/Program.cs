@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml;
 using System.Xml.Linq;
 using NuGet.Versioning;
 using NuGetDefense.Configuration;
 using NuGetDefense.Core;
 using NuGetDefense.OSSIndex;
 using NuGetDefense.PackageSources;
-using PackagesConfigReader = NuGet.Packaging.PackagesConfigReader;
 
 namespace NuGetDefense
 {
@@ -127,6 +125,7 @@ namespace NuGetDefense
             IEnumerable<NuGetPackage> nugetPackages;
 
             var packagesRead = PackagesConfigFileReader.TryReadFromFile(packageSource, out nugetPackages) ||
+                                        PackagesLockFileReader.TryReadFromFile(packageSource, out nugetPackages) ||
                                         ProjectFileReader.TryReadFromFile(packageSource, out nugetPackages);
 
             if (!packagesRead)

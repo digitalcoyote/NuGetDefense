@@ -4,23 +4,24 @@ using Xunit;
 
 namespace NuGetDefense.Tests.PackageSources
 {
-    public class PackagesConfigFileReaderTests
+    public class PackagesLockFileReaderTests
     {
         [Fact]
         public void TryReadFromFile_ReturnsFalse_WhenFileDoesNotExist()
         {
-            PackagesConfigFileReader.TryReadFromFile(@"non-existing/packages.config", out var packages).Should().BeFalse();
+            PackagesLockFileReader.TryReadFromFile(@"non-existing/packages.lock.json", out var packages).Should()
+                .BeFalse();
             packages.Should().BeEmpty();
         }
-        
+
         [Theory]
-        [InlineData(@"TestFiles/packages.config")]
+        [InlineData(@"TestFiles/packages.lock.json")]
         [InlineData(@"TestFiles/test.csproj")]
         [InlineData("TestFiles")]
         public void TryReadFromFile_ReturnsTrue_WhenFileExists(string path)
         {
-            PackagesConfigFileReader.TryReadFromFile(path, out var packages).Should().BeTrue();
-            packages.Should().NotBeEmpty().And.HaveCount(4);
+            PackagesLockFileReader.TryReadFromFile(path, out var packages).Should().BeTrue();
+            packages.Should().NotBeEmpty().And.HaveCount(3);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -10,7 +11,7 @@ namespace NuGetDefense.PackageSources
     {
         public static bool TryReadFromFile(string path, out IEnumerable<NuGetPackage> nugetPackages)
         {
-            var packagesConfigPath = new FileInfo(path);
+            var packagesConfigPath = PackagesConfigFile(path);
             if (!packagesConfigPath.Exists)
             {
                 nugetPackages = Enumerable.Empty<NuGetPackage>();
@@ -22,6 +23,20 @@ namespace NuGetDefense.PackageSources
                 .AsEnumerable();
             
             return true;
+        }
+        
+        private static FileInfo PackagesConfigFile(string path)
+        {
+            const string defaultConfigFileName = "packages.config";
+            var packagesConfigFile = new FileInfo(path);
+
+            if (packagesConfigFile.Name.Equals(defaultConfigFileName, StringComparison.InvariantCultureIgnoreCase))
+                return packagesConfigFile;
+            
+            if ((packagesConfigFile.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
+                return new FileInfo(Path.Combine(packagesConfigFile.FullName, defaultConfigFileName));
+            
+            return new FileInfo(Path.Combine(Path.GetDirectoryName(packagesConfigFile.FullName), defaultConfigFileName));
         }
 
         private static IEnumerable<XElement> PackageXmlNodesFromPackagesConfig(FileSystemInfo packagesConfigPath) =>
