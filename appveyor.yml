@@ -1,16 +1,16 @@
-version: '1.0.{build}'
-image: Ubuntu 1804
+version: "1.0.{build}"
+image: Ubuntu
 branches:
   only:
-  - master
+    - master
 dotnet_csproj:
   patch: true
   file: '**\NuGetDefense.csproj'
-  version: '{version}'
-  package_version: '{version}'
-  assembly_version: '{version}'
-  file_version: '{version}'
-  informational_version: '{version}'
+  version: "{version}"
+  package_version: "{version}"
+  assembly_version: "{version}"
+  file_version: "{version}"
+  informational_version: "{version}"
 init:
   # Good practise, because Windows line endings are different from Unix/Linux ones
   - cmd: git config --global core.autocrlf true
@@ -27,9 +27,9 @@ build_script:
 after_build:
   # For once the build has completed
 artifacts:
- - path: './Src/NuGetDefense/bin/Release/*.nupkg'
-   name: NuGetDefense
-   type: zip
+  - path: "./Src/NuGetDefense/bin/Release/*.nupkg"
+    name: NuGetDefense
+    type: zip
 clone_depth: 1
 test_script:
   # restore packages for our unit tests
@@ -37,6 +37,6 @@ test_script:
   # run the unit tests (requires changing into the test directory)
   - cmd: cd tests
   - cmd: dotnet xunit
-on_finish :
+on_finish:
   # any cleanup in here
 deploy: off
