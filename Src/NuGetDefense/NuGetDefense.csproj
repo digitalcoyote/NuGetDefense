@@ -42,7 +42,6 @@
 
     <ItemGroup>
       <None Remove="Tests\**" />
-      <None Include="TestFiles\test.csproj" />
     </ItemGroup>
 
     <ItemGroup>

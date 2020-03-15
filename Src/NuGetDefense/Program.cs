@@ -8,6 +8,8 @@ using NuGet.Versioning;
 using NuGetDefense.Configuration;
 using NuGetDefense.Core;
 using NuGetDefense.OSSIndex;
+using NuGetDefense.PackageSources;
+using PackagesConfigReader = NuGet.Packaging.PackagesConfigReader;
 
 namespace NuGetDefense
 {
@@ -57,24 +59,29 @@ namespace NuGetDefense
             }
 
             _pkgs = LoadPackages(_nuGetFile, framework);
-            if (_settings.ErrorSettings.BlackListedPackages.Length > 0) CheckForBlacklistedPackages();
-            if (_settings.ErrorSettings.WhiteListedPackages.Length > 0)
+            if (_settings.ErrorSettings.BlackListedPackages.Any())
+                CheckForBlacklistedPackages();
+            
+            if (_settings.ErrorSettings.WhiteListedPackages.Any())
                 foreach (var pkg in _pkgs.Where(p => !_settings.ErrorSettings.WhiteListedPackages.Any(b =>
                     b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
                     Console.WriteLine(
                         $"{_nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {pkg.Id} has not been whitelisted and may not be used in this project");
+            
             Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null;
+            
             if (_settings.OssIndex.Enabled)
-                vulnDict =
-                    new Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun).GetVulnerabilitiesForPackages(_pkgs);
+                vulnDict = new Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun).GetVulnerabilitiesForPackages(_pkgs);
+            
             if (_settings.NVD.Enabled)
-                vulnDict =
-                    new NVD.Scanner(_nuGetFile, _settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate)
-                        .GetVulnerabilitiesForPackages(_pkgs,
-                            vulnDict);
-            if (_settings.ErrorSettings.IgnoredCvEs.Length > 0) IgnoreCVEs(vulnDict);
-            VulnerabilityReports.ReportVulnerabilities(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
-                _settings.ErrorSettings.CVSS3Threshold);
+                vulnDict = new NVD.Scanner(_nuGetFile, _settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate)
+                                .GetVulnerabilitiesForPackages(_pkgs, vulnDict);
+            
+            if (_settings.ErrorSettings.IgnoredCvEs.Any())
+                IgnoreCVEs(vulnDict);
+            
+            VulnerabilityReports.ReportVulnerabilities(vulnDict, _pkgs, 
+                _nuGetFile, _settings.WarnOnly, _settings.ErrorSettings.CVSS3Threshold);
         }
 
         private static void CheckForBlacklistedPackages()
@@ -84,6 +91,7 @@ namespace NuGetDefense
                 var blacklistedPackage = _settings.ErrorSettings.BlackListedPackages.FirstOrDefault(b =>
                     b.Package.Id == pkg.Id &&
                     VersionRange.Parse(pkg.Version).Satisfies(new NuGetVersion(b.Package.Version)));
+                
                 if (blacklistedPackage != null)
                     Console.WriteLine(
                         $"{_nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {pkg.Id} : {(string.IsNullOrEmpty(blacklistedPackage.CustomErrorMessage) ? blacklistedPackage.CustomErrorMessage : "has been blacklisted and may not be used in this project")}");
@@ -102,12 +110,12 @@ namespace NuGetDefense
         /// </summary>
         /// <param name="nuGetPackages"> Array of Packages used as the source</param>
         /// <returns>Filtered list of packages</returns>
-        private static NuGetPackage[] IgnorePackages(IEnumerable<NuGetPackage> nuGetPackages)
+        private static IEnumerable<NuGetPackage> IgnorePackages(IEnumerable<NuGetPackage> nuGetPackages)
         {
             return nuGetPackages.Where(nuget => !_settings.ErrorSettings.IgnoredPackages
                 .Where(ignoredNupkg => ignoredNupkg.Id == nuget.Id)
                 .Any(ignoredNupkg => !VersionRange.TryParse(ignoredNupkg.Version, out var versionRange) ||
-                                     versionRange.Satisfies(new NuGetVersion(nuget.Version)))).ToArray();
+                                     versionRange.Satisfies(new NuGetVersion(nuget.Version))));
         }
 
         /// <summary>
@@ -116,37 +124,34 @@ namespace NuGetDefense
         /// <returns></returns>
         public static NuGetPackage[] LoadPackages(string packageSource, string framework)
         {
-            IEnumerable<NuGetPackage> pkgs;
-            if (Path.GetFileName(packageSource) == "packages.config")
-                pkgs = XElement.Load(packageSource, LoadOptions.SetLineInfo).DescendantsAndSelf("package").Select(x =>
-                    new NuGetPackage
-                    {
-                        Id = x.Attribute("id").Value, Version = x.Attribute("version").Value,
-                        LineNumber = ((IXmlLineInfo) x).LineNumber, LinePosition = ((IXmlLineInfo) x).LinePosition
-                    });
-            else
-                pkgs = XElement.Load(packageSource, LoadOptions.SetLineInfo).DescendantsAndSelf("PackageReference")
-                    .Select(
-                        x => new NuGetPackage
-                        {
-                            Id = x.Attribute("Include").Value, Version = x.Attribute("Version").Value,
-                            LineNumber = ((IXmlLineInfo) x).LineNumber, LinePosition = ((IXmlLineInfo) x).LinePosition
-                        });
+            IEnumerable<NuGetPackage> nugetPackages;
 
-            if (_settings.ErrorSettings.IgnoredPackages.Length > 0) pkgs = IgnorePackages(pkgs);
+            var packagesRead = PackagesConfigFileReader.TryReadFromFile(packageSource, out nugetPackages) ||
+                                        ProjectFileReader.TryReadFromFile(packageSource, out nugetPackages);
+
+            if (!packagesRead)
+            {
+                Console.WriteLine($"Warning : Could not read packages from source file '{packageSource}'");
+                return (nugetPackages ?? Enumerable.Empty<NuGetPackage>()).ToArray();
+            }
+            
+            if (_settings.ErrorSettings.IgnoredPackages.Any()) 
+                nugetPackages = IgnorePackages(nugetPackages);
+            
             try
             {
-                pkgs = NuGetClient
-                    .GetAllPackageDependencies(pkgs.Where(p => p.Id != "NuGetDefense").ToList(), framework)
-                    .Result.ToArray();
+                nugetPackages = NuGetClient
+                    .GetAllPackageDependencies(nugetPackages.Where(p => p.Id != "NuGetDefense").ToList(), framework)
+                    .Result
+                    .AsEnumerable();
             }
             catch (Exception e)
             {
                 Console.WriteLine(
-                    $"{_nuGetFile} : Warning : Error getting package dependencies: {e}");
+                    $"Warning : Error getting package dependencies from source '{packageSource}' : {e}");
             }
 
-            return pkgs as NuGetPackage[] ?? pkgs.ToArray();
+            return (nugetPackages ?? Enumerable.Empty<NuGetPackage>()).ToArray();
         }
     }
 }

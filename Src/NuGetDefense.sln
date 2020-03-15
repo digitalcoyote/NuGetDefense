@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NuGetDefense.Core", "NuGetD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NuGetDefense.OSSIndex", "NuGetDefense.OSSIndex\NuGetDefense.OSSIndex.csproj", "{AC56CBA9-943D-4616-8805-63C8EC7F9162}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NuGetDefense.Tests", "NuGetDefense.Tests\NuGetDefense.Tests.csproj", "{9B4402CF-8C38-4C65-AC18-0F73A90BFE01}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{AC56CBA9-943D-4616-8805-63C8EC7F9162}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC56CBA9-943D-4616-8805-63C8EC7F9162}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC56CBA9-943D-4616-8805-63C8EC7F9162}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B4402CF-8C38-4C65-AC18-0F73A90BFE01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B4402CF-8C38-4C65-AC18-0F73A90BFE01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B4402CF-8C38-4C65-AC18-0F73A90BFE01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B4402CF-8C38-4C65-AC18-0F73A90BFE01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
