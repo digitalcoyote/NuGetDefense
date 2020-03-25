@@ -19,21 +19,12 @@
   <files>
     <!-- <file src="Src/bin/Release/net461/NuGetDefense.exe" target="tools/net461/NuGetDefense.exe" /> -->
     <file src="build/nugetdefense.targets" target="build/nugetdefense.targets" />
-    <file src="bin/Release/netcoreapp3.1/runtimes/unix/lib/netstandard1.3/System.Security.Cryptography.ProtectedData.dll" target="tools/netcoreapp3.1/runtimes/unix/lib/netstandard1.3/System.Security.Cryptography.ProtectedData.dll" />
-    <file src="bin/Release/netcoreapp3.1/runtimes/win/lib/netstandard1.3/System.Security.Cryptography.ProtectedData.dll" target="tools/netcoreapp3.1/runtimes/win/lib/netstandard1.3/System.Security.Cryptography.ProtectedData.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGetDefense.deps.json" target="tools/netcoreapp3.1/NuGetDefense.deps.json" />
-    <file src="bin/Release/netcoreapp3.1/Newtonsoft.Json.dll" target="tools/netcoreapp3.1/Newtonsoft.Json.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGetDefense.dll" target="tools/netcoreapp3.1/NuGetDefense.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGetDefense.Core.dll" target="tools/netcoreapp3.1/NuGetDefense.Core.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGetDefense.NVD.dll" target="tools/netcoreapp3.1/NuGetDefense.NVD.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGetDefense.OSSIndex.dll" target="tools/netcoreapp3.1/NuGetDefense.OSSIndex.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGetDefense.runtimeconfig.json" target="tools/netcoreapp3.1/NuGetDefense.runtimeconfig.json" />
-    <file src="bin/Release/netcoreapp3.1/NuGet.Common.dll" target="tools/netcoreapp3.1/NuGet.Common.dll" />
-    <file src="bin/Release/netcoreapp3.1/NuGet.Configuration.dll" target="tools/netcoreapp3.1/NuGet.Configuration.dll" />
-    <file src="bin/Release/netcoreapp3.1/NuGet.Frameworks.dll" target="tools/netcoreapp3.1/NuGet.Frameworks.dll" />
-    <file src="bin/Release/netcoreapp3.1/NuGet.Packaging.dll" target="tools/netcoreapp3.1/NuGet.Packaging.dll" />
-    <file src="bin/Release/netcoreapp3.1/NuGet.Protocol.dll" target="tools/netcoreapp3.1/NuGet.Protocol.dll" />
-    <file src="bin/Release/netcoreapp3.1/NuGet.Resolver.dll" target="tools/netcoreapp3.1/NuGet.Resolver.dll" />
     <file src="bin/Release/netcoreapp3.1/MessagePack.dll" target="tools/netcoreapp3.1/MessagePack.dll" />
     <file src="bin/Release/netcoreapp3.1/MessagePack.Annotations.dll" target="tools/netcoreapp3.1/MessagePack.Annotations.dll" />
     <file src="bin/Release/netcoreapp3.1/Microsoft.Bcl.AsyncInterfaces.dll" target="tools/netcoreapp3.1/Microsoft.Bcl.AsyncInterfaces.dll" />

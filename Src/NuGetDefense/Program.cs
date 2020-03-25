@@ -134,17 +134,6 @@ namespace NuGetDefense
                         });
 
             if (_settings.ErrorSettings.IgnoredPackages.Length > 0) pkgs = IgnorePackages(pkgs);
-            try
-            {
-                pkgs = NuGetClient
-                    .GetAllPackageDependencies(pkgs.Where(p => p.Id != "NuGetDefense").ToList(), framework)
-                    .Result.ToArray();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(
-                    $"{_nuGetFile} : Warning : Error getting package dependencies: {e}");
-            }
 
             return pkgs as NuGetPackage[] ?? pkgs.ToArray();
         }

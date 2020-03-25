@@ -4,7 +4,6 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>0.0.1</PackageVersion>
         <Title>NuGetDefense</Title>
         <Authors>Curtis Carter</Authors>
         <Description>NuGetDefense ~ Check for Known Vulnerabilities at Build</Description>
@@ -21,14 +20,10 @@
 
     <ItemGroup>
       <PackageReference Include="MessagePack" Version="2.1.90" />
-      <PackageReference Include="NuGet.Frameworks" Version="5.4.0" />
-      <PackageReference Include="NuGet.Packaging" Version="5.4.0" />
-      <PackageReference Include="NuGet.Protocol" Version="5.4.0" />
-      <PackageReference Include="NuGet.Resolver" Version="5.4.0" />
-      <PackageReference Include="NuGet.Versioning" Version="5.4.0" />
-      <PackageReference Include="NuGetDefense.Core" Version="1.0.0" />
-      <PackageReference Include="NuGetDefense.NVD" Version="1.0.0" />
-      <PackageReference Include="NuGetDefense.OSSIndex" Version="1.0.0" />
+      <PackageReference Include="NuGet.Versioning" Version="5.5.0" />
+      <PackageReference Include="NuGetDefense.Core" Version="1.0.1.1" />
+      <PackageReference Include="NuGetDefense.NVD" Version="1.0.0.1" />
+      <PackageReference Include="NuGetDefense.OSSIndex" Version="1.0.1.1" />
       <PackageReference Include="System.Text.Json" Version="4.7.1" />
     </ItemGroup>
 
