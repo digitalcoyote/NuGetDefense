@@ -1,5 +1,5 @@
 version: '1.0.{build}'
-image: Ubuntu 1804
+image: Ubuntu1804
 branches:
   only:
   - master
