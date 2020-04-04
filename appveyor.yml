@@ -10,6 +10,8 @@ nuget:
   project_feed: true
 build_script:
 - pwsh: ./build.ps1
+artifacts:
+- path: NuGetDefense.*.nupkg
 notifications:
 - provider: Email
   to:
