@@ -1,42 +1,29 @@
-version: '1.0.{build}'
-image: Ubuntu1804
+version: 1.0.0.{build}
 branches:
   only:
   - master
-dotnet_csproj:
-  patch: true
-  file: '**\NuGetDefense.csproj'
-  version: '{version}'
-  package_version: '{version}'
-  assembly_version: '{version}'
-  file_version: '{version}'
-  informational_version: '{version}'
-init:
-  # Good practise, because Windows line endings are different from Unix/Linux ones
-  - cmd: git config --global core.autocrlf true
-install:
-  # Install repo specific stuff here
-before_build:
-  # Display .NET Core version
-  - cmd: dotnet --version
-  # Display minimal restore text
-  - cmd: dotnet restore ./Src/NuGetDefense/NuGetDefense.csproj --verbosity m
+image:
+- Visual Studio 2019
+- Ubuntu1804
+nuget:
+  account_feed: true
+  project_feed: true
 build_script:
-  # output will be in ./src/bin/debug/netcoreapp1.1/publish
-  - cmd: dotnet publish ./Src/NuGetDefense/NuGetDefense.csproj
-after_build:
-  # For once the build has completed
-artifacts:
- - path: './Src/NuGetDefense/bin/Release/*.nupkg'
-   name: NuGetDefense
-   type: zip
-clone_depth: 1
-test_script:
-  # restore packages for our unit tests
-  - cmd: dotnet restore ./tests/tests.csproj --verbosity m
-  # run the unit tests (requires changing into the test directory)
-  - cmd: cd tests
-  - cmd: dotnet xunit
-on_finish :
-  # any cleanup in here
-deploy: off
+- pwsh: ./build.ps1
+notifications:
+- provider: Email
+  to:
+  - lokiphasma@gmail.com
+  subject: A new version of NuGetDefense has successfullybeen built
+  message: Build for NuGetDefense was successful
+  on_build_success: true
+  on_build_failure: false
+  on_build_status_changed: false
+- provider: Email
+  to:
+  - lokiphasma@gmail.com
+  subject: NuGetDefense Build Is Failing
+  message: Look into the failure and create an issue if necessary.
+  on_build_success: false
+  on_build_failure: true
+  on_build_status_changed: false
