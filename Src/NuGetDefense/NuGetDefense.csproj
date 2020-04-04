@@ -20,9 +20,9 @@
 
     <ItemGroup>
       <PackageReference Include="MessagePack" Version="2.1.90" />
-      <PackageReference Include="NuGet.Versioning" Version="5.5.0" />
+      <PackageReference Include="NuGet.Versioning" Version="5.5.1" />
       <PackageReference Include="NuGetDefense.Core" Version="1.0.1.1" />
-      <PackageReference Include="NuGetDefense.NVD" Version="1.0.0.1" />
+      <PackageReference Include="NuGetDefense.NVD" Version="1.0.0.2" />
       <PackageReference Include="NuGetDefense.OSSIndex" Version="1.0.1.1" />
       <PackageReference Include="System.Text.Json" Version="4.7.1" />
     </ItemGroup>
