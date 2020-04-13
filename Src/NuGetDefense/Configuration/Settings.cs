@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace NuGetDefense.Configuration
 {
-    public class Settings
+    internal class Settings
     {
         public bool WarnOnly { get; set; } = false;
 

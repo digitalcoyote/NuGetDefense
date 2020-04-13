@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,37 +26,8 @@ namespace NuGetDefense
             _settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
             var pkgConfig = Path.Combine(Path.GetDirectoryName(args[0]), "packages.config");
             _nuGetFile = File.Exists(pkgConfig) ? pkgConfig : args[0];
-
-            string framework;
-            if (args.Length > 1)
-            {
-                framework = args[1];
-            }
-            else
-            {
-                var targetFrameworkVersion = XElement.Load(File.OpenRead(args[0])).Descendants()
-                    .First(x => x.Name.LocalName == "TargetFrameworkVersion").Value;
-
-                framework = targetFrameworkVersion switch
-                {
-                    "v2.0" => "net20",
-                    "v3.0" => "net30",
-                    "v3.5" => "net35",
-                    "v4.5" => "net45",
-                    "v4.5.1" => "net451",
-                    "v4.5.2" => "net452",
-                    "v4.6" => "net46",
-                    "v4.6.1" => "net461",
-                    "v4.6.2" => "net462",
-                    "v4.7" => "net27",
-                    "v4.7.1" => "net471",
-                    "v4.7.2" => "net472",
-                    "v4.8" => "net48",
-                    _ => "netstandard2.0"
-                };
-            }
-
-            _pkgs = LoadPackages(_nuGetFile, framework);
+            
+            _pkgs = LoadPackages(_nuGetFile);
             if (_settings.ErrorSettings.BlackListedPackages.Length > 0) CheckForBlacklistedPackages();
             if (_settings.ErrorSettings.WhiteListedPackages.Length > 0)
                 foreach (var pkg in _pkgs.Where(p => !_settings.ErrorSettings.WhiteListedPackages.Any(b =>
@@ -69,7 +40,7 @@ namespace NuGetDefense
                     new Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun).GetVulnerabilitiesForPackages(_pkgs);
             if (_settings.NVD.Enabled)
                 vulnDict =
-                    new NVD.Scanner(_nuGetFile, _settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate)
+                    new NVD.Scanner(_nuGetFile, TimeSpan.FromSeconds(_settings.NVD.TimeoutInSeconds),_settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate)
                         .GetVulnerabilitiesForPackages(_pkgs,
                             vulnDict);
             if (_settings.ErrorSettings.IgnoredCvEs.Length > 0) IgnoreCVEs(vulnDict);
@@ -114,7 +85,7 @@ namespace NuGetDefense
         ///     Loads NuGet packages in use form packages.config or PackageReferences in the project file
         /// </summary>
         /// <returns></returns>
-        public static NuGetPackage[] LoadPackages(string packageSource, string framework)
+        public static NuGetPackage[] LoadPackages(string packageSource)
         {
             IEnumerable<NuGetPackage> pkgs;
             if (Path.GetFileName(packageSource) == "packages.config")
