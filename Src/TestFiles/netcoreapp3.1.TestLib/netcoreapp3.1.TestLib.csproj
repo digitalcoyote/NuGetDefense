@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <RootNamespace>netcoreapp3_1</RootNamespace>
+        <Configurations>Debug;Release;Linux</Configurations>
+        <Platforms>AnyCPU</Platforms>
+    </PropertyGroup>
+    <ItemGroup>
+      <PackageReference Include="jQuery" Version="2.2.2" />
+      <PackageReference Include="NuGetDefense" Version="1.0.4" />
+      <PackageReference Include="Bootstrap" Version="3.4.1" />
+    </ItemGroup>
+</Project>

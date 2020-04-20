@@ -5,3 +5,5 @@
 *.cache
 *.blob
 **/.idea/**/*
+Src/TestFiles/packages/**/*
+**/*.suo

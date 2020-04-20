@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <RootNamespace>netstandard2._1.TestLib</RootNamespace>
+        <Configurations>Debug;Release;Linux</Configurations>
+        <Platforms>AnyCPU</Platforms>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="jQuery" Version="2.2.2" />
+        <PackageReference Include="NuGetDefense" Version="1.0.4" />
+        <PackageReference Include="Bootstrap" Version="3.4.1" />
+    </ItemGroup>
+</Project>
