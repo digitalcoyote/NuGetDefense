@@ -7,6 +7,6 @@
   </PropertyGroup>
   
   <Target Name="CheckForVulnerableNuGetPkgs" AfterTargets="Build">
-    <Exec Command="$(NuGetDefenseExe) $(MSBuildProjectFullPath) $(TargetFramework)" IgnoreExitCode="false" />
+    <Exec Command="$(NuGetDefenseExe) &quot;$(MSBuildProjectFullPath)&quot; $(TargetFramework)" IgnoreExitCode="false" />
   </Target>
 </Project>
