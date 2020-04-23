@@ -38,7 +38,8 @@ namespace NuGetDefense.Configuration
         {
             new NuGetPackage
             {
-                Id = "NugetDefense"
+                Id = "NugetDefense",
+                Version = "1.0.6"
             }
         };
 

@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace NuGetDefense.Configuration
 {
-    internal class Settings
+    public class Settings
     {
         public bool WarnOnly { get; set; } = false;
 
@@ -15,7 +15,7 @@ namespace NuGetDefense.Configuration
         public OfflineVulnerabilitySourceConfiguration NVD { get; set; } =
             new OfflineVulnerabilitySourceConfiguration();
 
-        internal static Settings LoadSettings(string directory)
+        public static Settings LoadSettings(string directory)
         {
             Settings settings;
 
@@ -23,8 +23,14 @@ namespace NuGetDefense.Configuration
             {
                 if (File.Exists(Path.Combine(directory, "NuGetDefense.json")))
                 {
+                    var ops = new JsonSerializerOptions()
+                    {
+                        IgnoreReadOnlyProperties = true,
+                        PropertyNameCaseInsensitive = true,
+                        ReadCommentHandling = JsonCommentHandling.Skip
+                    };
                     settings = JsonSerializer.Deserialize<Settings>(
-                        File.ReadAllText(Path.Combine(directory, "NuGetDefense.json")));
+                        File.ReadAllText(Path.Combine(directory, "NuGetDefense.json")), ops);
                 }
                 else
                 {
@@ -44,8 +50,15 @@ namespace NuGetDefense.Configuration
 
         public static void SaveSettings(Settings settings, string directory)
         {
+            var ops = new JsonSerializerOptions()
+            {
+                IgnoreReadOnlyProperties = true,
+                PropertyNameCaseInsensitive = true,
+                ReadCommentHandling = JsonCommentHandling.Skip,
+                WriteIndented = true,
+            };
             File.WriteAllText(Path.Combine(directory, "NuGetDefense.json"),
-                JsonSerializer.Serialize(settings, new JsonSerializerOptions {WriteIndented = true}));
+                JsonSerializer.Serialize(settings, ops));
         }
     }
 }
