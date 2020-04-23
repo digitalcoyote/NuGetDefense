@@ -44,7 +44,7 @@ namespace NuGetDefense
                         .GetVulnerabilitiesForPackages(_pkgs,
                             vulnDict);
             if (_settings.ErrorSettings.IgnoredCvEs.Length > 0) IgnoreCVEs(vulnDict);
-            VulnerabilityReports.ReportVulnerabilities(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
+            if (vulnDict != null) VulnerabilityReports.ReportVulnerabilities(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
                 _settings.ErrorSettings.CVSS3Threshold);
         }
 
