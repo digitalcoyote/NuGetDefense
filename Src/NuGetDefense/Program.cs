@@ -26,7 +26,7 @@ namespace NuGetDefense
             _settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
             var pkgConfig = Path.Combine(Path.GetDirectoryName(args[0]), "packages.config");
             _nuGetFile = File.Exists(pkgConfig) ? pkgConfig : args[0];
-            
+
             _pkgs = LoadPackages(_nuGetFile);
             if (_settings.ErrorSettings.BlackListedPackages.Length > 0) CheckForBlacklistedPackages();
             if (_settings.ErrorSettings.WhiteListedPackages.Length > 0)
@@ -40,12 +40,14 @@ namespace NuGetDefense
                     new Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun).GetVulnerabilitiesForPackages(_pkgs);
             if (_settings.NVD.Enabled)
                 vulnDict =
-                    new NVD.Scanner(_nuGetFile, TimeSpan.FromSeconds(_settings.NVD.TimeoutInSeconds),_settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate)
+                    new NVD.Scanner(_nuGetFile, TimeSpan.FromSeconds(_settings.NVD.TimeoutInSeconds),
+                            _settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate)
                         .GetVulnerabilitiesForPackages(_pkgs,
                             vulnDict);
             if (_settings.ErrorSettings.IgnoredCvEs.Length > 0) IgnoreCVEs(vulnDict);
-            if (vulnDict != null) VulnerabilityReports.ReportVulnerabilities(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
-                _settings.ErrorSettings.CVSS3Threshold);
+            if (vulnDict != null)
+                VulnerabilityReports.ReportVulnerabilities(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
+                    _settings.ErrorSettings.CVSS3Threshold);
         }
 
         private static void CheckForBlacklistedPackages()
@@ -89,14 +91,16 @@ namespace NuGetDefense
         {
             IEnumerable<NuGetPackage> pkgs;
             if (Path.GetFileName(packageSource) == "packages.config")
-                pkgs = XElement.Load(packageSource, LoadOptions.SetLineInfo).DescendantsAndSelf("package").Select(x =>
-                    new NuGetPackage
+                pkgs = XElement.Load(packageSource, LoadOptions.SetLineInfo).DescendantsAndSelf("package")
+                    .Where(x => RemoveInvalidVersions(x))
+                    .Select(x => new NuGetPackage
                     {
                         Id = x.Attribute("id").Value, Version = x.Attribute("version").Value,
                         LineNumber = ((IXmlLineInfo) x).LineNumber, LinePosition = ((IXmlLineInfo) x).LinePosition
                     });
             else
                 pkgs = XElement.Load(packageSource, LoadOptions.SetLineInfo).DescendantsAndSelf("PackageReference")
+                    .Where(x => RemoveInvalidVersions(x))
                     .Select(
                         x => new NuGetPackage
                         {
@@ -107,6 +111,14 @@ namespace NuGetDefense
             if (_settings.ErrorSettings.IgnoredPackages.Length > 0) pkgs = IgnorePackages(pkgs);
 
             return pkgs as NuGetPackage[] ?? pkgs.ToArray();
+        }
+
+        private static bool RemoveInvalidVersions(XElement x)
+        {
+            if (NuGetVersion.TryParse(x.Attribute("Version")?.Value, out var version)) return true;
+            Console.WriteLine(
+                $"{_nuGetFile}({((IXmlLineInfo) x).LineNumber},{((IXmlLineInfo) x).LinePosition}) : Warning : {version} is not a valid NuGetVersion and is being ignored. See 'https://docs.microsoft.com/en-us/nuget/concepts/package-versioning' for more info on valid versions");
+            return false;
         }
     }
 }
