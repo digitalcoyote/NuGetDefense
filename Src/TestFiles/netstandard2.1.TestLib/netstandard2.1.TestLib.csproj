@@ -7,8 +7,7 @@
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="jQuery" Version="2.2.2" />
-        <PackageReference Include="NuGetDefense" Version="1.0.4" />
-        <PackageReference Include="Bootstrap" Version="3.4.1" />
+        <PackageReference Include="NuGetDefense" Version="1.0.6" />
+        <PackageReference Include="Bootstrap" Version="4.0.0-beta" />
     </ItemGroup>
 </Project>
