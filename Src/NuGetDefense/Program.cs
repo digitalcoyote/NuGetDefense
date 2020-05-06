@@ -95,7 +95,7 @@ namespace NuGetDefense
                     .Where(x => RemoveInvalidVersions(x))
                     .Select(x => new NuGetPackage
                     {
-                        Id = x.Attribute("id").Value, Version = x.Attribute("version").Value,
+                        Id = (x.AttributeIgnoreCase("id")).Value, Version = x.AttributeIgnoreCase("version").Value,
                         LineNumber = ((IXmlLineInfo) x).LineNumber, LinePosition = ((IXmlLineInfo) x).LinePosition
                     });
             else
@@ -104,7 +104,7 @@ namespace NuGetDefense
                     .Select(
                         x => new NuGetPackage
                         {
-                            Id = x.Attribute("Include").Value, Version = x.Attribute("Version").Value,
+                            Id = x.AttributeIgnoreCase("Include").Value, Version = x.AttributeIgnoreCase("Version").Value,
                             LineNumber = ((IXmlLineInfo) x).LineNumber, LinePosition = ((IXmlLineInfo) x).LinePosition
                         });
 
@@ -115,9 +115,17 @@ namespace NuGetDefense
 
         private static bool RemoveInvalidVersions(XElement x)
         {
-            if (NuGetVersion.TryParse(x.Attribute("Version")?.Value, out var version)) return true;
-            Console.WriteLine(
-                $"{_nuGetFile}({((IXmlLineInfo) x).LineNumber},{((IXmlLineInfo) x).LinePosition}) : Warning : {version} is not a valid NuGetVersion and is being ignored. See 'https://docs.microsoft.com/en-us/nuget/concepts/package-versioning' for more info on valid versions");
+            if (NuGetVersion.TryParse(x.AttributeIgnoreCase("Version")?.Value, out var version)) return true;
+            if (version != null)
+            {
+                Console.WriteLine(
+                    $"{_nuGetFile}({((IXmlLineInfo) x).LineNumber},{((IXmlLineInfo) x).LinePosition}) : Warning : {version} is not a valid NuGetVersion and is being ignored. See 'https://docs.microsoft.com/en-us/nuget/concepts/package-versioning' for more info on valid versions");
+            }
+            else
+            {
+                Console.WriteLine(
+                        $"{_nuGetFile}({((IXmlLineInfo) x).LineNumber},{((IXmlLineInfo) x).LinePosition}) : Warning : Unable to find a version for this package. It will be ignored.");
+            }
             return false;
         }
     }
