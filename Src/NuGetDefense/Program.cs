@@ -14,6 +14,7 @@ namespace NuGetDefense
     internal class Program
     {
         private static string _nuGetFile;
+        private const string UserAgentString = @"NuGetDefense/1.0.7.1 (https://github.com/digitalcoyote/NuGetDefense/blob/master/README.md)";
         private static NuGetPackage[] _pkgs;
         private static Settings _settings;
 
@@ -37,7 +38,7 @@ namespace NuGetDefense
             Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null;
             if (_settings.OssIndex.Enabled)
                 vulnDict =
-                    new Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun).GetVulnerabilitiesForPackages(_pkgs);
+                    new Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun, UserAgentString).GetVulnerabilitiesForPackages(_pkgs);
             if (_settings.NVD.Enabled)
                 vulnDict =
                     new NVD.Scanner(_nuGetFile, TimeSpan.FromSeconds(_settings.NVD.TimeoutInSeconds),
