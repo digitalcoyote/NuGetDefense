@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -23,7 +23,7 @@
       <PackageReference Include="NuGet.Versioning" Version="5.6.0" />
       <PackageReference Include="NuGetDefense.Core" Version="1.0.4" />
       <PackageReference Include="NuGetDefense.NVD" Version="1.0.2.1" />
-      <PackageReference Include="NuGetDefense.OSSIndex" Version="1.0.1.5" />
+      <PackageReference Include="NuGetDefense.OSSIndex" Version="1.0.1.6" />
       <PackageReference Include="System.Text.Json" Version="4.7.2" />
     </ItemGroup>
 

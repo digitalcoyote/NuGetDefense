@@ -14,7 +14,7 @@ namespace NuGetDefense
     internal class Program
     {
         private static string _nuGetFile;
-        private const string UserAgentString = @"NuGetDefense/1.0.7.1 (https://github.com/digitalcoyote/NuGetDefense/blob/master/README.md)";
+        private const string UserAgentString = @"NuGetDefense/1.0.7.2 (https://github.com/digitalcoyote/NuGetDefense/blob/master/README.md)";
         private static NuGetPackage[] _pkgs;
         private static Settings _settings;
 
