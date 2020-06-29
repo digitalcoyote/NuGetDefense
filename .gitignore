@@ -1,6 +1,5 @@
 **/bin/*
 **/obj/*
-*.dll
 *.pdb
 *.cache
 *.blob
@@ -13,3 +12,5 @@ Src/TestFiles/net461.TestLib/Content/
 Src/TestFiles/net461.TestLib/fonts/
 
 Src/TestFiles/net461.TestLib/Scripts/
+
+*.user
