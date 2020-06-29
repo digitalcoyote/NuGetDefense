@@ -1,17 +1,11 @@
-# NuGetDefense
+# [NuGetDefense](https://digitalcoyote.github.io/NuGetDefense/)
 
 [![Join the chat at https://gitter.im/NuGetDefense/community](https://badges.gitter.im/NuGetDefense/community.svg)](https://gitter.im/NuGetDefense/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  [![NuGet version](https://badge.fury.io/nu/NugetDefense.svg)](https://badge.fury.io/nu/NugetDefense)
 
 An MSBuildTask that checks for known vulnerabilities. Inspired by [OWASP SafeNuGet](https://github.com/OWASP/SafeNuGet).
-#### Rider
-![Example Error Messages in Rider](https://rawcdn.githack.com/digitalcoyote/NuGetDefense/c5e153a627cde0d194daf8500ffb8cab7020e903/ErrorMessages.png)
-#### Visual Studio
-![Example Error Messages in Visual Studio 2019](https://rawcdn.githack.com/digitalcoyote/NuGetDefense/16150e955e89e21d24c54bb4a03888e9a7b896e5/VSErrorMessages.png)
-
-## Why a new Project?
-  1. SafeNuGet hasn't seen a new commit in years  and isn't able to keep up with vulnerable packages.
-  2. SafeNuGet doesn't have a license (at all).
-  3. A pure MSBuild task [should not use dependencies](https://natemcmaster.com/blog/2017/11/11/msbuild-task-with-dependencies/) and cannot get the desired results without them.
+  
+## Docs
+View the full documentation for NuGetDefense [here](https://digitalcoyote.github.io/NuGetDefense/)
   
 ## Features  
 * Uses Multiple Sources to check for known vulnerabilities in third-party libraries (NuGet packages)
