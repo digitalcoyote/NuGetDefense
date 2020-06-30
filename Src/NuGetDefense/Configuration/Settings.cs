@@ -7,6 +7,7 @@ namespace NuGetDefense.Configuration
     public class Settings
     {
         public bool WarnOnly { get; set; } = false;
+        public bool CheckTransitiveDependencies { get; set; } = true;
 
         public BuildErrorSettings ErrorSettings { get; set; } = new BuildErrorSettings();
 
