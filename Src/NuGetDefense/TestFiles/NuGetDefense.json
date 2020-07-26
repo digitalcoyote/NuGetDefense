@@ -10,8 +10,8 @@
       }
     ],
     "IgnoredCvEs": [],
-    "WhiteListedPackages": [],
-    "BlackListedPackages": []
+    "AllowedPackages": [],
+    "BlockedPackages": []
   },
   "OssIndex": {
     "Enabled": true,

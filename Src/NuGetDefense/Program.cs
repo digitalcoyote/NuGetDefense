@@ -26,12 +26,12 @@ namespace NuGetDefense
             _nuGetFile = nugetFile.Path;
             _settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
             _pkgs = nugetFile.LoadPackages(args[0], _settings.CheckTransitiveDependencies).Values.ToArray();
-            if (_settings.ErrorSettings.BlackListedPackages.Length > 0) CheckForBlacklistedPackages();
-            if (_settings.ErrorSettings.WhiteListedPackages.Length > 0)
-                foreach (var pkg in _pkgs.Where(p => !_settings.ErrorSettings.WhiteListedPackages.Any(b =>
+            if (_settings.ErrorSettings.BlockedPackages.Length > 0) CheckForBlockedPackages();
+            if (_settings.ErrorSettings.AllowedPackages.Length > 0)
+                foreach (var pkg in _pkgs.Where(p => !_settings.ErrorSettings.AllowedPackages.Any(b =>
                     b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
                     Console.WriteLine(
-                        $"{_nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {pkg.Id} has not been whitelisted and may not be used in this project");
+                        $"{_nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {pkg.Id} is not listed as an allowed package and may not be used in this project");
             Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null;
             if (_settings.OssIndex.Enabled)
                 vulnDict =
@@ -47,17 +47,17 @@ namespace NuGetDefense
                 VulnerabilityReports.ReportVulnerabilities(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
                     _settings.ErrorSettings.CVSS3Threshold);
         }
-
-        private static void CheckForBlacklistedPackages()
+        
+        private static void CheckForBlockedPackages()
         {
             foreach (var pkg in _pkgs)
             {
-                var blacklistedPackage = _settings.ErrorSettings.BlackListedPackages.FirstOrDefault(b =>
+                var blockedPackage = _settings.ErrorSettings.BlockedPackages.FirstOrDefault(b =>
                     b.Package.Id == pkg.Id &&
                     VersionRange.Parse(pkg.Version).Satisfies(new NuGetVersion(b.Package.Version)));
-                if (blacklistedPackage != null)
+                if (blockedPackage != null)
                     Console.WriteLine(
-                        $"{_nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {pkg.Id} : {(string.IsNullOrEmpty(blacklistedPackage.CustomErrorMessage) ? blacklistedPackage.CustomErrorMessage : "has been blacklisted and may not be used in this project")}");
+                        $"{_nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {pkg.Id} : {(string.IsNullOrEmpty(blockedPackage.CustomErrorMessage) ? blockedPackage.CustomErrorMessage : "has been blocked and may not be used in this project")}");
             }
         }
     }

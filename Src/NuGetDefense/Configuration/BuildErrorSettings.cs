@@ -1,3 +1,5 @@
+using System;
+
 namespace NuGetDefense.Configuration
 {
     public class BuildErrorSettings
@@ -39,7 +41,7 @@ namespace NuGetDefense.Configuration
             new NuGetPackage
             {
                 Id = "NugetDefense",
-                Version = "1.0.6"
+                Version = "1.0.8.0"
             }
         };
 
@@ -52,17 +54,31 @@ namespace NuGetDefense.Configuration
         };
 
         /// <summary>
-        ///     List Package Id and Version/Range to be Whitelisted
+        ///     List Package Id and Version/Range to be Allowed
         ///     (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
         ///     Version is "any" if omitted
         /// </summary>
-        public NuGetPackage[] WhiteListedPackages { get; set; } = { };
+        public NuGetPackage[] AllowedPackages { get; set; } = { };
+
+        [Obsolete("Here for support of old config files")]
+        public NuGetPackage[] WhitelistedPackages
+        {
+            get => AllowedPackages;
+            set => AllowedPackages = value;
+        }
 
         /// <summary>
-        ///     List Package Id and Version/Range to be Blacklisted
+        ///     List Package Id and Version/Range to be Blocked
         ///     (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
         ///     Version is "any" if omitted
         /// </summary>
-        public BlacklistedPackage[] BlackListedPackages { get; set; } = { };
+        public BlockedPackage[] BlockedPackages { get; set; } = { };
+
+        [Obsolete("Here for support of old config files")]
+        public NuGetPackage[] BlacklistedPackages
+        {
+            get => AllowedPackages;
+            set => AllowedPackages = value;
+        }
     }
 }
