@@ -3,7 +3,7 @@
   <metadata>
     <id>NuGetDefense</id>
     <title>NuGetDefense</title>
-    <version>1.0.8.0-beta2</version>
+    <version>1.0.8.0-beta3</version>
     <authors>Curtis Carter</authors>
     <owners>Curtis Carter</owners>
     <projectUrl>https://github.com/DigitalCoyote/NuGetDefense</projectUrl>
@@ -29,6 +29,8 @@
     <file src="bin/Release/netcoreapp3.1/MessagePack.Annotations.dll" target="tools/netcoreapp3.1/MessagePack.Annotations.dll" />
     <file src="bin/Release/netcoreapp3.1/Microsoft.Bcl.AsyncInterfaces.dll" target="tools/netcoreapp3.1/Microsoft.Bcl.AsyncInterfaces.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGet.Versioning.dll" target="tools/netcoreapp3.1/NuGet.Versioning.dll" />
+    <file src="bin/Release/netcoreapp3.1/Serilog.dll" target="tools/netcoreapp3.1/Serilog.dll" />
+    <file src="bin/Release/netcoreapp3.1/Serilog.Sinks.File.dll" target="tools/netcoreapp3.1/Serilog.Sinks.File.dll" />
     <file src="bin/Release/netcoreapp3.1/System.Text.Json.dll" target="tools/netcoreapp3.1/System.Text.Json.dll" />
     <file src="bin/Release/netcoreapp3.1/VulnerabilityData.bin" target="tools/netcoreapp3.1/VulnerabilityData.bin" />
 

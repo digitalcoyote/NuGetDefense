@@ -1,24 +1,55 @@
 {
-  "WarnOnly": true,
+  "WarnOnly": false,
+  "Log": {
+    "OutPut": "ReportedVulnerabilities.log",
+    "LogLevel": 2,
+    "RollingInterval": 0
+  },
+  "Logs": [
+    {
+      "OutPut": "ReportedVulnerabilities.log",
+      "LogLevel": 2,
+      "RollingInterval": 0
+    }
+  ],
+  "CheckTransitiveDependencies": true,
   "ErrorSettings": {
     "ErrorSeverityThreshold": 5,
     "CVSS3Threshold": -1,
-    "WhiteListedPackages": [],
-    "BlackListedPackages": [
+    "IgnoredPackages": [
+      {
+        "Id": "NugetDefense",
+        "Version": "1.0.8.0"
+      }
+    ],
+    "IgnoredCvEs": [],
+    "BlockedPackages": [
       {
         "Package": {
-          "Id": "Blacklisted.Example",
-          "Version": "1.0.0"
-        }
+          "Id": "BlockList.Example",
+          "Version": "1.0.1"
+        },
+        "CustomErrorMessage": "Custom Error Message"
+      }
+    ],
+    "BlacklistedPackages": [
+      {
+        "Package": {
+          "Id": "BlackListed.Example",
+          "Version": "1.0.1"
+        },
+        "CustomErrorMessage": "Custom Error Message"
       }
     ]
   },
   "OssIndex": {
     "Enabled": true,
-    "BreakIfCannotRun": false
+    "BreakIfCannotRun": true
   },
   "NVD": {
+    "SelfUpdate": false,
+    "TimeoutInSeconds": 15,
     "Enabled": true,
-    "BreakIfCannotRun": false
+    "BreakIfCannotRun": true
   }
 }

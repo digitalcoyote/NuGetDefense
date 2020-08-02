@@ -61,11 +61,8 @@ namespace NuGetDefense.Configuration
         public NuGetPackage[] AllowedPackages { get; set; } = { };
 
         [Obsolete("Here for support of old config files")]
-        public NuGetPackage[] WhitelistedPackages
-        {
-            get => AllowedPackages;
-            set => AllowedPackages = value;
-        }
+        public NuGetPackage[] WhiteListedPackages { get; set; }
+
 
         /// <summary>
         ///     List Package Id and Version/Range to be Blocked
@@ -75,10 +72,7 @@ namespace NuGetDefense.Configuration
         public BlockedPackage[] BlockedPackages { get; set; } = { };
 
         [Obsolete("Here for support of old config files")]
-        public NuGetPackage[] BlacklistedPackages
-        {
-            get => AllowedPackages;
-            set => AllowedPackages = value;
-        }
+        public BlockedPackage[] BlacklistedPackages { get; set; }
+
     }
 }
