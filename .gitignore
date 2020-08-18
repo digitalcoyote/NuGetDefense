@@ -14,3 +14,4 @@ Src/TestFiles/net461.TestLib/fonts/
 Src/TestFiles/net461.TestLib/Scripts/
 
 *.user
+**/.vs/*
