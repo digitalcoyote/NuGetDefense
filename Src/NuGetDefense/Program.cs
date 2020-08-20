@@ -29,7 +29,8 @@ namespace NuGetDefense
             _nuGetFile = nugetFile.Path;
             _settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
             ConfigureLogging();
-            _pkgs = nugetFile.LoadPackages(args[0], args[1], _settings.CheckTransitiveDependencies).Values.ToArray();
+            var targetFramework = (args.Length > 1) ? args[1] : "";
+            _pkgs = nugetFile.LoadPackages(args[0], targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray();
             if (_settings.ErrorSettings.BlockedPackages.Length > 0) CheckForBlockedPackages();
             if (_settings.ErrorSettings.AllowedPackages.Length > 0)
                 foreach (var pkg in _pkgs.Where(p => !_settings.ErrorSettings.AllowedPackages.Any(b =>
