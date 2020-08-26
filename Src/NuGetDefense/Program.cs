@@ -25,18 +25,18 @@ namespace NuGetDefense
         /// <param name="args"></param>
         private static void Main(string[] args)
         {
-            var nugetFile = new NuGetFile();
+            var nugetFile = new NuGetFile(args[0]);
             _nuGetFile = nugetFile.Path;
             _settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
             ConfigureLogging();
             var targetFramework = (args.Length > 1) ? args[1] : "";
-            _pkgs = nugetFile.LoadPackages(args[0], targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray();
+            _pkgs = nugetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray();
             if (_settings.ErrorSettings.BlockedPackages.Length > 0) CheckForBlockedPackages();
             if (_settings.ErrorSettings.AllowedPackages.Length > 0)
                 foreach (var pkg in _pkgs.Where(p => !_settings.ErrorSettings.AllowedPackages.Any(b =>
                     b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
-                    Console.WriteLine(
-                        $"{_nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {pkg.Id} is not listed as an allowed package and may not be used in this project");
+                    Console.WriteLine(MsBuild.Log(_nuGetFile, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
+                        $"{pkg.Id} is not listed as an allowed package and may not be used in this project"));
             Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null;
             if (_settings.OssIndex.Enabled)
                 vulnDict =
@@ -52,24 +52,8 @@ namespace NuGetDefense
                 VulnerabilityData.IgnoreCVEs(vulnDict, _settings.ErrorSettings.IgnoredCvEs);
             if (vulnDict == null) return;
             {
-                VulnerabilityReports.ReportVulnerabilities(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
-                    _settings.ErrorSettings.CVSS3Threshold);
-                Log.Information("Scanned for known vulnerabilities in dependencies of {projectFile}", args[0]);
-                foreach (var pkg in _pkgs)
-                    if (!vulnDict.ContainsKey(pkg.Id))
-                    {
-                        Log.Information("No vulnerabilities for {id} At Version {version} detected", pkg.Id,
-                            pkg.Version);
-                    }
-                    else
-                    {
-                        if (_settings.WarnOnly)
-                            Log.Warning("{count} vulnerabilities found for {id} @ {version}: {@vuln}",
-                                vulnDict[pkg.Id].Count, pkg.Id, pkg.Version, vulnDict[pkg.Id]);
-                        else
-                            Log.Error("{count} vulnerabilities found for {id} @ {version}: {@vuln}",
-                                vulnDict[pkg.Id].Count, pkg.Id, pkg.Version, vulnDict[pkg.Id]);
-                    }
+                new VulnerabilityReporter().ReportVulnerabilities(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
+                    _settings.ErrorSettings.Cvss3Threshold);
             }
         }
 

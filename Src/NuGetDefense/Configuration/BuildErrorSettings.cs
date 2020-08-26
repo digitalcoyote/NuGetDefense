@@ -8,15 +8,15 @@ namespace NuGetDefense.Configuration
         {
             get
             {
-                if (CVSS3Threshold > 8.9) return Severity.Critical;
-                if (CVSS3Threshold > 6.9) return Severity.High;
-                if (CVSS3Threshold > 3.9) return Severity.Medium;
-                if (CVSS3Threshold > 0) return Severity.Low;
-                return CVSS3Threshold < 0 ? Severity.Any : Severity.None;
+                if (Cvss3Threshold > 8.9) return Severity.Critical;
+                if (Cvss3Threshold > 6.9) return Severity.High;
+                if (Cvss3Threshold > 3.9) return Severity.Medium;
+                if (Cvss3Threshold > 0) return Severity.Low;
+                return Cvss3Threshold < 0 ? Severity.Any : Severity.None;
             }
             set
             {
-                CVSS3Threshold = value switch
+                Cvss3Threshold = value switch
                 {
                     Severity.Any => -1,
                     Severity.None => 0,
@@ -24,12 +24,12 @@ namespace NuGetDefense.Configuration
                     Severity.Medium => 4.0,
                     Severity.High => 7.0,
                     Severity.Critical => 9.0,
-                    _ => CVSS3Threshold
+                    _ => Cvss3Threshold
                 };
             }
         }
 
-        public double CVSS3Threshold { get; set; } = -1;
+        public double Cvss3Threshold { get; set; } = -1;
 
         /// <summary>
         ///     List Package Id and Version/Range to be ignored

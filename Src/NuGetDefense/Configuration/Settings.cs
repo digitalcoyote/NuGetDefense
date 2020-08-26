@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using NuGetDefense.Core;
 
 namespace NuGetDefense.Configuration
 {
@@ -50,17 +51,19 @@ namespace NuGetDefense.Configuration
             }
             catch (Exception e)
             {
-                Console.WriteLine(
-                    $"{Path.Combine(directory, "NuGetDefense.json")} : Error : NuGetDefense Settings failed to load. Default Settings were used instead. Exception: {e}");
+                Console.WriteLine(MsBuild.Log(Path.Combine(directory, "NuGetDefense.json"), MsBuild.Category.Error,
+                    $"NuGetDefense Settings failed to load. Default Settings were used instead. Exception: {e}"));
                 settings = new Settings();
             }
 
+#pragma warning disable 618
             if (settings.ErrorSettings.BlacklistedPackages != null)
                 settings.ErrorSettings.BlockedPackages =
                     settings.ErrorSettings.BlockedPackages.Concat(settings.ErrorSettings.BlacklistedPackages).ToArray();
             if (settings.ErrorSettings.WhiteListedPackages != null)
                 settings.ErrorSettings.AllowedPackages =
                     settings.ErrorSettings.AllowedPackages.Concat(settings.ErrorSettings.WhiteListedPackages).ToArray();
+#pragma warning restore 618
 
 
             return settings;
