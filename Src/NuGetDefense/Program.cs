@@ -28,15 +28,11 @@ namespace NuGetDefense
             var nugetFile = new NuGetFile(args[0]);
             _nuGetFile = nugetFile.Path;
             _settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
-            ConfigureLogging();
-            var targetFramework = (args.Length > 1) ? args[1] : "";
+            ConfigureLogging(Path.GetFileName(args[0]));
+            var targetFramework = args.Length > 1 ? args[1] : "";
             _pkgs = nugetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray();
-            if (_settings.ErrorSettings.BlockedPackages.Length > 0) CheckForBlockedPackages();
-            if (_settings.ErrorSettings.AllowedPackages.Length > 0)
-                foreach (var pkg in _pkgs.Where(p => !_settings.ErrorSettings.AllowedPackages.Any(b =>
-                    b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
-                    Console.WriteLine(MsBuild.Log(_nuGetFile, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
-                        $"{pkg.Id} is not listed as an allowed package and may not be used in this project"));
+            if (_settings.ErrorSettings.BlockedPackages.Length > 0) CheckBlockedPackages();
+            if (_settings.ErrorSettings.AllowedPackages.Length > 0) CheckAllowedPackages();
             Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null;
             if (_settings.OssIndex.Enabled)
                 vulnDict =
@@ -50,34 +46,60 @@ namespace NuGetDefense
                             vulnDict);
             if (_settings.ErrorSettings.IgnoredCvEs.Length > 0)
                 VulnerabilityData.IgnoreCVEs(vulnDict, _settings.ErrorSettings.IgnoredCvEs);
-            if (vulnDict == null) return;
+            if (vulnDict == null) Log.Logger.Information("No Vulnerabilities found in {0} packages", _pkgs.Length);
+
+            ReportVulnerabilities(vulnDict);
+        }
+
+        private static void CheckAllowedPackages()
+        {
+            foreach (var pkg in _pkgs.Where(p => !_settings.ErrorSettings.AllowedPackages.Any(b =>
+                b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
             {
-                new VulnerabilityReporter().ReportVulnerabilities(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
-                    _settings.ErrorSettings.Cvss3Threshold);
+                var msBuildMessage = MsBuild.Log(_nuGetFile, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
+                    $"{pkg.Id} is not listed as an allowed package and may not be used in this project");
+                Console.WriteLine(msBuildMessage);
+                Log.Logger.Debug(msBuildMessage);
             }
         }
 
-        private static void ConfigureLogging()
+        private static void ReportVulnerabilities(Dictionary<string, Dictionary<string, Vulnerability>> vulnDict)
+        {
+            var vulnReporter = new VulnerabilityReporter();
+            vulnReporter.BuildVulnerabilityReport(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
+                _settings.ErrorSettings.Cvss3Threshold);
+            Log.Logger.Error(vulnReporter.VulnerabilityReport);
+            foreach (var msBuildMessage in vulnReporter.MsBuildMessages)
+            {
+                Console.WriteLine(msBuildMessage);
+                Log.Logger.Debug(msBuildMessage);
+            }
+        }
+
+        private static void ConfigureLogging(string projectFileName)
         {
             if (!(_settings.Logs?.Length > 0)) return;
             var loggerConfiguration = new LoggerConfiguration();
             foreach (var log in _settings.Logs)
-                loggerConfiguration.WriteTo.File(log.OutPut,
+                loggerConfiguration.WriteTo.File(log.OutPut.Replace("{project}", projectFileName),
                     log.LogLevel,
                     rollingInterval: log.RollingInterval);
+            loggerConfiguration.WriteTo.Console();
             Log.Logger = loggerConfiguration.CreateLogger();
         }
 
-        private static void CheckForBlockedPackages()
+        private static void CheckBlockedPackages()
         {
             foreach (var pkg in _pkgs)
             {
                 var blockedPackage = _settings.ErrorSettings.BlockedPackages.FirstOrDefault(b =>
                     b.Package.Id == pkg.Id &&
                     VersionRange.Parse(pkg.Version).Satisfies(new NuGetVersion(b.Package.Version)));
-                if (blockedPackage != null)
-                    Console.WriteLine(
-                        $"{_nuGetFile}({pkg.LineNumber},{pkg.LinePosition}) : Error : {pkg.Id} : {(string.IsNullOrEmpty(blockedPackage.CustomErrorMessage) ? blockedPackage.CustomErrorMessage : "has been blocked and may not be used in this project")}");
+                if (blockedPackage == null) continue;
+
+                var msBuildMessage = MsBuild.Log(_nuGetFile, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
+                    $"{pkg.Id}: {(string.IsNullOrEmpty(blockedPackage.CustomErrorMessage) ? blockedPackage.CustomErrorMessage : "has been blocked and may not be used in this project")}");
+                Log.Logger.Debug(msBuildMessage);
             }
         }
     }

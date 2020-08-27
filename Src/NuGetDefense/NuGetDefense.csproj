@@ -21,9 +21,10 @@
     <ItemGroup>
       <PackageReference Include="MessagePack" Version="2.1.165" />
       <PackageReference Include="NuGet.Versioning" Version="5.7.0" />
-      <PackageReference Include="NuGetDefense.Core" Version="1.0.6-beta4" />
+      <PackageReference Include="NuGetDefense.Core" Version="1.0.6-beta9" />
       <PackageReference Include="NuGetDefense.NVD" Version="1.0.2.2-beta" />
       <PackageReference Include="NuGetDefense.OSSIndex" Version="1.0.1.7-beta" />
+      <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
       <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
       <PackageReference Include="System.Text.Json" Version="4.7.2" />
     </ItemGroup>

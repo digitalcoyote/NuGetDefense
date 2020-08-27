@@ -73,6 +73,5 @@ namespace NuGetDefense.Configuration
 
         [Obsolete("Here for support of old config files")]
         public BlockedPackage[] BlacklistedPackages { get; set; }
-
     }
 }
