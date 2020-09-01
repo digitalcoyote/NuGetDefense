@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Xml;
+using System.Xml.Serialization;
 using NuGet.Versioning;
 using NuGetDefense.Configuration;
 using NuGetDefense.Core;
@@ -25,37 +29,71 @@ namespace NuGetDefense
         /// <param name="args"></param>
         private static void Main(string[] args)
         {
-            var nugetFile = new NuGetFile(args[0]);
-            _nuGetFile = nugetFile.Path;
             _settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
             ConfigureLogging(Path.GetFileName(args[0]));
-            var targetFramework = args.Length > 1 ? args[1] : "";
-            _pkgs = nugetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray();
-            if (_settings.ErrorSettings.BlockedPackages.Length > 0) CheckBlockedPackages();
-            if (_settings.ErrorSettings.AllowedPackages.Length > 0) CheckAllowedPackages();
-            Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null;
-            if (_settings.OssIndex.Enabled)
-                vulnDict =
-                    new Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun, UserAgentString)
-                        .GetVulnerabilitiesForPackages(_pkgs);
-            if (_settings.NVD.Enabled)
-                vulnDict =
-                    new NVD.Scanner(_nuGetFile, TimeSpan.FromSeconds(_settings.NVD.TimeoutInSeconds),
-                            _settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate)
-                        .GetVulnerabilitiesForPackages(_pkgs,
-                            vulnDict);
-            if (_settings.ErrorSettings.IgnoredCvEs.Length > 0)
-                VulnerabilityData.IgnoreCVEs(vulnDict, _settings.ErrorSettings.IgnoredCvEs);
-            if (vulnDict == null) Log.Logger.Information("No Vulnerabilities found in {0} packages", _pkgs.Length);
+            try
+            {
+                Log.Logger.Verbose("Logging Configured");
 
-            ReportVulnerabilities(vulnDict);
+                Log.Logger.Verbose("Started NuGetDefense with arguments: {args}", args);
+                var nugetFile = new NuGetFile(args[0]);
+                _nuGetFile = nugetFile.Path;
+                Log.Logger.Verbose("NuGetFile Path: {nugetFilePath}", _nuGetFile);
+
+
+                var targetFramework = args.Length > 1 ? args[1] : "";
+                Log.Logger.Information("Target Framework: {framework}", string.IsNullOrWhiteSpace(targetFramework) ? "Undefined" : targetFramework);
+                Log.Logger.Verbose("Loading Packages");
+                Log.Logger.Verbose("Transitive Dependencies Included: {CheckTransitiveDependencies}", _settings.CheckTransitiveDependencies);
+                _pkgs = nugetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray();
+                Log.Logger.Information("Loaded {packageCount} packages", _pkgs.Length);
+
+                if (_settings.ErrorSettings.BlockedPackages.Length > 0) CheckBlockedPackages();
+                if (_settings.ErrorSettings.AllowedPackages.Length > 0) CheckAllowedPackages();
+                Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null;
+                if (_settings.OssIndex.Enabled)
+                {
+                    Log.Logger.Verbose("Checking with OSSIndex for Vulnerabilities");
+                    vulnDict =
+                        new Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun, UserAgentString)
+                            .GetVulnerabilitiesForPackages(_pkgs);
+                }
+
+                if (_settings.NVD.Enabled)
+                {
+                    Log.Logger.Verbose("Checking the embedded NVD source for Vulnerabilities");
+
+                    vulnDict =
+                        new NVD.Scanner(_nuGetFile, TimeSpan.FromSeconds(_settings.NVD.TimeoutInSeconds),
+                                _settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate)
+                            .GetVulnerabilitiesForPackages(_pkgs,
+                                vulnDict);
+                }
+
+                Log.Logger.Information("ignoring {ignoredCVECount} Vulnerabilities", _settings.ErrorSettings.IgnoredCvEs.Length);
+                if (_settings.ErrorSettings.IgnoredCvEs.Length > 0)
+                    VulnerabilityData.IgnoreCVEs(vulnDict, _settings.ErrorSettings.IgnoredCvEs);
+
+                ReportVulnerabilities(vulnDict);
+            }
+            catch (Exception e)
+            {
+                var msBuildMessage = MsBuild.Log(_nuGetFile, MsBuild.Category.Error,
+                    $"Encountered a fatal exception while checking for Dependencies in {_nuGetFile}. Exception: {e}");
+                Console.WriteLine(msBuildMessage);
+                Log.Logger.Fatal(msBuildMessage);
+            }
         }
 
         private static void CheckAllowedPackages()
         {
+            Log.Logger.Verbose("Checking Allowed Packages");
+
             foreach (var pkg in _pkgs.Where(p => !_settings.ErrorSettings.AllowedPackages.Any(b =>
                 b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
             {
+                Log.Logger.Error("{packageName}:{version} was included in {nugetFile} but is not in the Allowed List", pkg.Id, pkg.Version, _nuGetFile);
+
                 var msBuildMessage = MsBuild.Log(_nuGetFile, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
                     $"{pkg.Id} is not listed as an allowed package and may not be used in this project");
                 Console.WriteLine(msBuildMessage);
@@ -65,14 +103,48 @@ namespace NuGetDefense
 
         private static void ReportVulnerabilities(Dictionary<string, Dictionary<string, Vulnerability>> vulnDict)
         {
-            var vulnReporter = new VulnerabilityReporter();
-            vulnReporter.BuildVulnerabilityReport(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
-                _settings.ErrorSettings.Cvss3Threshold);
-            Log.Logger.Error(vulnReporter.VulnerabilityReport);
-            foreach (var msBuildMessage in vulnReporter.MsBuildMessages)
+            if (vulnDict == null)
             {
-                Console.WriteLine(msBuildMessage);
-                Log.Logger.Debug(msBuildMessage);
+                Log.Logger.Information("No Vulnerabilities found in {numberOfPackages} packages", _pkgs.Length);
+            }
+            else
+            {
+                Log.Logger.Verbose("Building report of Vulnerabilities found in {numberOfPackages} packages", vulnDict.Keys.Count);
+                var vulnReporter = new VulnerabilityReporter();
+                vulnReporter.BuildVulnerabilityTextReport(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
+                    _settings.ErrorSettings.Cvss3Threshold);
+                if (_settings.VulnerabilityReports.OutputTextReport) Log.Logger.Information(vulnReporter.VulnerabilityTextReport);
+                foreach (var msBuildMessage in vulnReporter.MsBuildMessages)
+                {
+                    Console.WriteLine(msBuildMessage);
+                    Log.Logger.Debug(msBuildMessage);
+                }
+
+                var fileTimestamp = DateTime.Now.ToString("u");
+
+                if (string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.JsonReportPath) && string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.XmlReportPath)) return;
+                vulnReporter.BuildVulnerabilityReport(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
+                    _settings.ErrorSettings.Cvss3Threshold);
+                if (!string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.JsonReportPath))
+                {
+                    var ops = new JsonSerializerOptions
+                    {
+                        IgnoreReadOnlyProperties = true,
+                        PropertyNameCaseInsensitive = true,
+                        ReadCommentHandling = JsonCommentHandling.Skip,
+                        WriteIndented = true
+                    };
+
+                    var contents = JsonSerializer.Serialize(vulnReporter.Report, ops);
+                    File.WriteAllText(Path.Combine(_settings.VulnerabilityReports.JsonReportPath, $"VulnerabilityReport-{fileTimestamp}.json"), contents
+                    );
+                }
+
+                if (string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.XmlReportPath)) return;
+
+                var xmlser = new XmlTextWriter(Path.Combine(_settings.VulnerabilityReports.JsonReportPath, $"VulnerabilityReport-{fileTimestamp}.xml"), Encoding.Default);
+                var xser = new XmlSerializer(typeof(VulnerabilityReport));
+                xser.Serialize(xmlser, vulnReporter.Report);
             }
         }
 
@@ -81,9 +153,13 @@ namespace NuGetDefense
             if (!(_settings.Logs?.Length > 0)) return;
             var loggerConfiguration = new LoggerConfiguration();
             foreach (var log in _settings.Logs)
-                loggerConfiguration.WriteTo.File(log.OutPut.Replace("{project}", projectFileName),
+            {
+                var file = log.OutPut.Replace("{project}", projectFileName);
+                loggerConfiguration.WriteTo.File(file,
                     log.LogLevel,
                     rollingInterval: log.RollingInterval);
+            }
+
             loggerConfiguration.WriteTo.Console();
             Log.Logger = loggerConfiguration.CreateLogger();
         }
@@ -92,10 +168,18 @@ namespace NuGetDefense
         {
             foreach (var pkg in _pkgs)
             {
+                Log.Logger.Verbose("Checking to see if {packageName}:{version} is Blocked", pkg.Id, pkg.Version);
+
                 var blockedPackage = _settings.ErrorSettings.BlockedPackages.FirstOrDefault(b =>
                     b.Package.Id == pkg.Id &&
                     VersionRange.Parse(pkg.Version).Satisfies(new NuGetVersion(b.Package.Version)));
-                if (blockedPackage == null) continue;
+                if (blockedPackage == null)
+                {
+                    Log.Logger.Verbose("{packageName}:{version} is not Blocked", pkg.Id, pkg.Version);
+                    continue;
+                }
+
+                Log.Logger.Error("{packageName}:{version} is Blocked but was included in {nugetFile}", pkg.Id, pkg.Version, _nuGetFile);
 
                 var msBuildMessage = MsBuild.Log(_nuGetFile, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
                     $"{pkg.Id}: {(string.IsNullOrEmpty(blockedPackage.CustomErrorMessage) ? blockedPackage.CustomErrorMessage : "has been blocked and may not be used in this project")}");

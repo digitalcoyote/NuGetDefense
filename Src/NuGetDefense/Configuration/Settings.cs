@@ -16,6 +16,8 @@ namespace NuGetDefense.Configuration
             set { Logs = new[] {value}; }
         }
 
+        public VulnerabilityReportsSettings VulnerabilityReports { get; set; } = new VulnerabilityReportsSettings();
+
         public FileLogSettings[] Logs { get; set; }
         public bool CheckTransitiveDependencies { get; set; } = true;
 
@@ -65,7 +67,6 @@ namespace NuGetDefense.Configuration
                     settings.ErrorSettings.AllowedPackages.Concat(settings.ErrorSettings.WhiteListedPackages).ToArray();
 #pragma warning restore 618
 
-
             return settings;
         }
 
@@ -78,6 +79,7 @@ namespace NuGetDefense.Configuration
                 ReadCommentHandling = JsonCommentHandling.Skip,
                 WriteIndented = true
             };
+
             File.WriteAllText(Path.Combine(directory, "NuGetDefense.json"),
                 JsonSerializer.Serialize(settings, ops));
         }
