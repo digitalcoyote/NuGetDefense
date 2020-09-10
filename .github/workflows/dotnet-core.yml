@@ -31,6 +31,9 @@ jobs:
            dotnet nuget add source "https://nuget.pkg.github.com/digitalcoyote/index.json" --name github --username digitalcoyote --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
            dotnet restore ./NuGetDefense.NVD/Src/NuGetDefense.NVD.sln
            dotnet restore ./NuGetDefense/Src/NuGetDefense.sln
+           dotnet tool install Nuke.GlobalTool --global
+           dotnet tool install GitVersion.Tool --global
+
 
     - name: Generate VulnerabilityData.bin
       run: |
@@ -42,4 +45,7 @@ jobs:
       run: dotnet build ./NuGetDefense/Src/NuGetDefense.sln --configuration Release --no-restore
       
     - name: Test
-      run: dotnet test ./NuGetDefense/Src/NuGetDefense.sln --no-restore --verbosity normal
+      run: nuke compile --root ./NuGetDefense
+      
+    - name: Publish to GitHub Package Repository
+      run: dotnet push "./NuGetDefense/Src/NuGetDefense/bin/Release/*.nupkg"
