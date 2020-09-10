@@ -1,1 +1,0 @@
-dotnet build -c Release ./Src/NuGetDefense/NuGetDefense.csproj -v q 

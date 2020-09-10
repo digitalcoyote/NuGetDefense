@@ -16,6 +16,7 @@
         <PackageId>NuGetDefense</PackageId>
         <NuspecFile>NuGetDefense.nuspec</NuspecFile>
         <LangVersion>8</LangVersion>
+        <NuspecProperties>version=$(PackageVersion)</NuspecProperties>
     </PropertyGroup>
 
     <ItemGroup>
