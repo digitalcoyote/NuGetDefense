@@ -14,17 +14,7 @@ jobs:
       uses: actions/checkout@v2.3.2
       with:
         path: ./NuGetDefense
-
-    - name: Setup .NET Core v3.1
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.402
-
-    - name: Setup .NET Core v2.1
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 2.1.810
-
+        fetch-depth: 0
 
     - name: Checkout NVD Feed Impoorter
       uses: actions/checkout@v2.3.2
@@ -49,10 +39,10 @@ jobs:
       
     - name: Build NuGetDefense
       working-directory: NuGetDefense
-      run: nuke
+      run: nuke --root ./
       
     - name: Test
       run: dotnet test ./NuGetDefense/Src/NuGetDefense.sln --no-restore --verbosity normal
       
     - name: Publish to GitHub Package Repository
-      run: dotnet push "./NuGetDefense/Src/NuGetDefense/bin/Release/*.nupkg"
+      run: dotnet nuget push "./NuGetDefense/Src/NuGetDefense/bin/Release/*.nupkg"
