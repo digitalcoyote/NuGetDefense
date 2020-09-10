@@ -1,0 +1,45 @@
+name: .NET Core
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Initial Checkout
+      uses: actions/checkout@v2.3.2
+      with:
+        path: ./NuGetDefense
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.402
+
+    - name: Checkout NVD Feed Impoorter
+      uses: actions/checkout@v2.3.2
+      with:
+        repository: digitalcoyote/NuGetDefense.NVD
+        path: ./NuGetDefense.NVD
+
+    - name: Install dependencies
+      run: | 
+           dotnet nuget add source "https://nuget.pkg.github.com/digitalcoyote/index.json" --name github --username digitalcoyote --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+           dotnet restore ./NuGetDefense.NVD/Src/NuGetDefense.NVD.sln
+           dotnet restore ./NuGetDefense/Src/NuGetDefense.sln
+
+    - name: Generate VulnerabilityData.bin
+      run: |
+           dotnet build ./NuGetDefense.NVD/Src/NuGetDefense.NVD.sln -property:GeneratePackageOnBuild=false --configuration Release -v m
+           mkdir -p ./NuGetDefense/Src/NuGetDefense/bin/Release/netcoreapp3.1
+           dotnet ./NuGetDefense.NVD/Src/NVDFeedImporter/bin/Release/netcoreapp3.1/NVDFeedImporter.dll "./NuGetDefense/Src/NuGetDefense/bin/Release/netcoreapp3.1/"
+      
+    - name: Build NuGetDefense
+      run: dotnet build ./NuGetDefense/Src/NuGetDefense.sln --configuration Release --no-restore
+      
+    - name: Test
+      run: dotnet test ./NuGetDefense/Src/NuGetDefense.sln --no-restore --verbosity normal
