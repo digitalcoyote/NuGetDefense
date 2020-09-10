@@ -45,4 +45,4 @@ jobs:
       run: dotnet test ./NuGetDefense/Src/NuGetDefense.sln --no-restore --verbosity normal
       
     - name: Publish to GitHub Package Repository
-      run: dotnet nuget push "./NuGetDefense/Src/NuGetDefense/bin/Release/*.nupkg"
+      run: dotnet nuget push "./NuGetDefense/Src/NuGetDefense/bin/Release/*.nupkg" -s github
