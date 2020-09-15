@@ -3,10 +3,10 @@
   <metadata>
     <id>NuGetDefense</id>
     <title>NuGetDefense</title>
-    <version>1.0.8.0-beta7</version>
+    <version>1.0.8</version>
     <authors>Curtis Carter</authors>
     <owners>Curtis Carter</owners>
-    <projectUrl>https://github.com/DigitalCoyote/NuGetDefense</projectUrl>
+    <projectUrl>https://digitalcoyote.github.io/NuGetDefense/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>NuGetDefense ~ Check for Known Vulnerabilities at Build</summary>
     <description>NuGetDefense was inspired by OWASP SafeNuGet but checks with multiple sources for known vulnerabilities.</description>
@@ -30,9 +30,9 @@
     <file src="bin/Release/netcoreapp3.1/Microsoft.Bcl.AsyncInterfaces.dll" target="tools/netcoreapp3.1/Microsoft.Bcl.AsyncInterfaces.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGet.Versioning.dll" target="tools/netcoreapp3.1/NuGet.Versioning.dll" />
     <file src="bin/Release/netcoreapp3.1/Serilog.dll" target="tools/netcoreapp3.1/Serilog.dll" />
+    <file src="bin/Release/netcoreapp3.1/Serilog.Sinks.Console.dll" target="tools/netcoreapp3.1/Serilog.Sinks.Console.dll" />
     <file src="bin/Release/netcoreapp3.1/Serilog.Sinks.File.dll" target="tools/netcoreapp3.1/Serilog.Sinks.File.dll" />
     <file src="bin/Release/netcoreapp3.1/System.Text.Json.dll" target="tools/netcoreapp3.1/System.Text.Json.dll" />
     <file src="bin/Release/netcoreapp3.1/VulnerabilityData.bin" target="tools/netcoreapp3.1/VulnerabilityData.bin" />
-
   </files>
 </package>

@@ -7,52 +7,52 @@ on:
     branches: [ master ]
 
 jobs:
-  # Build:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Initial Checkout
-  #     uses: actions/checkout@v2.3.2
-  #     with:
-  #       path: ./NuGetDefense
-  #       fetch-depth: 0
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Initial Checkout
+      uses: actions/checkout@v2.3.2
+      with:
+        path: ./NuGetDefense
+        fetch-depth: 0
 
-  #   - name: Checkout NVD Feed Impoorter
-  #     uses: actions/checkout@v2.3.2
-  #     with:
-  #       repository: digitalcoyote/NuGetDefense.NVD
-  #       path: ./NuGetDefense.NVD
+    - name: Checkout NVD Feed Impoorter
+      uses: actions/checkout@v2.3.2
+      with:
+        repository: digitalcoyote/NuGetDefense.NVD
+        path: ./NuGetDefense.NVD
 
-  #   - name: Install Dependencies
-  #     run: | 
-  #          dotnet nuget add source "https://nuget.pkg.github.com/digitalcoyote/index.json" --name github --username digitalcoyote --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
-  #          dotnet restore ./NuGetDefense.NVD/Src/NuGetDefense.NVD.sln
-  #          dotnet restore ./NuGetDefense/Src/NuGetDefense.sln
-  #          dotnet tool install Nuke.GlobalTool --global
-  #          dotnet tool install GitVersion.Tool --global
+    - name: Install Dependencies
+      run: | 
+           dotnet nuget add source "https://nuget.pkg.github.com/digitalcoyote/index.json" --name github --username digitalcoyote --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+           dotnet restore ./NuGetDefense.NVD/Src/NuGetDefense.NVD.sln
+           dotnet restore ./NuGetDefense/Src/NuGetDefense.sln
+           dotnet tool install Nuke.GlobalTool --global
+           dotnet tool install GitVersion.Tool --global
 
 
-  #   - name: Generate VulnerabilityData.bin
-  #     run: |
-  #          dotnet build ./NuGetDefense.NVD/Src/NuGetDefense.NVD.sln -property:GeneratePackageOnBuild=false --configuration Release -v m
-  #          mkdir -p ./NuGetDefense/Src/NuGetDefense/bin/Release/netcoreapp3.1
-  #          dotnet ./NuGetDefense.NVD/Src/NVDFeedImporter/bin/Release/netcoreapp3.1/NVDFeedImporter.dll "./NuGetDefense/Src/NuGetDefense/bin/Release/netcoreapp3.1/"
+    - name: Generate VulnerabilityData.bin
+      run: |
+           dotnet build ./NuGetDefense.NVD/Src/NuGetDefense.NVD.sln -property:GeneratePackageOnBuild=false --configuration Release -v m
+           mkdir -p ./NuGetDefense/Src/NuGetDefense/bin/Release/netcoreapp3.1
+           dotnet ./NuGetDefense.NVD/Src/NVDFeedImporter/bin/Release/netcoreapp3.1/NVDFeedImporter.dll "./NuGetDefense/Src/NuGetDefense/bin/Release/netcoreapp3.1/"
       
-  #   - name: Build NuGetDefense
-  #     working-directory: NuGetDefense
-  #     run: nuke --root ./
+    - name: Build NuGetDefense
+      working-directory: NuGetDefense
+      run: nuke --root ./
       
-  #   - name: Test
-  #     run: dotnet test ./NuGetDefense/Src/NuGetDefense.sln --no-restore --verbosity normal
+    - name: Test
+      run: dotnet test ./NuGetDefense/Src/NuGetDefense.sln --no-restore --verbosity normal
       
-  #   - name: Publish to GitHub Package Repository
-  #     working-directory: ./NuGetDefense/Src/NuGetDefense/bin/Release/
-  #     shell: pwsh
-  #     run: |
-  #          $nupkg = Get-ChildItem -Filter *.nupkg -Name | Select-Object -First 1
-  #          &curl -X PUT -u "digitalcoyote:${{ secrets.GITHUB_TOKEN }}" -F package=@"$nupkg" https://nuget.pkg.github.com/digitalcoyote/
+    - name: Publish to GitHub Package Repository
+      working-directory: ./NuGetDefense/Src/NuGetDefense/bin/Release/
+      shell: pwsh
+      run: |
+           $nupkg = Get-ChildItem -Filter *.nupkg -Name | Select-Object -First 1
+           &curl -X PUT -u "digitalcoyote:${{ secrets.GITHUB_TOKEN }}" -F package=@"$nupkg" https://nuget.pkg.github.com/digitalcoyote/
 
   Bogus_Net:
-    # needs: Build
+    needs: Build
     runs-on: windows-latest
     steps:
     - name: Checkout
@@ -65,76 +65,113 @@ jobs:
            dotnet restore ./Source/Bogus/Bogus.csproj
            dotnet restore ./Source/Bogus.Tests/Bogus.Tests.csproj
            dotnet nuget add source "https://nuget.pkg.github.com/digitalcoyote/index.json" --username digitalcoyote --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
-           dotnet add ./Source/Bogus/Bogus.csproj package NuGetDefense --version *-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
-           dotnet add ./Source/Bogus.Tests/Bogus.Tests.csproj package NuGetDefense --version *-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
+           dotnet add ./Source/Bogus/Bogus.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
+           dotnet add ./Source/Bogus.Tests/Bogus.Tests.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
            
 
-    - name: Build Bogus.Net
-      run: |
-          dotnet build ./Source/Bogus/Bogus.csproj
-          dotnet build ./Source/Bogus.Tests/Bogus.Tests.csproj
+    - name: Build Bogus
+      run: dotnet build ./Source/Bogus/Bogus.csproj
+      
+    - name: Build Bogus.Tests
+      run: dotnet build ./Source/Bogus.Tests/Bogus.Tests.csproj
 
 
-  # GitExtensions:
-  #   needs: Build
-  #   runs-on: windows-latest
-  #   steps:
-  #   - name: Checkout
-  #     uses: actions/checkout@v2.3.2
-  #     with:
-  #       repository: gitextensions/gitextensions
+  GitExtensions:
+    needs: Build
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.3.2
+      with:
+        repository: gitextensions/gitextensions
+        submodules: true
 
-  #   - name: Install Dependencies
-  #     run: | 
-  #          dotnet nuget add source "https://nuget.pkg.github.com/digitalcoyote/index.json" --name github --username digitalcoyote --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
-  #          dotnet add ./GitExtensions/GitExtensions.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./GitUI/GitUI.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./GitCommands/GitCommands.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./GitCommands/GitCommands.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/GitUIPluginInterfaces/GitUIPluginInterfaces.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/Statistics/GitStatistics/GitStatistics.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./ResourceManager/ResourceManager.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/Gource/Gource.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/DeleteUnusedBranches/DeleteUnusedBranches.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./NetSpell.SpellChecker/SpellChecker.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/Statistics/GitImpact/GitImpact.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/CreateLocalBranches/CreateLocalBranches.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/FindLargeFiles/FindLargeFiles.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/GitHub3/GitHub3.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/ProxySwitcher/ProxySwitcher.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/ReleaseNotesGenerator/ReleaseNotesGenerator.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./TranslationApp/TranslationApp.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/BackgroundFetch/BackgroundFetch.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/AutoCompileSubmodules/AutoCompileSubmodules.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/GitFlow/GitFlow.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/BuildServerIntegration/TeamCityIntegration/TeamCityIntegration.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Externals/Git.hub/Git.hub/Git.hub.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/Bitbucket/Bitbucket.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/BuildServerIntegration/JenkinsIntegration/JenkinsIntegration.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/BuildServerIntegration/TfsIntegration/TfsIntegration.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/BuildServerIntegration/TfsInterop.Vs2012/TfsInterop.Vs2012.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/BuildServerIntegration/TfsInterop.Vs2013/TfsInterop.Vs2013.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./GitExtUtils/GitExtUtils.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/BuildServerIntegration/TfsInterop.Vs2015/TfsInterop.Vs2015.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Externals/conemu-inside/ConEmuWinForms/ConEmuWinForms.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/BuildServerIntegration/AppVeyorIntegration/AppVeyorIntegration.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./UnitTests/GitCommands.Tests/GitCommands.Tests.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./UnitTests/GitUI.Tests/GitUI.Tests.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./UnitTests/Plugins/ReleaseNotesGenerator.Tests/ReleaseNotesGenerator.Tests.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./UnitTests/ResourceManager.Tests/ResourceManager.Tests.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/JiraCommitHintPlugin/JiraCommitHintPlugin.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./UnitTests/CommonTestUtils/CommonTestUtils.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Plugins/BuildServerIntegration/AzureDevOpsIntegration/AzureDevOpsIntegration.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./UnitTests/GitExtUtils.Tests/GitExtUtils.Tests.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Externals/ICSharpCode.TextEditor/Project/ICSharpCode.TextEditor.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./UnitTests/Plugins/GitUIPluginInterfaces.Tests/GitUIPluginInterfaces.Tests.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./UnitTests/Plugins/BuildServerIntegration/AzureDevOpsIntegration.Tests/AzureDevOpsIntegration.Tests.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./UnitTests/Plugins/BuildServerIntegration/AppVeyorIntegration.Tests/AppVeyorIntegration.Tests.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./UnitTests/Plugins/DeleteUnusedBranches.Tests/DeleteUnusedBranches.Tests.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./Externals/EasyHook/EasyHook/EasyHook.csproj package NuGetDefense --version *-* -s github
-  #          dotnet add ./IntegrationTests/UI.IntegrationTests/UI.IntegrationTests.csproj package NuGetDefense --version *-* -s github
-  #          dotnet restore ./GitExtensions.sln -s github --version *-*
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.1
 
-  #   - name: Build Bogus.Net
-  #     run: dotnet build ./GitExtensions.sln -c Release
+    - name: Install Dependencies
+      run: | 
+           dotnet restore ./GitExtensions.sln
+           dotnet nuget add source "https://nuget.pkg.github.com/digitalcoyote/index.json" --name github --username digitalcoyote --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+           dotnet add ./GitExtensions/GitExtensions.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./GitUI/GitUI.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./GitCommands/GitCommands.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./GitCommands/GitCommands.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/GitUIPluginInterfaces/GitUIPluginInterfaces.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/Statistics/GitStatistics/GitStatistics.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./ResourceManager/ResourceManager.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/Gource/Gource.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/DeleteUnusedBranches/DeleteUnusedBranches.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./NetSpell.SpellChecker/SpellChecker.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/Statistics/GitImpact/GitImpact.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/CreateLocalBranches/CreateLocalBranches.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/FindLargeFiles/FindLargeFiles.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/GitHub3/GitHub3.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/ProxySwitcher/ProxySwitcher.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/ReleaseNotesGenerator/ReleaseNotesGenerator.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./TranslationApp/TranslationApp.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/BackgroundFetch/BackgroundFetch.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/AutoCompileSubmodules/AutoCompileSubmodules.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/GitFlow/GitFlow.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/BuildServerIntegration/TeamCityIntegration/TeamCityIntegration.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Externals/Git.hub/Git.hub/Git.hub.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/Bitbucket/Bitbucket.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/BuildServerIntegration/JenkinsIntegration/JenkinsIntegration.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/BuildServerIntegration/TfsIntegration/TfsIntegration.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/BuildServerIntegration/TfsInterop.Vs2012/TfsInterop.Vs2012.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/BuildServerIntegration/TfsInterop.Vs2013/TfsInterop.Vs2013.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./GitExtUtils/GitExtUtils.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/BuildServerIntegration/TfsInterop.Vs2015/TfsInterop.Vs2015.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Externals/conemu-inside/ConEmuWinForms/ConEmuWinForms.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/BuildServerIntegration/AppVeyorIntegration/AppVeyorIntegration.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./UnitTests/GitCommands.Tests/GitCommands.Tests.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./UnitTests/GitUI.Tests/GitUI.Tests.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./UnitTests/Plugins/ReleaseNotesGenerator.Tests/ReleaseNotesGenerator.Tests.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./UnitTests/ResourceManager.Tests/ResourceManager.Tests.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/JiraCommitHintPlugin/JiraCommitHintPlugin.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./UnitTests/CommonTestUtils/CommonTestUtils.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Plugins/BuildServerIntegration/AzureDevOpsIntegration/AzureDevOpsIntegration.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./UnitTests/GitExtUtils.Tests/GitExtUtils.Tests.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./Externals/ICSharpCode.TextEditor/Project/ICSharpCode.TextEditor.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./UnitTests/Plugins/GitUIPluginInterfaces.Tests/GitUIPluginInterfaces.Tests.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./UnitTests/Plugins/BuildServerIntegration/AzureDevOpsIntegration.Tests/AzureDevOpsIntegration.Tests.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./UnitTests/Plugins/BuildServerIntegration/AppVeyorIntegration.Tests/AppVeyorIntegration.Tests.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./UnitTests/Plugins/DeleteUnusedBranches.Tests/DeleteUnusedBranches.Tests.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+           dotnet add ./IntegrationTests/UI.IntegrationTests/UI.IntegrationTests.csproj package NuGetDefense --version 1.*-* -s "https://nuget.pkg.github.com/digitalcoyote/index.json"
+
+    - name: Build GitExtensions
+      run: MSBuild ./GitExtensions.sln -property:Configuration=Release
         
+  NodaTime:
+    needs: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+     matrix:
+      os: [windows-latest, ubuntu-latest, macos-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.3.2
+      with:
+        repository: nodatime/nodatime
+
+    - name: Install Dependencies
+      run: | 
+           dotnet restore ./src/NodaTime.sln
+           dotnet nuget add source "https://nuget.pkg.github.com/digitalcoyote/index.json" --username digitalcoyote --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+           dotnet add ./src/NodaTime.Benchmarks/NodaTime.Benchmarks.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
+           dotnet add ./src/NodaTime.Demo/NodaTime.Demo.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
+           dotnet add ./src/NodaTime.NzdPrinter/NodaTime.NzdPrinter.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
+           dotnet add ./src/NodaTime.Test/NodaTime.Test.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
+           dotnet add ./src/NodaTime.Testing/NodaTime.Testing.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
+           dotnet add ./src/NodaTime.Tools.Common/NodaTime.Tools.Common.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
+           dotnet add ./src/NodaTime.Tools.DumpTimeZoneInfo/NodaTime.Tools.DumpTimeZoneInfo.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
+           dotnet add ./src/NodaTime.Tools.ValidateHistoricalNzd/NodaTime.Tools.ValidateHistoricalNzd.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
+           dotnet add ./src/NodaTime.TzValidate.NodaDump/NodaTime.TzValidate.NodaDump.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
+           dotnet add ./src/NodaTime.TzValidate.NzdCompatibility/NodaTime.TzValidate.NzdCompatibility.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
+           dotnet add ./src/NodaTime.TzdbCompiler.Test/NodaTime.TzdbCompiler.Test.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
+           dotnet add ./src/NodaTime.TzdbCompiler/NodaTime.TzdbCompiler.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
+           dotnet add ./src/NodaTime/NodaTime.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
+           
+
+    - name: Build Noda Time
+      run: dotnet build ./src/NodaTime.sln

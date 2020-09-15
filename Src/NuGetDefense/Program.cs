@@ -27,7 +27,7 @@ namespace NuGetDefense
         ///     args[0] is expected to be the path to the project file.
         /// </summary>
         /// <param name="args"></param>
-        private static void Main(string[] args)
+        private static int Main(string[] args)
         {
             _settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
             ConfigureLogging(Path.GetFileName(args[0]));
@@ -75,6 +75,7 @@ namespace NuGetDefense
                     VulnerabilityData.IgnoreCVEs(vulnDict, _settings.ErrorSettings.IgnoredCvEs);
 
                 ReportVulnerabilities(vulnDict);
+                if (vulnDict?.Count == 0) return 0;
             }
             catch (Exception e)
             {
@@ -82,7 +83,10 @@ namespace NuGetDefense
                     $"Encountered a fatal exception while checking for Dependencies in {_nuGetFile}. Exception: {e}");
                 Console.WriteLine(msBuildMessage);
                 Log.Logger.Fatal(msBuildMessage);
+                return -1;
             }
+
+            return 0;
         }
 
         private static void CheckAllowedPackages()
@@ -120,9 +124,11 @@ namespace NuGetDefense
                     Log.Logger.Debug(msBuildMessage);
                 }
 
-                var fileTimestamp = DateTime.Now.ToString("u");
 
                 if (string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.JsonReportPath) && string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.XmlReportPath)) return;
+
+                var fileTimestamp = DateTime.Now.ToString("u");
+
                 vulnReporter.BuildVulnerabilityReport(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
                     _settings.ErrorSettings.Cvss3Threshold);
                 if (!string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.JsonReportPath))
@@ -141,7 +147,7 @@ namespace NuGetDefense
                 }
 
                 if (string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.XmlReportPath)) return;
-
+                
                 var xmlser = new XmlTextWriter(Path.Combine(_settings.VulnerabilityReports.JsonReportPath, $"VulnerabilityReport-{fileTimestamp}.xml"), Encoding.Default);
                 var xser = new XmlSerializer(typeof(VulnerabilityReport));
                 xser.Serialize(xmlser, vulnReporter.Report);
