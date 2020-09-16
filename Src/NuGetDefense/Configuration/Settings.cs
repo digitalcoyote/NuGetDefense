@@ -88,8 +88,11 @@ namespace NuGetDefense.Configuration
             {
                 IgnoreReadOnlyProperties = true,
                 PropertyNameCaseInsensitive = true,
-                ReadCommentHandling = JsonCommentHandling.Skip
+                ReadCommentHandling = JsonCommentHandling.Skip,
+                IgnoreNullValues = true,
+                AllowTrailingCommas = true,
             };
+            
             settings = JsonSerializer.Deserialize<Settings>(settingsFileContents, ops);
             return settings;
         }
@@ -122,7 +125,9 @@ namespace NuGetDefense.Configuration
                 IgnoreReadOnlyProperties = true,
                 PropertyNameCaseInsensitive = true,
                 ReadCommentHandling = JsonCommentHandling.Skip,
-                WriteIndented = true
+                IgnoreNullValues = true,
+                AllowTrailingCommas = true,
+                WriteIndented = true,
             };
 
             try
