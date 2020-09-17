@@ -89,7 +89,6 @@ namespace NuGetDefense.Configuration
                 IgnoreReadOnlyProperties = true,
                 PropertyNameCaseInsensitive = true,
                 ReadCommentHandling = JsonCommentHandling.Skip,
-                IgnoreNullValues = true,
                 AllowTrailingCommas = true,
             };
             
