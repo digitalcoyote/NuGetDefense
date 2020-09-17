@@ -1,13 +1,14 @@
 {
   "WarnOnly": false,
+  "VulnerabilityReports": {},
+  "CheckTransitiveDependencies": true,
   "ErrorSettings": {
     "ErrorSeverityThreshold": 5,
-    "CVSS3Threshold": -1,
+    "Cvss3Threshold": -1,
     "IgnoredPackages": [
       {
         "Id": "NugetDefense",
-        "Version": null,
-        "PackageUrl": "pkg:nuget/NugetDefense@"
+        "Version": "1.0.8.0"
       }
     ],
     "IgnoredCvEs": [],
@@ -16,11 +17,12 @@
   },
   "OssIndex": {
     "Enabled": true,
-    "BreakIfCannotRun": false
+    "BreakIfCannotRun": true
   },
   "NVD": {
-    "SelfUpdate": true,
+    "SelfUpdate": false,
+    "TimeoutInSeconds": 15,
     "Enabled": true,
-    "BreakIfCannotRun": false
+    "BreakIfCannotRun": true
   }
 }

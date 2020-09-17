@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Xml;
@@ -29,6 +30,19 @@ namespace NuGetDefense
         /// <param name="args"></param>
         private static int Main(string[] args)
         {
+            #if DOTNETTOOL
+            if (args.Length == 0)
+            {
+                var versionString = Assembly.GetEntryAssembly()
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                    ?.InformationalVersion;
+                Console.WriteLine($"NuGetDefense v{versionString}");
+                Console.WriteLine("-------------");
+                Console.WriteLine("\nUsage:");
+                Console.WriteLine("  nugetdefense projectFile.proj TargetFrameworkMoniker");
+                return 0;
+            }
+#endif
             _settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
             ConfigureLogging(Path.GetFileName(args[0]));
             try

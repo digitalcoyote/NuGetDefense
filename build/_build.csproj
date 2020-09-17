@@ -8,6 +8,8 @@
     <NukeRootDirectory>..</NukeRootDirectory>
     <NukeScriptDirectory>..\Src</NukeScriptDirectory>
     <LangVersion>8</LangVersion>
+    <Configurations>Debug;Release;DotNetTool</Configurations>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
