@@ -30,6 +30,8 @@ namespace NuGetDefense.Configuration
         public OfflineVulnerabilitySourceConfiguration NVD { get; set; } =
             new OfflineVulnerabilitySourceConfiguration();
 
+        public string[] SensitivePackages { get; set; } = new string[0];
+
         public static Settings LoadSettings(string directory)
         {
             Settings settings;

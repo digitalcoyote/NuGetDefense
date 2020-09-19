@@ -46,6 +46,7 @@ namespace NuGetDefense
                 Log.Logger.Verbose("Loading Packages");
                 Log.Logger.Verbose("Transitive Dependencies Included: {CheckTransitiveDependencies}", _settings.CheckTransitiveDependencies);
                 _pkgs = nugetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray();
+                var nonSensitivePackages = _pkgs.Where(p => !_settings.SensitivePackages.Contains(p.Id)).ToArray();
                 Log.Logger.Information("Loaded {packageCount} packages", _pkgs.Length);
 
                 if (_settings.ErrorSettings.BlockedPackages.Length > 0) CheckBlockedPackages();
@@ -56,7 +57,7 @@ namespace NuGetDefense
                     Log.Logger.Verbose("Checking with OSSIndex for Vulnerabilities");
                     vulnDict =
                         new Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun, UserAgentString)
-                            .GetVulnerabilitiesForPackages(_pkgs);
+                            .GetVulnerabilitiesForPackages(nonSensitivePackages);
                 }
 
                 if (_settings.NVD.Enabled)
