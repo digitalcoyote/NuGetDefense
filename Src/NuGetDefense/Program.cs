@@ -18,7 +18,7 @@ namespace NuGetDefense
     internal class Program
     {
         private const string UserAgentString =
-            @"NuGetDefense/1.0.8.0-beta (https://github.com/digitalcoyote/NuGetDefense/blob/master/README.md)";
+            @"NuGetDefense/1.0.10.0-pre0001 (https://github.com/digitalcoyote/NuGetDefense/blob/master/README.md)";
 
         private static string _nuGetFile;
         private static NuGetPackage[] _pkgs;
@@ -70,7 +70,7 @@ namespace NuGetDefense
                 {
                     Log.Logger.Verbose("Checking with OSSIndex for Vulnerabilities");
                     vulnDict =
-                        new Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun, UserAgentString)
+                        new Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun, UserAgentString, _settings.OssIndex.Username, _settings.OssIndex.ApiToken)
                             .GetVulnerabilitiesForPackages(nonSensitivePackages);
                 }
 
