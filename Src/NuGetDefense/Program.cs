@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
 using NuGet.Versioning;
@@ -60,7 +61,7 @@ namespace NuGetDefense
                 Log.Logger.Verbose("Loading Packages");
                 Log.Logger.Verbose("Transitive Dependencies Included: {CheckTransitiveDependencies}", _settings.CheckTransitiveDependencies);
                 _pkgs = nugetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray();
-                var nonSensitivePackages = _pkgs.Where(p => !_settings.SensitivePackages.Contains(p.Id)).ToArray();
+                var nonSensitivePackages = GetNonSensitivePackages(_pkgs);
                 Log.Logger.Information("Loaded {packageCount} packages", _pkgs.Length);
 
                 if (_settings.ErrorSettings.BlockedPackages.Length > 0) CheckBlockedPackages();
@@ -102,6 +103,17 @@ namespace NuGetDefense
             }
 
             return 0;
+        }
+
+        /// <summary>
+        /// Escapes all characters for Regex, then replaces '*' with '.*' (Regex wild Card for 0 or more of any character) 
+        /// </summary>
+        /// <param name="nuGetPackages"></param>
+        /// <returns>a list of packages that do not match the wild card strings in SensitivePackages</returns>
+        private static NuGetPackage[] GetNonSensitivePackages(NuGetPackage[] nuGetPackages)
+        {
+            var sensitiveRegexSet = _settings.SensitivePackages.Select(sp => Regex.Escape(sp).Replace(@"\*", ".*"));
+            return nuGetPackages.Where(p => !sensitiveRegexSet.Any(x => Regex.IsMatch(p.Id, x))).ToArray();
         }
 
         private static void CheckAllowedPackages()
