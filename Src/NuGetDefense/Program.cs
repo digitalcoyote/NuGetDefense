@@ -22,6 +22,7 @@ namespace NuGetDefense
             @"NuGetDefense/1.0.10 (https://github.com/digitalcoyote/NuGetDefense/blob/master/README.md)";
 
         private static string _nuGetFile;
+        private static string _projectFileName;
         private static NuGetPackage[] _pkgs;
         private static Settings _settings;
 
@@ -45,7 +46,8 @@ namespace NuGetDefense
             }
 #endif
             _settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
-            ConfigureLogging(Path.GetFileName(args[0]));
+            _projectFileName = Path.GetFileName(args[0]);
+            ConfigureLogging();
             try
             {
                 Log.Logger.Verbose("Logging Configured");
@@ -110,7 +112,7 @@ namespace NuGetDefense
         /// </summary>
         /// <param name="nuGetPackages"></param>
         /// <returns>a list of packages that do not match the wild card strings in SensitivePackages</returns>
-        private static NuGetPackage[] GetNonSensitivePackages(NuGetPackage[] nuGetPackages)
+        public static NuGetPackage[] GetNonSensitivePackages(NuGetPackage[] nuGetPackages)
         {
             var sensitiveRegexSet = _settings.SensitivePackages.Select(sp => Regex.Escape(sp).Replace(@"\*", ".*"));
             return nuGetPackages.Where(p => !sensitiveRegexSet.Any(x => Regex.IsMatch(p.Id, x))).ToArray();
@@ -154,7 +156,7 @@ namespace NuGetDefense
 
                 if (string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.JsonReportPath) && string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.XmlReportPath)) return;
 
-                var fileTimestamp = DateTime.Now.ToString("u");
+                var fileTimestamp = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
 
                 vulnReporter.BuildVulnerabilityReport(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
                     _settings.ErrorSettings.Cvss3Threshold);
@@ -169,25 +171,25 @@ namespace NuGetDefense
                     };
 
                     var contents = JsonSerializer.Serialize(vulnReporter.Report, ops);
-                    File.WriteAllText(Path.Combine(_settings.VulnerabilityReports.JsonReportPath, $"VulnerabilityReport-{fileTimestamp}.json"), contents
+                    File.WriteAllText(_settings.VulnerabilityReports.JsonReportPath.Replace("{project}", _projectFileName), contents
                     );
                 }
 
                 if (string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.XmlReportPath)) return;
-                
-                var xmlser = new XmlTextWriter(Path.Combine(_settings.VulnerabilityReports.JsonReportPath, $"VulnerabilityReport-{fileTimestamp}.xml"), Encoding.Default);
+                var filename = _settings.VulnerabilityReports.XmlReportPath.Replace("{project}", _projectFileName);
+                var xmlser = new XmlTextWriter(File.Create(filename), Encoding.Default);
                 var xser = new XmlSerializer(typeof(VulnerabilityReport));
                 xser.Serialize(xmlser, vulnReporter.Report);
             }
         }
 
-        private static void ConfigureLogging(string projectFileName)
+        private static void ConfigureLogging()
         {
             if (!(_settings.Logs?.Length > 0)) return;
             var loggerConfiguration = new LoggerConfiguration();
             foreach (var log in _settings.Logs)
             {
-                var file = log.OutPut.Replace("{project}", projectFileName);
+                var file = log.OutPut.Replace("{project}", _projectFileName);
                 loggerConfiguration.WriteTo.File(file,
                     log.LogLevel,
                     rollingInterval: log.RollingInterval);
