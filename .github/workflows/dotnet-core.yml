@@ -172,8 +172,8 @@ jobs:
                    `"OssIndex`": {
                      `"Enabled`": true,
                      `"BreakIfCannotRun`": true,
-                     `"Username`": `"{{ secrets.OSSINDEX_USERNAME }}`",
-                     `"ApiToken`": `"{{ secrets.OSSINDEX_API_TOKEN }}`"
+                     `"Username`": `"${{ secrets.OSSINDEX_USERNAME }}`",
+                     `"ApiToken`": `"${{ secrets.OSSINDEX_API_TOKEN }}`"
                    },
                    `"NVD`": {
                      `"SelfUpdate`": false,
@@ -238,7 +238,7 @@ jobs:
            dotnet restore ./NuGetDefenseDocs.sln
            dotnet nuget add source "https://nuget.pkg.github.com/digitalcoyote/index.json" --name github --username digitalcoyote --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
            dotnet add ./NuGetDefenseDocs/NuGetDefenseDocs.csproj package NuGetDefense --version 1.*-* -s https://nuget.pkg.github.com/digitalcoyote/index.json
-           Set-Content -Path ""./NuGetDefenseDocs/NuGetDefense.json" -Value "{
+           Set-Content -Path "./NuGetDefenseDocs/NuGetDefense.json" -Value "{
              `"WarnOnly`": false,
              `"VulnerabilityReports`": {
                `"XmlReportPath`": `"./NuGetDefenseDocs/logs/{project}.NuGetDefense.xml`",
@@ -281,4 +281,4 @@ jobs:
            }";
 
     - name: Build NuGetDefenseDocs
-      run: dotnet build ./NuGetDefense.sln
+      run: dotnet build ./NuGetDefenseDocs.sln
