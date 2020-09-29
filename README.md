@@ -17,8 +17,8 @@ View the full documentation for NuGetDefense [here](https://digitalcoyote.github
   * Uses the versions resolved by the dotnet cli at build
 * Allow breaking the build based on severity of vulnerability.
 * Ignore specific vulnerabilities/packages.
-* Blacklisting NuGet Packages
-* Whitelisting NuGet Packages
+* Blocklisting NuGet Packages
+* Allowlisting NuGet Packages
 * MIT Licensed
 
 ## Requirements
