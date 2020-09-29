@@ -12,14 +12,14 @@ View the full documentation for NuGetDefense [here](https://digitalcoyote.github
   * [OSS Index](https://ossindex.sonatype.org/)
   * [National Vulnerability Database](https://nvd.nist.gov/) (Optionally Self-Updating)
 * Simple installation/configuration: the [NuGet Package](https://www.nuget.org/packages/NuGetDefense/) is all you need.
+* Transitive Dependency Checking
+  * SDK style projects only (older project format is not supported by the dotnet cli)
+  * Uses the versions resolved by the dotnet cli at build
 * Allow breaking the build based on severity of vulnerability.
 * Ignore specific vulnerabilities/packages.
 * Blacklisting NuGet Packages
 * Whitelisting NuGet Packages
 * MIT Licensed
-
-## Planned Features
-* Checking Dependencies based on the versions that were installed when the project was built.
 
 ## Requirements
   Currently NuGetDefense is built only in .Net Core 3.1 so you will need the runtime/SDK installed.
