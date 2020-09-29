@@ -30,16 +30,16 @@
         <PackageId>NuGetDefense.Tool</PackageId>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>nugetdefense</ToolCommandName>
-        <Version>1.0.11</Version>
+        <Version>1.0.12</Version>
         
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="MessagePack" Version="[2.1.194]" />
+      <PackageReference Include="MessagePack" Version="2.2.60" />
       <PackageReference Include="NuGet.Versioning" Version="[5.7.0]" />
       <PackageReference Include="NuGetDefense.Core" Version="[1.0.7]" />
       <PackageReference Include="NuGetDefense.NVD" Version="[1.0.3.1]" />
-      <PackageReference Include="NuGetDefense.OSSIndex" Version="[1.0.3]" />
+      <PackageReference Include="NuGetDefense.OSSIndex" Version="1.0.4" />
       <PackageReference Include="Serilog.Sinks.Console" Version="[3.1.1]" />
       <PackageReference Include="Serilog.Sinks.File" Version="[4.1.0]" />
       <PackageReference Include="System.Text.Json" Version="[4.7.2]" />

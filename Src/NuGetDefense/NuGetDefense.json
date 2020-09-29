@@ -7,9 +7,7 @@
     "Cvss3Threshold": -1,
     "IgnoredPackages": [
       {
-        "Id": "NugetDefense",
-        "Version": "1.0.8.0"
-      }
+        "Id": "NugetDefense"}
     ],
     "IgnoredCvEs": [],
     "AllowedPackages": [],
