@@ -1,3 +1,4 @@
+<p align="center"><img align="center" style="width:320px" src="https://i.imgur.com/faz3yOD.png"/></p><br/>
 # [NuGetDefense](https://digitalcoyote.github.io/NuGetDefense/)
 
 [![Join the chat at https://gitter.im/NuGetDefense/community](https://badges.gitter.im/NuGetDefense/community.svg)](https://gitter.im/NuGetDefense/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  [![NuGet version](https://badge.fury.io/nu/NugetDefense.svg)](https://badge.fury.io/nu/NugetDefense)
