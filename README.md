@@ -1,4 +1,4 @@
-<img align="center" style="width:320px" src="https://i.imgur.com/crqMBD4.png"/>
+<img style="width:300px" src="https://i.imgur.com/crqMBD4.png"/>
 
 # [NuGetDefense](https://digitalcoyote.github.io/NuGetDefense/)
 
