@@ -13,6 +13,7 @@ using NuGetDefense.Configuration;
 using NuGetDefense.Core;
 using NuGetDefense.OSSIndex;
 using Serilog;
+using static NuGetDefense.UtilityMethods;
 
 namespace NuGetDefense
 {
@@ -64,6 +65,8 @@ namespace NuGetDefense
                 Log.Logger.Verbose("Transitive Dependencies Included: {CheckTransitiveDependencies}", _settings.CheckTransitiveDependencies);
                 _pkgs = nugetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray();
                 var nonSensitivePackages = GetNonSensitivePackages(_pkgs);
+                if (_settings.ErrorSettings.IgnoredPackages.Length > 0)
+                    IgnorePackages(_pkgs, _settings.ErrorSettings.IgnoredPackages, out _pkgs);
                 Log.Logger.Information("Loaded {packageCount} packages", _pkgs.Length);
 
                 if (_settings.ErrorSettings.BlockedPackages.Length > 0) CheckBlockedPackages();
