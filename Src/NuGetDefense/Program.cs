@@ -20,7 +20,7 @@ namespace NuGetDefense
     internal class Program
     {
         private const string UserAgentString =
-            @"NuGetDefense/1.0.14 (https://github.com/digitalcoyote/NuGetDefense/blob/master/README.md)";
+            @"NuGetDefense/2.0.1";
 
         private static string _nuGetFile;
         private static string _projectFileName;

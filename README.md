@@ -9,6 +9,7 @@ An MSBuildTask that checks for known vulnerabilities. Inspired by [OWASP SafeNuG
 View the full documentation for NuGetDefense [here](https://digitalcoyote.github.io/NuGetDefense/)
   
 ## Features  
+
 * Uses Multiple Sources to check for known vulnerabilities in third-party libraries (NuGet packages)
   * [OSS Index](https://ossindex.sonatype.org/)
   * [National Vulnerability Database](https://nvd.nist.gov/) (Optionally Self-Updating)
@@ -25,11 +26,14 @@ View the full documentation for NuGetDefense [here](https://digitalcoyote.github
 * MIT Licensed
 
 ## Requirements
-  Currently NuGetDefense is built only in .Net Core 3.1 so you will need the runtime/SDK installed.
 
+  NuGetDefense v1.x is built only in .Net Core 3.1 so you will need the runtime/SDK installed.
+  NuGetDefense v2.x is built only in .Net 5.0 (significantly faster) so you will need the runtime/SDK installed.
+  
 ## How does it work?
+
   NuGetDefense is a bundled dotnet tool that runs using an [MSBuild ExecTask](https://docs.microsoft.com/en-us/visualstudio/msbuild/exec-task?view=vs-2019) after your project finishes building.
 
-    
 ## Love it? Support it!
+
 You can sponsor this project on [Github](https://github.com/sponsors/digitalcoyote) and [Patreon](https://www.patreon.com/codingcoyote). The funds will be used to pay for software licenses and cloud/hardware costs that keep my projects running.
