@@ -27,8 +27,8 @@ View the full documentation for NuGetDefense [here](https://digitalcoyote.github
 
 ## Requirements
 
-  NuGetDefense v1.x is built only in .Net Core 3.1 so you will need the runtime/SDK installed.
-  NuGetDefense v2.x is built only in .Net 5.0 (significantly faster) so you will need the runtime/SDK installed.
+  - NuGetDefense v1.x is built only in .Net Core 3.1 so you will need the runtime/SDK installed.
+  - NuGetDefense v2.x is built only in .Net 5.0 (significantly faster) so you will need the runtime/SDK installed.
   
 ## How does it work?
 
