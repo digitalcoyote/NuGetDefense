@@ -3,7 +3,7 @@
   <metadata>
     <id>NuGetDefense</id>
     <title>NuGetDefense</title>
-    <version>2.0.1</version>
+    <version>1.0.15-pre0002</version>
     <authors>Curtis Carter</authors>
     <owners>Curtis Carter</owners>
     <projectUrl>https://digitalcoyote.github.io/NuGetDefense/</projectUrl>
@@ -21,20 +21,20 @@
     <!-- <file src="Src/bin/Release/net461/NuGetDefense.exe" target="tools/net461/NuGetDefense.exe" /> -->
     <file src="build/nugetdefense.targets" target="build/nugetdefense.targets" />
     <file src="icon.png" target="images\" />
-    <file src="bin/Release/net5.0/NuGetDefense.deps.json" target="tools/net5.0/NuGetDefense.deps.json" />
-    <file src="bin/Release/net5.0/NuGetDefense.dll" target="tools/net5.0/NuGetDefense.dll" />
-    <file src="bin/Release/net5.0/NuGetDefense.Core.dll" target="tools/net5.0/NuGetDefense.Core.dll" />
-    <file src="bin/Release/net5.0/NuGetDefense.NVD.dll" target="tools/net5.0/NuGetDefense.NVD.dll" />
-    <file src="bin/Release/net5.0/NuGetDefense.OSSIndex.dll" target="tools/net5.0/NuGetDefense.OSSIndex.dll" />
-    <file src="bin/Release/net5.0/NuGetDefense.runtimeconfig.json" target="tools/net5.0/NuGetDefense.runtimeconfig.json" />
-    <file src="bin/Release/net5.0/MessagePack.dll" target="tools/net5.0/MessagePack.dll" />
-    <file src="bin/Release/net5.0/MessagePack.Annotations.dll" target="tools/net5.0/MessagePack.Annotations.dll" />
-    <file src="bin/Release/net5.0/Microsoft.Bcl.AsyncInterfaces.dll" target="tools/net5.0/Microsoft.Bcl.AsyncInterfaces.dll" />
-    <file src="bin/Release/net5.0/NuGet.Versioning.dll" target="tools/net5.0/NuGet.Versioning.dll" />
-    <file src="bin/Release/net5.0/Serilog.dll" target="tools/net5.0/Serilog.dll" />
-    <file src="bin/Release/net5.0/Serilog.Sinks.Console.dll" target="tools/net5.0/Serilog.Sinks.Console.dll" />
-    <file src="bin/Release/net5.0/Serilog.Sinks.File.dll" target="tools/net5.0/Serilog.Sinks.File.dll" />
-<!--    <file src="bin/Release/net5.0/System.Text.Json.dll" target="tools/net5.0/System.Text.Json.dll" />-->
-    <file src="bin/Release/net5.0/VulnerabilityData.bin" target="tools/net5.0/VulnerabilityData.bin" />
+    <file src="bin/Release/netcoreapp3.1/NuGetDefense.deps.json" target="tools/netcoreapp3.1/NuGetDefense.deps.json" />
+    <file src="bin/Release/netcoreapp3.1/NuGetDefense.dll" target="tools/netcoreapp3.1/NuGetDefense.dll" />
+    <file src="bin/Release/netcoreapp3.1/NuGetDefense.Core.dll" target="tools/netcoreapp3.1/NuGetDefense.Core.dll" />
+    <file src="bin/Release/netcoreapp3.1/NuGetDefense.NVD.dll" target="tools/netcoreapp3.1/NuGetDefense.NVD.dll" />
+    <file src="bin/Release/netcoreapp3.1/NuGetDefense.OSSIndex.dll" target="tools/netcoreapp3.1/NuGetDefense.OSSIndex.dll" />
+    <file src="bin/Release/netcoreapp3.1/NuGetDefense.runtimeconfig.json" target="tools/netcoreapp3.1/NuGetDefense.runtimeconfig.json" />
+    <file src="bin/Release/netcoreapp3.1/MessagePack.dll" target="tools/netcoreapp3.1/MessagePack.dll" />
+    <file src="bin/Release/netcoreapp3.1/MessagePack.Annotations.dll" target="tools/netcoreapp3.1/MessagePack.Annotations.dll" />
+    <file src="bin/Release/netcoreapp3.1/Microsoft.Bcl.AsyncInterfaces.dll" target="tools/netcoreapp3.1/Microsoft.Bcl.AsyncInterfaces.dll" />
+    <file src="bin/Release/netcoreapp3.1/NuGet.Versioning.dll" target="tools/netcoreapp3.1/NuGet.Versioning.dll" />
+    <file src="bin/Release/netcoreapp3.1/Serilog.dll" target="tools/netcoreapp3.1/Serilog.dll" />
+    <file src="bin/Release/netcoreapp3.1/Serilog.Sinks.Console.dll" target="tools/netcoreapp3.1/Serilog.Sinks.Console.dll" />
+    <file src="bin/Release/netcoreapp3.1/Serilog.Sinks.File.dll" target="tools/netcoreapp3.1/Serilog.Sinks.File.dll" />
+    <file src="bin/Release/netcoreapp3.1/System.Text.Json.dll" target="tools/netcoreapp3.1/System.Text.Json.dll" />
+    <file src="bin/Release/netcoreapp3.1/VulnerabilityData.bin" target="tools/netcoreapp3.1/VulnerabilityData.bin" />
   </files>
 </package>
