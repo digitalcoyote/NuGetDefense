@@ -39,6 +39,9 @@ namespace NuGetDefense.Configuration
             var settingsFilePath = Path.Combine(directory, "NuGetDefense.json");
             try
             {
+                if (!File.Exists(settingsFilePath) && File.Exists(Path.Combine(Directory.GetParent(directory)?.FullName ?? "", "NuGetDefense.json")))
+                        settingsFilePath = Path.Combine(Directory.GetParent(directory)?.FullName ?? "", "NuGetDefense.json");
+
                 //Edit to allow it to repeatedly check if hte file exists prior to multiple instances trying to save over it.
                 if (File.Exists(settingsFilePath))
                 {
@@ -46,6 +49,7 @@ namespace NuGetDefense.Configuration
                 }
                 else
                 {
+                    settingsFilePath = Path.Combine(directory, "NuGetDefense.json");
                     settings = new Settings();
                     SpinWait.SpinUntil(() =>
                     {
