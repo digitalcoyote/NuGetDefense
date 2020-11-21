@@ -7,7 +7,7 @@
     <NoWarn>CS0649;CS0169</NoWarn>
     <NukeRootDirectory>..</NukeRootDirectory>
     <NukeScriptDirectory>..\Src</NukeScriptDirectory>
-    <LangVersion>8</LangVersion>
+    <LangVersion>9</LangVersion>
     <Configurations>Debug;Release;DotNetTool</Configurations>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nuke.Common" Version="0.25.0" />
+    <PackageReference Include="Nuke.Common" Version="5.0.0" />
   </ItemGroup>
 
 </Project>

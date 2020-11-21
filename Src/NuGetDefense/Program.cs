@@ -19,8 +19,9 @@ namespace NuGetDefense
 {
     internal class Program
     {
-        private const string UserAgentString =
-            @"NuGetDefense/2.0.1";
+        private static readonly string UserAgentString = @$"NuGetDefense/{Version}";
+
+        private const string Version = "2.0.2";
 
         private static string _nuGetFile;
         private static string _projectFileName;
@@ -36,16 +37,14 @@ namespace NuGetDefense
             #if DOTNETTOOL
             if (args.Length == 0)
             {
-                var versionString = Assembly.GetEntryAssembly()
-                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                    ?.InformationalVersion;
-                Console.WriteLine($"NuGetDefense v{versionString}");
+                Console.WriteLine($"NuGetDefense v{Version}");
                 Console.WriteLine("-------------");
                 Console.WriteLine("\nUsage:");
                 Console.WriteLine("  nugetdefense projectFile.proj TargetFrameworkMoniker");
                 return 0;
             }
-#endif
+            #endif
+            
             _settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
             _projectFileName = Path.GetFileName(args[0]);
             ConfigureLogging();

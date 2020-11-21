@@ -38,11 +38,7 @@ namespace NuGetDefense.Configuration
         /// </summary>
         public NuGetPackage[] IgnoredPackages { get; set; } =
         {
-            new NuGetPackage
-            {
-                Id = "NugetDefense",
-                Version = "1.0.8.0"
-            }
+            new NuGetPackage {Id = "NugetDefense"}
         };
 
         /// <summary>
