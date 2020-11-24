@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -158,8 +157,6 @@ namespace NuGetDefense
 
 
                 if (string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.JsonReportPath) && string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.XmlReportPath)) return;
-
-                var fileTimestamp = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
 
                 vulnReporter.BuildVulnerabilityReport(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
                     _settings.ErrorSettings.Cvss3Threshold);
