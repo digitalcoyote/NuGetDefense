@@ -125,14 +125,15 @@ namespace NuGetDefense
             Log.Logger.Verbose("Checking Allowed Packages");
 
             foreach (var pkg in _pkgs.Where(p => !_settings.ErrorSettings.AllowedPackages.Any(b =>
-                b.Id == p.Id && VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version)))))
+                b.Id == p.Id && 
+                (string.IsNullOrWhiteSpace(b.Version) || VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version))))))
             {
                 Log.Logger.Error("{packageName}:{version} was included in {nugetFile} but is not in the Allowed List", pkg.Id, pkg.Version, _nuGetFile);
 
                 var msBuildMessage = MsBuild.Log(_nuGetFile, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
                     $"{pkg.Id} is not listed as an allowed package and may not be used in this project");
                 Console.WriteLine(msBuildMessage);
-                Log.Logger.Debug(msBuildMessage);
+                Log.Logger.Error(msBuildMessage);
             }
         }
 
@@ -208,19 +209,18 @@ namespace NuGetDefense
                 Log.Logger.Verbose("Checking to see if {packageName}:{version} is Blocked", pkg.Id, pkg.Version);
 
                 var blockedPackage = _settings.ErrorSettings.BlockedPackages.FirstOrDefault(b =>
-                    b.Package.Id == pkg.Id &&
-                    VersionRange.Parse(pkg.Version).Satisfies(new NuGetVersion(b.Package.Version)));
+                    b.Package.Id == pkg.Id && 
+                    (string.IsNullOrWhiteSpace(b.Package.Version) || VersionRange.Parse(pkg.Version).Satisfies(new NuGetVersion(b.Package.Version))));
                 if (blockedPackage == null)
                 {
                     Log.Logger.Verbose("{packageName}:{version} is not Blocked", pkg.Id, pkg.Version);
                     continue;
                 }
-
-                Log.Logger.Error("{packageName}:{version} is Blocked but was included in {nugetFile}", pkg.Id, pkg.Version, _nuGetFile);
-
+                
                 var msBuildMessage = MsBuild.Log(_nuGetFile, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
-                    $"{pkg.Id}: {(string.IsNullOrEmpty(blockedPackage.CustomErrorMessage) ? blockedPackage.CustomErrorMessage : "has been blocked and may not be used in this project")}");
-                Log.Logger.Debug(msBuildMessage);
+                    $"{pkg.Id}: {(string.IsNullOrEmpty(blockedPackage.CustomErrorMessage) ? "has been blocked and may not be used in this project" : blockedPackage.CustomErrorMessage)}");
+                Console.WriteLine(msBuildMessage);
+                Log.Logger.Error(msBuildMessage);
             }
         }
     }
