@@ -52,16 +52,23 @@ namespace NuGetDefense
                 Log.Logger.Verbose("Logging Configured");
 
                 Log.Logger.Verbose("Started NuGetDefense with arguments: {args}", args);
-                var nugetFile = new NuGetFile(args[0]);
-                _nuGetFile = nugetFile.Path;
-                Log.Logger.Verbose("NuGetFile Path: {nugetFilePath}", _nuGetFile);
-
-
-                var targetFramework = args.Length > 1 ? args[1] : "";
-                Log.Logger.Information("Target Framework: {framework}", string.IsNullOrWhiteSpace(targetFramework) ? "Undefined" : targetFramework);
-                Log.Logger.Verbose("Loading Packages");
-                Log.Logger.Verbose("Transitive Dependencies Included: {CheckTransitiveDependencies}", _settings.CheckTransitiveDependencies);
-                _pkgs = nugetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray();
+                if (args[0].EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new ArgumentException($"{args[0]} is not a valid target. Solution scanning is only supported by NuGetDefense.Tool ≥ 2.0.2");
+                }
+                else
+                {
+                    var nugetFile = new NuGetFile(args[0]);
+                    _nuGetFile = nugetFile.Path;
+                    Log.Logger.Verbose("NuGetFile Path: {nugetFilePath}", _nuGetFile);
+                    
+                    var targetFramework = args.Length > 1 ? args[1] : "";
+                    Log.Logger.Information("Target Framework: {framework}", string.IsNullOrWhiteSpace(targetFramework) ? "Undefined" : targetFramework);
+                    Log.Logger.Verbose("Loading Packages");
+                    Log.Logger.Verbose("Transitive Dependencies Included: {CheckTransitiveDependencies}", _settings.CheckTransitiveDependencies);
+                    _pkgs = nugetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray();
+                }
+                
                 var nonSensitivePackages = GetNonSensitivePackages(_pkgs);
                 if (_settings.ErrorSettings.IgnoredPackages.Length > 0)
                     IgnorePackages(_pkgs, _settings.ErrorSettings.IgnoredPackages, out _pkgs);
