@@ -38,7 +38,7 @@ namespace NuGetDefense
             {
                 Console.WriteLine($"NuGetDefense v{Version}");
                 Console.WriteLine("-------------");
-                Console.WriteLine("\nUsage:");
+                Console.WriteLine($"{Environment.NewLine}Usage:");
                 Console.WriteLine("  nugetdefense projectFile.proj TargetFrameworkMoniker");
                 return 0;
             }
