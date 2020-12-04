@@ -7,6 +7,8 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
+using ByteDev.DotNet.Project;
+using ByteDev.DotNet.Solution;
 using NuGet.Versioning;
 using NuGetDefense.Configuration;
 using NuGetDefense.Core;
@@ -16,7 +18,7 @@ using static NuGetDefense.UtilityMethods;
 
 namespace NuGetDefense
 {
-    internal class Program
+    internal static class Program
     {
         private static readonly string UserAgentString = @$"NuGetDefense/{Version}";
 
@@ -39,7 +41,9 @@ namespace NuGetDefense
                 Console.WriteLine($"NuGetDefense v{Version}");
                 Console.WriteLine("-------------");
                 Console.WriteLine($"{Environment.NewLine}Usage:");
-                Console.WriteLine("  nugetdefense projectFile.proj TargetFrameworkMoniker");
+                Console.WriteLine($"{Environment.NewLine}  nugetdefense projectFile.proj TargetFrameworkMoniker");
+                Console.WriteLine($"{Environment.NewLine}  nugetdefense SolutionFile.sln Release");
+                Console.WriteLine($"{Environment.NewLine}  nugetdefense SolutionFile.sln Debug|Any CPU");
                 return 0;
             }
             #endif
@@ -52,9 +56,51 @@ namespace NuGetDefense
                 Log.Logger.Verbose("Logging Configured");
 
                 Log.Logger.Verbose("Started NuGetDefense with arguments: {args}", args);
-                if (args[0].EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
+                var targetFramework = args.Length == 2 ? args[1] : "";
+
+                if (args.Length > 2)
                 {
-                    throw new ArgumentException($"{args[0]} is not a valid target. Solution scanning is only supported by NuGetDefense.Tool ≥ 2.0.2");
+                    
+                }
+                else if (args[0].EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
+                {
+                    var specificFramework = !string.IsNullOrWhiteSpace(targetFramework);
+                    if (specificFramework)
+                    {
+                        Log.Logger.Information("Target Framework: {framework}", targetFramework);
+                    }
+
+                    var solution = DotNetSolution.Load(args[0]);
+                    var pkgs = new List<NuGetPackage>();
+                    for (var i = 0; i < solution.Projects.Count; i++)
+                    {
+                        var project = solution.Projects[i];
+                        var path = Path.Combine(Path.GetDirectoryName(args[0])!, project.Path
+                            .Replace('\\', Path.DirectorySeparatorChar)
+                            .Replace('/', Path.DirectorySeparatorChar));
+                        
+                        var proj = DotNetProject.Load(path);
+                        if (!specificFramework && proj.Format == ProjectFormat.New)
+                        {
+                            var monikersListBuilder = new StringBuilder();
+                            var monikers = proj.ProjectTargets.Select(t => t.Moniker).ToArray();
+                            monikersListBuilder.Append(monikers[0]);
+                            for (var index = 1; index < monikers.Length; index++)
+                            {
+                                monikersListBuilder.Append($", {monikers[index]}");
+                            }
+
+                            Log.Logger.Information("Target Frameworks for {project}: {frameworks}", project.Name, monikersListBuilder.ToString());
+                            var nugetFile = new NuGetFile(path);
+                            pkgs.AddDistinctPackages(monikers.SelectMany(m => nugetFile.LoadPackages(m, _settings.CheckTransitiveDependencies).Values));
+                        }
+                        else
+                        {
+                            pkgs.AddDistinctPackages(new NuGetFile(path).LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values);
+                        }
+                    }
+
+                    _pkgs = pkgs.ToArray();
                 }
                 else
                 {
@@ -62,7 +108,6 @@ namespace NuGetDefense
                     _nuGetFile = nugetFile.Path;
                     Log.Logger.Verbose("NuGetFile Path: {nugetFilePath}", _nuGetFile);
                     
-                    var targetFramework = args.Length > 1 ? args[1] : "";
                     Log.Logger.Information("Target Framework: {framework}", string.IsNullOrWhiteSpace(targetFramework) ? "Undefined" : targetFramework);
                     Log.Logger.Verbose("Loading Packages");
                     Log.Logger.Verbose("Transitive Dependencies Included: {CheckTransitiveDependencies}", _settings.CheckTransitiveDependencies);
@@ -113,6 +158,23 @@ namespace NuGetDefense
             }
 
             return 0;
+        }
+
+        private static void AddDistinctPackages(this List<NuGetPackage> pkgs,  IEnumerable<NuGetPackage> newPkgs)
+        {
+            foreach (var pkg in newPkgs)
+            {
+                if (pkgs.Any(p => p.Id == pkg.Id && p.Version == pkg.Version))
+                {
+                    pkgs.Add(pkg);
+                }
+            }
+        }
+
+        private static void ParseSolutionForProjects(string s)
+        {
+            // TODO: This will parse hte solution file into a list of projects relative to the solution file.
+            throw new NotImplementedException();
         }
 
         /// <summary>
