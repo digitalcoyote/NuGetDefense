@@ -22,7 +22,7 @@ namespace NuGetDefense
     {
         private static readonly string UserAgentString = @$"NuGetDefense/{Version}";
 
-        private const string Version = "2.0.2";
+        private const string Version = "2.1.0";
 
         private static string _nuGetFile;
         private static string _projectFileName;
@@ -64,43 +64,25 @@ namespace NuGetDefense
                 }
                 else if (args[0].EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
                 {
+                    var projects = DotNetSolution.Load(args[0]).Projects.Select(p => p.Path).ToArray();
                     var specificFramework = !string.IsNullOrWhiteSpace(targetFramework);
                     if (specificFramework)
                     {
                         Log.Logger.Information("Target Framework: {framework}", targetFramework);
                     }
 
-                    var solution = DotNetSolution.Load(args[0]);
-                    var pkgs = new List<NuGetPackage>();
-                    for (var i = 0; i < solution.Projects.Count; i++)
+                    _pkgs = LoadMultipleProjects(args[0], projects, specificFramework, targetFramework, true);
+                }
+                else if (_settings.CheckTransitiveDependencies)
+                {
+                    var projects = DotNetProject.Load(args[0]).ProjectReferences.Select(p => p.FilePath).ToArray();
+                    var specificFramework = !string.IsNullOrWhiteSpace(targetFramework);
+                    if (specificFramework)
                     {
-                        var project = solution.Projects[i];
-                        var path = Path.Combine(Path.GetDirectoryName(args[0])!, project.Path
-                            .Replace('\\', Path.DirectorySeparatorChar)
-                            .Replace('/', Path.DirectorySeparatorChar));
-                        
-                        var proj = DotNetProject.Load(path);
-                        if (!specificFramework && proj.Format == ProjectFormat.New)
-                        {
-                            var monikersListBuilder = new StringBuilder();
-                            var monikers = proj.ProjectTargets.Select(t => t.Moniker).ToArray();
-                            monikersListBuilder.Append(monikers[0]);
-                            for (var index = 1; index < monikers.Length; index++)
-                            {
-                                monikersListBuilder.Append($", {monikers[index]}");
-                            }
-
-                            Log.Logger.Information("Target Frameworks for {project}: {frameworks}", project.Name, monikersListBuilder.ToString());
-                            var nugetFile = new NuGetFile(path);
-                            pkgs.AddDistinctPackages(monikers.SelectMany(m => nugetFile.LoadPackages(m, _settings.CheckTransitiveDependencies).Values));
-                        }
-                        else
-                        {
-                            pkgs.AddDistinctPackages(new NuGetFile(path).LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values);
-                        }
+                        Log.Logger.Information("Target Framework: {framework}", targetFramework);
                     }
 
-                    _pkgs = pkgs.ToArray();
+                    _pkgs = LoadMultipleProjects(args[0], projects, specificFramework, targetFramework);
                 }
                 else
                 {
@@ -158,6 +140,42 @@ namespace NuGetDefense
             }
 
             return 0;
+        }
+
+        private static NuGetPackage[] LoadMultipleProjects(string TopLevelProject, string[] projects, bool specificFramework, string targetFramework, bool solutionFile = false)
+        {
+            var pkgs = new List<NuGetPackage>();
+            for (var i = 0; i < projects.Length; i++)
+            {
+                var project = projects[i];
+                var path = Path.Combine(Path.GetDirectoryName(TopLevelProject)!, project
+                    .Replace('\\', Path.DirectorySeparatorChar)
+                    .Replace('/', Path.DirectorySeparatorChar));
+
+                var proj = DotNetProject.Load(path);
+                if (!specificFramework && proj.Format == ProjectFormat.New)
+                {
+                    var monikersListBuilder = new StringBuilder();
+                    var monikers = proj.ProjectTargets.Select(t => t.Moniker).ToArray();
+                    monikersListBuilder.Append(monikers[0]);
+                    for (var index = 1; index < monikers.Length; index++)
+                    {
+                        monikersListBuilder.Append($", {monikers[index]}");
+                    }
+
+                    Log.Logger.Information("Target Frameworks for {project}: {frameworks}", project, monikersListBuilder.ToString());
+                    var nugetFile = new NuGetFile(path);
+                    pkgs.AddDistinctPackages(monikers.SelectMany(m => nugetFile.LoadPackages(m, _settings.CheckTransitiveDependencies).Values));
+                }
+                else
+                {
+                    pkgs.AddDistinctPackages(new NuGetFile(path).LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values);
+                }
+            }
+
+            if (!solutionFile) pkgs.AddDistinctPackages(new NuGetFile(TopLevelProject).LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values);
+            
+            return pkgs.ToArray();
         }
 
         private static void AddDistinctPackages(this List<NuGetPackage> pkgs,  IEnumerable<NuGetPackage> newPkgs)

@@ -33,7 +33,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="ByteDev.DotNet" Version="7.0.0" />
+      <PackageReference Include="ByteDev.DotNet" Version="7.1.0" />
       <PackageReference Include="NuGet.Versioning" Version="5.8.0" />
       <PackageReference Include="NuGetDefense.Core" Version="2.0.0" />
       <PackageReference Include="NuGetDefense.NVD" Version="2.0.0" />
