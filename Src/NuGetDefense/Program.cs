@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -22,7 +23,7 @@ namespace NuGetDefense
     {
         private static readonly string UserAgentString = @$"NuGetDefense/{Version}";
 
-        private const string Version = "2.1.0";
+        private const string Version = "2.1.0-pre0001";
 
         private static string _nuGetFile;
         private static string _projectFileName;
@@ -73,27 +74,51 @@ namespace NuGetDefense
 
                     _pkgs = LoadMultipleProjects(args[0], projects, specificFramework, targetFramework, true);
                 }
-                else if (_settings.CheckTransitiveDependencies)
+                else if (_settings.CheckReferencedProjects)
                 {
-                    var projects = DotNetProject.Load(args[0]).ProjectReferences.Select(p => p.FilePath).ToArray();
+                    // var slnFile = Directory.GetFiles(Path.GetDirectoryName(args[0]) ?? AppContext.BaseDirectory, "*.sln").FirstOrDefault();
+                    // if(string.IsNullOrWhiteSpace(slnFile)) slnFile = Directory.GetFiles(Directory.GetParent(Path.GetDirectoryName(args[0]) ?? AppContext.BaseDirectory)?.FullName ?? AppContext.BaseDirectory, "*.sln").FirstOrDefault();
+                    // if (string.IsNullOrWhiteSpace(slnFile))
+                    //     throw new FileNotFoundException(
+                    //         "CheckReferencedProjects Only works if the solution file is in the same directory of parent directory of the project file.");
+                    // DotNetProject.Load(args[0]).ProjectReferences.Select(p => p.FilePath);
+
+                    var projects = new List<string>{args[0]};
+                    GetProjectsReferenced(in args[0], in projects);
                     var specificFramework = !string.IsNullOrWhiteSpace(targetFramework);
                     if (specificFramework)
                     {
                         Log.Logger.Information("Target Framework: {framework}", targetFramework);
                     }
 
-                    _pkgs = LoadMultipleProjects(args[0], projects, specificFramework, targetFramework);
+                    _pkgs = LoadMultipleProjects(args[0], projects.ToArray(), specificFramework, targetFramework, false);
                 }
                 else
                 {
                     var nugetFile = new NuGetFile(args[0]);
                     _nuGetFile = nugetFile.Path;
+                    
                     Log.Logger.Verbose("NuGetFile Path: {nugetFilePath}", _nuGetFile);
                     
                     Log.Logger.Information("Target Framework: {framework}", string.IsNullOrWhiteSpace(targetFramework) ? "Undefined" : targetFramework);
                     Log.Logger.Verbose("Loading Packages");
                     Log.Logger.Verbose("Transitive Dependencies Included: {CheckTransitiveDependencies}", _settings.CheckTransitiveDependencies);
-                    _pkgs = nugetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray();
+                    
+                    if (_settings.CheckTransitiveDependencies && nugetFile.PackagesConfig)
+                    {
+                        var projects = DotNetProject.Load(args[0]).ProjectReferences.Select(p => p.FilePath).ToArray();
+                        var specificFramework = !string.IsNullOrWhiteSpace(targetFramework);
+                        if (specificFramework)
+                        {
+                            Log.Logger.Information("Target Framework: {framework}", targetFramework);
+                        }
+
+                        _pkgs = LoadMultipleProjects(args[0], projects, specificFramework, targetFramework);
+                    }
+                    else
+                    {
+                        _pkgs = nugetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray();
+                    }
                 }
                 
                 var nonSensitivePackages = GetNonSensitivePackages(_pkgs);
@@ -142,6 +167,18 @@ namespace NuGetDefense
             return 0;
         }
 
+        private static void GetProjectsReferenced(in string proj, in List<string> projectList)
+        {
+            var dir = Path.GetDirectoryName(proj);
+            foreach (var referencedProj in DotNetProject.Load(proj).ProjectReferences
+                .Select(p => Path.Combine(dir!, p.FilePath.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar))))
+            {
+                if(!projectList.Contains(referencedProj))
+                    projectList.Add(referencedProj);
+                GetProjectsReferenced(in referencedProj, in projectList);
+            }
+        }
+
         private static NuGetPackage[] LoadMultipleProjects(string TopLevelProject, string[] projects, bool specificFramework, string targetFramework, bool solutionFile = false)
         {
             var pkgs = new List<NuGetPackage>();
@@ -173,7 +210,10 @@ namespace NuGetDefense
                 }
             }
 
-            if (!solutionFile) pkgs.AddDistinctPackages(new NuGetFile(TopLevelProject).LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values);
+            var nuGetFile = new NuGetFile(TopLevelProject);
+            _nuGetFile = nuGetFile.Path;
+
+            if (!solutionFile) pkgs.AddDistinctPackages(nuGetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values);
             
             return pkgs.ToArray();
         }
@@ -182,10 +222,9 @@ namespace NuGetDefense
         {
             foreach (var pkg in newPkgs)
             {
-                if (pkgs.Any(p => p.Id == pkg.Id && p.Version == pkg.Version))
-                {
-                    pkgs.Add(pkg);
-                }
+                if (pkgs.Any(p => p.Id == pkg.Id && p.Version == pkg.Version)) continue;
+                
+                pkgs.Add(pkg);
             }
         }
 

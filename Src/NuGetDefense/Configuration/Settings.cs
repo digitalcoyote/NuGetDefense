@@ -10,7 +10,7 @@ namespace NuGetDefense.Configuration
 {
     public class Settings
     {
-        public bool WarnOnly { get; set; } = false;
+        public bool WarnOnly { get; set; }
 
         public FileLogSettings Log
         {
@@ -18,17 +18,18 @@ namespace NuGetDefense.Configuration
             set { Logs = new[] {value}; }
         }
 
-        public VulnerabilityReportsSettings VulnerabilityReports { get; set; } = new VulnerabilityReportsSettings();
+        public VulnerabilityReportsSettings VulnerabilityReports { get; set; } = new();
 
         public FileLogSettings[] Logs { get; set; }
         public bool CheckTransitiveDependencies { get; set; } = true;
+        public bool CheckReferencedProjects{ get; set; }
 
-        public BuildErrorSettings ErrorSettings { get; set; } = new BuildErrorSettings();
+        public BuildErrorSettings ErrorSettings { get; set; } = new();
 
-        public RemoteVulnerabilitySourceConfiguration OssIndex { get; set; } = new RemoteVulnerabilitySourceConfiguration();
+        public RemoteVulnerabilitySourceConfiguration OssIndex { get; set; } = new();
 
         public OfflineVulnerabilitySourceConfiguration NVD { get; set; } =
-            new OfflineVulnerabilitySourceConfiguration();
+            new();
 
         public string[] SensitivePackages { get; set; } = new string[0];
 
