@@ -153,7 +153,7 @@ namespace NuGetDefense
                     VulnerabilityData.IgnoreCVEs(vulnDict, _settings.ErrorSettings.IgnoredCvEs);
 
                 ReportVulnerabilities(vulnDict);
-                if (vulnDict?.Count == 0) return 0;
+                return vulnDict?.Count ?? 0;
             }
             catch (Exception e)
             {
@@ -163,8 +163,6 @@ namespace NuGetDefense
                 Log.Logger.Fatal(msBuildMessage);
                 return -1;
             }
-
-            return 0;
         }
 
         private static void GetProjectsReferenced(in string proj, in List<string> projectList)
