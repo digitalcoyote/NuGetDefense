@@ -3,7 +3,7 @@
   <metadata>
     <id>NuGetDefense</id>
     <title>NuGetDefense</title>
-    <version>2.1.0-pre0007</version>
+    <version>2.1.0-pre0010</version>
     <authors>Curtis Carter</authors>
     <owners>Curtis Carter</owners>
     <projectUrl>https://digitalcoyote.github.io/NuGetDefense/</projectUrl>
@@ -36,7 +36,7 @@
     <file src="bin/Release/net5.0/Serilog.dll" target="tools/net5.0/Serilog.dll" />
     <file src="bin/Release/net5.0/Serilog.Sinks.Console.dll" target="tools/net5.0/Serilog.Sinks.Console.dll" />
     <file src="bin/Release/net5.0/Serilog.Sinks.File.dll" target="tools/net5.0/Serilog.Sinks.File.dll" />
-<!--    <file src="bin/Release/net5.0/System.Text.Json.dll" target="tools/net5.0/System.Text.Json.dll" />-->
+    <file src="bin/Release/net5.0/System.Text.Json.dll" target="tools/net5.0/System.Text.Json.dll" />
     <file src="bin/Release/net5.0/VulnerabilityData.bin" target="tools/net5.0/VulnerabilityData.bin" />
   </files>
 </package>

@@ -59,11 +59,7 @@ namespace NuGetDefense
                 Log.Logger.Verbose("Started NuGetDefense with arguments: {args}", args);
                 var targetFramework = args.Length == 2 ? args[1] : "";
 
-                if (args.Length > 2)
-                {
-                    
-                }
-                else if (args[0].EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
+                if (args[0].EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
                 {
                     var projects = DotNetSolution.Load(args[0]).Projects.Select(p => p.Path).ToArray();
                     var specificFramework = !string.IsNullOrWhiteSpace(targetFramework);
@@ -76,13 +72,6 @@ namespace NuGetDefense
                 }
                 else if (_settings.CheckReferencedProjects)
                 {
-                    // var slnFile = Directory.GetFiles(Path.GetDirectoryName(args[0]) ?? AppContext.BaseDirectory, "*.sln").FirstOrDefault();
-                    // if(string.IsNullOrWhiteSpace(slnFile)) slnFile = Directory.GetFiles(Directory.GetParent(Path.GetDirectoryName(args[0]) ?? AppContext.BaseDirectory)?.FullName ?? AppContext.BaseDirectory, "*.sln").FirstOrDefault();
-                    // if (string.IsNullOrWhiteSpace(slnFile))
-                    //     throw new FileNotFoundException(
-                    //         "CheckReferencedProjects Only works if the solution file is in the same directory of parent directory of the project file.");
-                    // DotNetProject.Load(args[0]).ProjectReferences.Select(p => p.FilePath);
-
                     var projects = new List<string>{args[0]};
                     GetProjectsReferenced(in args[0], in projects);
                     var specificFramework = !string.IsNullOrWhiteSpace(targetFramework);
