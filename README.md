@@ -11,12 +11,15 @@ View the full documentation for NuGetDefense [here](https://digitalcoyote.github
 ## Features  
 
 * Uses Multiple Sources to check for known vulnerabilities in third-party libraries (NuGet packages)
-  * [OSS Index](https://ossindex.sonatype.org/)
+  * [OSS Index](https://ossindex.sonatype.org/) (Caching Coming Soon!)
   * [National Vulnerability Database](https://nvd.nist.gov/) (Optionally Self-Updating)
+  * [Google's Open Source Vulnerabilities Database](https://osv.dev/) ([Coming Soon!](https://github.com/digitalcoyote/NuGetDefense/discussions/53))
 * Simple installation/configuration: the [NuGet Package](https://www.nuget.org/packages/NuGetDefense/) is all you need.
 * Transitive Dependency Checking
   * SDK style projects only (older project format is not supported by the dotnet cli)
   * Uses the versions resolved by the dotnet cli at build
+* Project Reference Scanning
+  * Scan all projects in a hierarchy by installing NuGet Defense to the top level package ([pre-release](https://www.nuget.org/packages/NuGetDefense/2.1.0-pre0011))
 * Allow breaking the build based on severity of vulnerability.
 * Ignore specific vulnerabilities/packages.
 * Sensitive/Internal Packages filtering
