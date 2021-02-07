@@ -35,7 +35,7 @@
     <ItemGroup>
       <PackageReference Include="ByteDev.DotNet" Version="7.1.0" />
       <PackageReference Include="NuGet.Versioning" Version="5.8.1" />
-      <PackageReference Include="NuGetDefense.Core" Version="2.0.1-pre0006" />
+      <PackageReference Include="NuGetDefense.Core" Version="2.0.1-pre0010" />
       <PackageReference Include="NuGetDefense.NVD" Version="2.0.1-pre0010" />
       <PackageReference Include="NuGetDefense.OSSIndex" Version="2.0.1-pre0010" />
       <PackageReference Include="Serilog.Sinks.Console" Version="[3.1.1]" />

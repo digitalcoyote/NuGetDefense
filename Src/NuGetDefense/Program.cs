@@ -27,7 +27,7 @@ namespace NuGetDefense
 
         private static string _nuGetFile;
         private static string _projectFileName;
-        private static NuGetPackage[] _pkgs;
+        private static Dictionary<string, NuGetPackage[]> _projects;
         private static Settings _settings;
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace NuGetDefense
                         Log.Logger.Information("Target Framework: {framework}", targetFramework);
                     }
 
-                    _pkgs = LoadMultipleProjects(args[0], projects, specificFramework, targetFramework, true);
+                    _projects = LoadMultipleProjects(args[0], projects, specificFramework, targetFramework, true);
                 }
                 else if (_settings.CheckReferencedProjects)
                 {
@@ -80,7 +80,7 @@ namespace NuGetDefense
                         Log.Logger.Information("Target Framework: {framework}", targetFramework);
                     }
 
-                    _pkgs = LoadMultipleProjects(args[0], projects.ToArray(), specificFramework, targetFramework, false);
+                    _projects = LoadMultipleProjects(args[0], projects.ToArray(), specificFramework, targetFramework, false);
                 }
                 else
                 {
@@ -102,18 +102,25 @@ namespace NuGetDefense
                             Log.Logger.Information("Target Framework: {framework}", targetFramework);
                         }
 
-                        _pkgs = LoadMultipleProjects(args[0], projects, specificFramework, targetFramework);
+                        _projects = LoadMultipleProjects(args[0], projects, specificFramework, targetFramework);
                     }
                     else
                     {
-                        _pkgs = nugetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray();
+                        _projects = new Dictionary<string, NuGetPackage[]>();
+                        _projects.Add(nugetFile.Path, nugetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray());
                     }
                 }
                 
-                var nonSensitivePackages = GetNonSensitivePackages(_pkgs);
+                GetNonSensitivePackages( out var nonSensitivePackages);
                 if (_settings.ErrorSettings.IgnoredPackages.Length > 0)
-                    IgnorePackages(_pkgs, _settings.ErrorSettings.IgnoredPackages, out _pkgs);
-                Log.Logger.Information("Loaded {packageCount} packages", _pkgs.Length);
+                {
+                    foreach (var (project, packages) in _projects)
+                    {
+                        IgnorePackages(in packages, _settings.ErrorSettings.IgnoredPackages, out var projPackages);
+                        _projects[project] = projPackages;
+                    }
+                }
+                Log.Logger.Information("Loaded {packageCount} packages", _projects.Sum(p => p.Value.Length));
 
                 if (_settings.ErrorSettings.BlockedPackages.Length > 0) CheckBlockedPackages();
                 if (_settings.ErrorSettings.AllowedPackages.Length > 0) CheckAllowedPackages();
@@ -123,18 +130,21 @@ namespace NuGetDefense
                     Log.Logger.Verbose("Checking with OSSIndex for Vulnerabilities");
                     vulnDict =
                         new Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun, UserAgentString, _settings.OssIndex.Username, _settings.OssIndex.ApiToken)
-                            .GetVulnerabilitiesForPackages(nonSensitivePackages);
+                            .GetVulnerabilitiesForPackages(nonSensitivePackages.SelectMany(p => p.Value).ToArray());
                 }
 
                 if (_settings.NVD.Enabled)
                 {
                     Log.Logger.Verbose("Checking the embedded NVD source for Vulnerabilities");
 
-                    vulnDict =
-                        new NVD.Scanner(_nuGetFile, TimeSpan.FromSeconds(_settings.NVD.TimeoutInSeconds),
-                                _settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate)
-                            .GetVulnerabilitiesForPackages(_pkgs,
-                                vulnDict);
+                    foreach (var (proj, pkgs) in _projects)
+                    {
+                        vulnDict =
+                            new NVD.Scanner(_nuGetFile, TimeSpan.FromSeconds(_settings.NVD.TimeoutInSeconds),
+                                    _settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate)
+                                .GetVulnerabilitiesForPackages(pkgs,
+                                    vulnDict);
+                    }
                 }
 
                 Log.Logger.Information("ignoring {ignoredCVECount} Vulnerabilities", _settings.ErrorSettings.IgnoredCvEs.Length);
@@ -166,11 +176,13 @@ namespace NuGetDefense
             }
         }
 
-        private static NuGetPackage[] LoadMultipleProjects(string TopLevelProject, string[] projects, bool specificFramework, string targetFramework, bool solutionFile = false)
+        private static Dictionary<string, NuGetPackage[]> LoadMultipleProjects(string TopLevelProject, string[] projects, bool specificFramework, string targetFramework, bool solutionFile = false)
         {
-            var pkgs = new List<NuGetPackage>();
+            var projectPackages = new Dictionary<string, NuGetPackage[]>();
             for (var i = 0; i < projects.Length; i++)
             {
+                var pkgs = new List<NuGetPackage>();
+
                 var project = projects[i];
                 var path = Path.Combine(Path.GetDirectoryName(TopLevelProject)!, project
                     .Replace('\\', Path.DirectorySeparatorChar)
@@ -195,14 +207,15 @@ namespace NuGetDefense
                 {
                     pkgs.AddDistinctPackages(new NuGetFile(path).LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values);
                 }
+                projectPackages.Add(path, pkgs.ToArray());
             }
 
             var nuGetFile = new NuGetFile(TopLevelProject);
             _nuGetFile = nuGetFile.Path;
 
-            if (!solutionFile) pkgs.AddDistinctPackages(nuGetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values);
+            if (!solutionFile && !projectPackages.ContainsKey(TopLevelProject)) projectPackages.Add(TopLevelProject, nuGetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray());
             
-            return pkgs.ToArray();
+            return projectPackages;
         }
 
         private static void AddDistinctPackages(this List<NuGetPackage> pkgs,  IEnumerable<NuGetPackage> newPkgs)
@@ -226,17 +239,23 @@ namespace NuGetDefense
         /// </summary>
         /// <param name="nuGetPackages"></param>
         /// <returns>a list of packages that do not match the wild card strings in SensitivePackages</returns>
-        public static NuGetPackage[] GetNonSensitivePackages(NuGetPackage[] nuGetPackages)
+        public static void GetNonSensitivePackages(out Dictionary<string, NuGetPackage[]> nonSensitives)
         {
-            var sensitiveRegexSet = _settings.SensitivePackages.Select(sp => Regex.Escape(sp).Replace(@"\*", ".*"));
-            return nuGetPackages.Where(p => !sensitiveRegexSet.Any(x => Regex.IsMatch(p.Id, x))).ToArray();
+            nonSensitives = new Dictionary<string, NuGetPackage[]>();
+            var sensitiveRegexSet = _settings.SensitivePackages.Select(sp => Regex.Escape(sp).Replace(@"\*", ".*")).ToArray();
+            if (!sensitiveRegexSet.Any()) return;
+            foreach (var (project, packages) in _projects)
+            {
+                nonSensitives.Add(project, packages.Where(p => !sensitiveRegexSet.Any(x => Regex.IsMatch(p.Id, x))).ToArray());
+            }
         }
 
         private static void CheckAllowedPackages()
         {
             Log.Logger.Verbose("Checking Allowed Packages");
 
-            foreach (var pkg in _pkgs.Where(p => !_settings.ErrorSettings.AllowedPackages.Any(b =>
+            foreach (var (project, packages) in _projects)
+            foreach (var pkg in packages.Where(p => !_settings.ErrorSettings.AllowedPackages.Any(b =>
                 b.Id == p.Id && 
                 (string.IsNullOrWhiteSpace(b.Version) || VersionRange.Parse(p.Version).Satisfies(new NuGetVersion(b.Version))))))
             {
@@ -253,26 +272,30 @@ namespace NuGetDefense
         {
             if (vulnDict == null)
             {
-                Log.Logger.Information("No Vulnerabilities found in {numberOfPackages} packages", _pkgs.Length);
+                Log.Logger.Information("No Vulnerabilities found in {numberOfPackages} packages", _projects.Sum(p => p.Value.Length));
             }
             else
             {
                 Log.Logger.Verbose("Building report of Vulnerabilities found in {numberOfPackages} packages", vulnDict.Keys.Count);
                 var vulnReporter = new VulnerabilityReporter();
-                vulnReporter.BuildVulnerabilityTextReport(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
-                    _settings.ErrorSettings.Cvss3Threshold);
-                if (_settings.VulnerabilityReports.OutputTextReport) Log.Logger.Information(vulnReporter.VulnerabilityTextReport);
-                foreach (var msBuildMessage in vulnReporter.MsBuildMessages)
+
+                foreach (var (project, packages) in _projects)
                 {
-                    Console.WriteLine(msBuildMessage);
-                    Log.Logger.Debug(msBuildMessage);
+                    //TODO: Losing the right file somewhere here
+                    vulnReporter.BuildVulnerabilityTextReport(vulnDict, packages, project, _settings.WarnOnly,
+                        _settings.ErrorSettings.Cvss3Threshold);
+                    if (_settings.VulnerabilityReports.OutputTextReport) Log.Logger.Information(vulnReporter.VulnerabilityTextReport);
+                    foreach (var msBuildMessage in vulnReporter.MsBuildMessages)
+                    {
+                        Console.WriteLine(msBuildMessage);
+                        Log.Logger.Debug(msBuildMessage);
+                    }
                 }
 
 
                 if (string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.JsonReportPath) && string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.XmlReportPath)) return;
 
-                vulnReporter.BuildVulnerabilityReport(vulnDict, _pkgs, _nuGetFile, _settings.WarnOnly,
-                    _settings.ErrorSettings.Cvss3Threshold);
+                vulnReporter.BuildVulnerabilityReport(vulnDict, _projects, _settings.WarnOnly);
                 if (!string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.JsonReportPath))
                 {
                     var ops = new JsonSerializerOptions
@@ -314,7 +337,8 @@ namespace NuGetDefense
 
         private static void CheckBlockedPackages()
         {
-            foreach (var pkg in _pkgs)
+            foreach ( var (proj, pkgs) in _projects)
+            foreach (var pkg in pkgs)
             {
                 Log.Logger.Verbose("Checking to see if {packageName}:{version} is Blocked", pkg.Id, pkg.Version);
 
@@ -327,7 +351,7 @@ namespace NuGetDefense
                     continue;
                 }
                 
-                var msBuildMessage = MsBuild.Log(_nuGetFile, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
+                var msBuildMessage = MsBuild.Log(proj, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
                     $"{pkg.Id}: {(string.IsNullOrEmpty(blockedPackage.CustomErrorMessage) ? "has been blocked and may not be used in this project" : blockedPackage.CustomErrorMessage)}");
                 Console.WriteLine(msBuildMessage);
                 Log.Logger.Error(msBuildMessage);
