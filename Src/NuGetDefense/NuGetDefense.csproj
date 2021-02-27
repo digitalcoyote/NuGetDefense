@@ -8,7 +8,7 @@
         <Description>NuGetDefense ~ Check for Known Vulnerabilities at Build</Description>
         <PackageDescription>NuGetDefense was inspired by [OWASP SafeNuGet](https://nuget.org/packages/SafeNuGet/) but aims to check with multiple sources for known vulnerabilities.</PackageDescription>
         <Copyright>Curtis Carter 2020</Copyright>
-        <LangVersion>8</LangVersion>
+        <LangVersion>9</LangVersion>
         <Configurations>Debug;Release;DotNetTool</Configurations>
         <Platforms>AnyCPU</Platforms>
         <PackageProjectUrl>https://digitalcoyote.github.io/NuGetDefense/</PackageProjectUrl>
@@ -30,15 +30,19 @@
         <ToolCommandName>nugetdefense</ToolCommandName>
         <Version>1.0.15</Version>
     </PropertyGroup>
+    <ItemGroup>
+        <None Include="icon.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="NuGet.Versioning" Version="5.8.0" />
-      <PackageReference Include="NuGetDefense.Core" Version="1.0.8" />
-      <PackageReference Include="NuGetDefense.NVD" Version="1.0.3.3" />
-      <PackageReference Include="NuGetDefense.OSSIndex" Version="1.0.6" />
+      <PackageReference Include="ByteDev.DotNet" Version="7.1.0" />
+      <PackageReference Include="NuGet.Versioning" Version="5.8.1" />
+      <PackageReference Include="NuGetDefense.Core" Version="1.0.9" />
+      <PackageReference Include="NuGetDefense.NVD" Version="1.0.4" />
+      <PackageReference Include="NuGetDefense.OSSIndex" Version="1.0.7" />
       <PackageReference Include="Serilog.Sinks.Console" Version="[3.1.1]" />
       <PackageReference Include="Serilog.Sinks.File" Version="[4.1.0]" />
-      <PackageReference Include="System.Text.Json" Version="5.0.0" />
+      <PackageReference Include="System.Text.Json" Version="5.0.1" />
     </ItemGroup>
 
     <ItemGroup>
