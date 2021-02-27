@@ -3,7 +3,7 @@ using NuGet.Versioning;
 
 namespace NuGetDefense
 {
-    public class UtilityMethods
+    public static class UtilityMethods
     {
         public static void IgnorePackages(in NuGetPackage[] pkgs, NuGetPackage[] ignorePackages, out NuGetPackage[] unIgnoredPackages)
         {

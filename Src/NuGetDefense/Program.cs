@@ -13,9 +13,10 @@ using ByteDev.DotNet.Solution;
 using NuGet.Versioning;
 using NuGetDefense.Configuration;
 using NuGetDefense.Core;
-using NuGetDefense.OSSIndex;
+using NuGetDefense.NVD;
 using Serilog;
 using static NuGetDefense.UtilityMethods;
+using Scanner = NuGetDefense.OSSIndex.Scanner;
 
 namespace NuGetDefense
 {
@@ -23,12 +24,13 @@ namespace NuGetDefense
     {
         private static readonly string UserAgentString = @$"NuGetDefense/{Version}";
 
-        private const string Version = "2.1.0-pre0001";
+        private const string Version = "2.1.0-pre0012";
 
         private static string _nuGetFile;
         private static string _projectFileName;
         private static Dictionary<string, NuGetPackage[]> _projects;
         private static Settings _settings;
+        public static int NumberOfVulnerabilities;
 
         /// <summary>
         ///     args[0] is expected to be the path to the project file.
@@ -152,7 +154,7 @@ namespace NuGetDefense
                     VulnerabilityData.IgnoreCVEs(vulnDict, _settings.ErrorSettings.IgnoredCvEs);
 
                 ReportVulnerabilities(vulnDict);
-                return vulnDict?.Count ?? 0;
+                return _settings.WarnOnly ? 0 : NumberOfVulnerabilities;
             }
             catch (Exception e)
             {
@@ -283,7 +285,7 @@ namespace NuGetDefense
                 {
                     //TODO: Losing the right file somewhere here
                     vulnReporter.BuildVulnerabilityTextReport(vulnDict, packages, project, _settings.WarnOnly,
-                        _settings.ErrorSettings.Cvss3Threshold);
+                        _settings.ErrorSettings.Cvss3Threshold, out NumberOfVulnerabilities);
                     if (_settings.VulnerabilityReports.OutputTextReport) Log.Logger.Information(vulnReporter.VulnerabilityTextReport);
                     foreach (var msBuildMessage in vulnReporter.MsBuildMessages)
                     {
