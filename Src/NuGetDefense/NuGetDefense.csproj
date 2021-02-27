@@ -28,7 +28,7 @@
         <PackageId>NuGetDefense.Tool</PackageId>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>nugetdefense</ToolCommandName>
-        <Version>1.0.15</Version>
+        <Version>1.0.16</Version>
     </PropertyGroup>
     <ItemGroup>
         <None Include="icon.png" Pack="true" PackagePath="\" />
