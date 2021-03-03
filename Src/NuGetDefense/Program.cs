@@ -63,7 +63,7 @@ namespace NuGetDefense
 
                 if (args[0].EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
                 {
-                    var projects = DotNetSolution.Load(args[0]).Projects.Select(p => p.Path).ToArray();
+                    var projects = DotNetSolution.Load(args[0]).Projects.Where(p => !p.Type.IsSolutionFolder).Select(p => p.Path).ToArray();
                     var specificFramework = !string.IsNullOrWhiteSpace(targetFramework);
                     if (specificFramework)
                     {
