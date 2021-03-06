@@ -116,7 +116,7 @@ namespace NuGetDefense
                 GetNonSensitivePackages( out var nonSensitivePackages);
                 if (_settings.ErrorSettings.IgnoredPackages.Length > 0)
                 {
-                    foreach (var (project, packages) in _projects)
+                    foreach (var (project, packages) in _projects.ToArray())
                     {
                         IgnorePackages(in packages, _settings.ErrorSettings.IgnoredPackages, out var projPackages);
                         _projects[project] = projPackages;
