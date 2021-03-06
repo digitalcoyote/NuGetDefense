@@ -3,7 +3,7 @@
   <metadata>
     <id>NuGetDefense</id>
     <title>NuGetDefense</title>
-    <version>1.0.16.1</version>
+    <version>1.0.17</version>
     <authors>Curtis Carter</authors>
     <owners>Curtis Carter</owners>
     <projectUrl>https://digitalcoyote.github.io/NuGetDefense/</projectUrl>
@@ -22,6 +22,8 @@
     <file src="build/nugetdefense.targets" target="build/nugetdefense.targets" />
     <file src="icon.png" target="images\" />
     <file src="bin/Release/netcoreapp3.1/NuGetDefense.deps.json" target="tools/netcoreapp3.1/NuGetDefense.deps.json" />
+    <file src="bin/Release/netcoreapp3.1/ByteDev.DotNet.dll" target="tools/netcoreapp3.1/ByteDev.DotNet.dll" />
+    <file src="bin/Release/netcoreapp3.1/ByteDev.Xml.dll" target="tools/netcoreapp3.1/ByteDev.Xml.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGetDefense.dll" target="tools/netcoreapp3.1/NuGetDefense.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGetDefense.Core.dll" target="tools/netcoreapp3.1/NuGetDefense.Core.dll" />
     <file src="bin/Release/netcoreapp3.1/NuGetDefense.NVD.dll" target="tools/netcoreapp3.1/NuGetDefense.NVD.dll" />
