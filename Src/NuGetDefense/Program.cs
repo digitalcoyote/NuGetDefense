@@ -24,7 +24,7 @@ namespace NuGetDefense
     {
         private static readonly string UserAgentString = @$"NuGetDefense/{Version}";
 
-        private const string Version = "2.1.0-pre0012";
+        private const string Version = "2.1.2";
 
         private static string _nuGetFile;
         private static string _projectFileName;
