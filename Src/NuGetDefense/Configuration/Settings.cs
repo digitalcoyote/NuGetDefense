@@ -133,11 +133,10 @@ namespace NuGetDefense.Configuration
                 IgnoreReadOnlyProperties = true,
                 PropertyNameCaseInsensitive = true,
                 ReadCommentHandling = JsonCommentHandling.Skip,
-                IgnoreNullValues = true,
                 AllowTrailingCommas = true,
                 WriteIndented = true,
                 Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)},
-
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
 
             try

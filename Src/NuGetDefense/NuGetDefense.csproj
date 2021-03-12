@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>NuGetDefense</Title>
         <Authors>Curtis Carter</Authors>
@@ -29,7 +29,7 @@
         <PackageId>NuGetDefense.Tool</PackageId>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>nugetdefense</ToolCommandName>
-        <Version>2.1.2</Version>
+        <Version>3.0.0-pre0001</Version>
     </PropertyGroup>
     <ItemGroup>
         <None Include="icon.png" Pack="true" PackagePath="\" />
@@ -37,13 +37,14 @@
 
     <ItemGroup>
       <PackageReference Include="ByteDev.DotNet" Version="7.1.0" />
-      <PackageReference Include="NuGet.Versioning" Version="5.9.0" />
+      <PackageReference Include="NuGet.Versioning" Version="5.10.0" />
       <PackageReference Include="NuGetDefense.Core" Version="2.0.2" />
       <PackageReference Include="NuGetDefense.NVD" Version="2.0.5" />
       <PackageReference Include="NuGetDefense.OSSIndex" Version="2.0.2" />
       <PackageReference Include="Serilog.Sinks.Console" Version="[3.1.1]" />
       <PackageReference Include="Serilog.Sinks.File" Version="[4.1.0]" />
-      <PackageReference Include="System.Text.Json" Version="5.0.1" />
+      <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20574.7" />
+      <PackageReference Include="System.Text.Json" Version="5.0.2" />
     </ItemGroup>
 
     <ItemGroup>
