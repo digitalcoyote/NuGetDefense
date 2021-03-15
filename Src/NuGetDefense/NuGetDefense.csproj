@@ -66,11 +66,4 @@
       </Content>
       <Content Include="NuGetDefense.nuspec" />
     </ItemGroup>
-
-    <PropertyGroup>
-        <!-- <NuGetDefenseExe Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">"$(MSBuildThisFileDirectory)/net46/NuGetDefense.exe"</TsGenFileExe> -->
-        <!-- <NuGetDefenseExe Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' OR '$(TargetFrameworkIdentifier)' == '.NETStandard'">dotnet "$(MSBuildThisFileDirectory)/netcoreapp3.1/NuGetDefense.dll"</TsGenFileExe> -->
-        <NuGetDefenseExe Condition="'$(OS)' == Unix">dotnet "$(MSBuildThisFileDirectory)../tools/netcoreapp3.1/NuGetDefense.dll"</NuGetDefenseExe>
-        <NuGetDefenseExe Condition="'$(OS)' == 'Windows_NT'">dotnet "$(MSBuildThisFileDirectory)..\tools\netcoreapp3.1\NuGetDefense.dll"</NuGetDefenseExe>
-    </PropertyGroup>
 </Project>
