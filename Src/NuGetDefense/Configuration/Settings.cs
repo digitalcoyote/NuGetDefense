@@ -87,7 +87,7 @@ namespace NuGetDefense.Configuration
             return settings;
         }
 
-        private static Settings LoadSettingsFile(string settingsFilePath)
+        public static Settings LoadSettingsFile(string settingsFilePath)
         {
             Settings settings;
             var settingsFileContents = ReadSettingsFileWhenAble(settingsFilePath, TimeSpan.FromMinutes(5));

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
-using System.CommandLine.Parsing;
+using System.CommandLine.Invocation;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -42,10 +42,11 @@ namespace NuGetDefense
             projFileOption.AddAlias("-p");
             projFileOption.AddAlias("--project");
             projFileOption.AddAlias("--solution");
+            
             var targetFrameworkMonikerOption = new Option<string>("--target-framework-moniker", "Framework to use when detecting versions for 'sdk style' projects");
             targetFrameworkMonikerOption.AddAlias("--tfm");
             targetFrameworkMonikerOption.AddAlias("--framework");
-            var settingsOption = new Option<FileInfo>("--settings-file", "Path to Settings File (ex. NuGetDefense.json)");
+            var settingsOption = new Option<FileInfo>("--settings-file", ()=> null, "Path to Settings File (ex. NuGetDefense.json)");
             settingsOption.AddAlias("--nugetdefense-settings");
             settingsOption.AddAlias("--nugetdefense-json");
             var vulnerabilityDataBinOption = new Option<FileInfo>("--vulnerability-data-bin", "Path to VulnerabilityData for NVD Scanner (ex. VulnerabilityData.bin)");
@@ -97,72 +98,85 @@ namespace NuGetDefense
                 return 0;
             }
 #endif
-            rootCommand.InvokeAsync(args);
-            // return Scan(args);
-            return 0;
+
+            rootCommand.Handler = CommandHandler.Create<FileInfo, string, FileInfo, FileInfo, bool, bool, bool, string[], string[], InvocationContext>(Scan);
+            return rootCommand.InvokeAsync(args).Result;
         }
         
-        private static int Scan(string[] args)
+        private static void Scan(FileInfo project,
+            string tfm,
+            FileInfo settingsFile,
+            FileInfo vulnDataFile,
+            bool warnOnly,
+            bool checkTransitiveDependencies,
+            bool checkReferencedProjects,
+            string[] ignorePackages,
+            string[] ignoredCves,
+            InvocationContext commandContext)
         {
-            _settings = Settings.LoadSettings(Path.GetDirectoryName(args[0]));
-            _projectFileName = Path.GetFileName(args[0]);
+            _settings = settingsFile == null ? Settings.LoadSettings(project.DirectoryName) : Settings.LoadSettingsFile(settingsFile.FullName);
+            _settings.WarnOnly = _settings.WarnOnly || warnOnly;
+            _settings.CheckTransitiveDependencies = _settings.CheckTransitiveDependencies || checkTransitiveDependencies;
+            _settings.CheckReferencedProjects = _settings.CheckReferencedProjects || checkReferencedProjects;
+            _settings.ErrorSettings.IgnoredPackages = _settings.ErrorSettings.IgnoredPackages.Union(ignorePackages.Select(p => new NuGetPackage(){Id = p})).ToArray();
+            _projectFileName = project.Name;
             ConfigureLogging();
             try
             {
                 Log.Logger.Verbose("Logging Configured");
 
-                Log.Logger.Verbose("Started NuGetDefense with arguments: {args}", args);
-                var targetFramework = args.Length == 2 ? args[1] : "";
+                // Log.Logger.Verbose("Started NuGetDefense with arguments: {args}", args);
 
-                if (args[0].EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
+                var projectFullName = project.FullName;
+                if (project.Extension.Equals(".sln", StringComparison.OrdinalIgnoreCase))
                 {
-                    var projects = DotNetSolution.Load(args[0]).Projects.Where(p => !p.Type.IsSolutionFolder).Select(p => p.Path).ToArray();
-                    var specificFramework = !string.IsNullOrWhiteSpace(targetFramework);
-                    if (specificFramework) Log.Logger.Information("Target Framework: {framework}", targetFramework);
+                    var projects = DotNetSolution.Load(projectFullName).Projects.Where(p => !p.Type.IsSolutionFolder).Select(p => p.Path).ToArray();
+                    var specificFramework = !string.IsNullOrWhiteSpace(tfm);
+                    if (specificFramework) Log.Logger.Information("Target Framework: {framework}", tfm);
 
-                    _projects = LoadMultipleProjects(args[0], projects, specificFramework, targetFramework, true);
+                    _projects = LoadMultipleProjects(projectFullName, projects, specificFramework, tfm, true);
                 }
                 else if (_settings.CheckReferencedProjects)
                 {
-                    var projects = new List<string> {args[0]};
-                    GetProjectsReferenced(in args[0], in projects);
-                    var specificFramework = !string.IsNullOrWhiteSpace(targetFramework);
-                    if (specificFramework) Log.Logger.Information("Target Framework: {framework}", targetFramework);
+                    var projects = new List<string> { projectFullName };
+                    GetProjectsReferenced(in projectFullName, in projects);
+                    var specificFramework = !string.IsNullOrWhiteSpace(tfm);
+                    if (specificFramework) Log.Logger.Information("Target Framework: {framework}", tfm);
 
-                    _projects = LoadMultipleProjects(args[0], projects.ToArray(), specificFramework, targetFramework);
+                    _projects = LoadMultipleProjects(projectFullName, projects.ToArray(), specificFramework, tfm);
                 }
                 else
                 {
-                    var nugetFile = new NuGetFile(args[0]);
+                    var nugetFile = new NuGetFile(projectFullName);
                     _nuGetFile = nugetFile.Path;
 
                     Log.Logger.Verbose("NuGetFile Path: {nugetFilePath}", _nuGetFile);
 
-                    Log.Logger.Information("Target Framework: {framework}", string.IsNullOrWhiteSpace(targetFramework) ? "Undefined" : targetFramework);
+                    Log.Logger.Information("Target Framework: {framework}", string.IsNullOrWhiteSpace(tfm) ? "Undefined" : tfm);
                     Log.Logger.Verbose("Loading Packages");
                     Log.Logger.Verbose("Transitive Dependencies Included: {CheckTransitiveDependencies}", _settings.CheckTransitiveDependencies);
 
                     if (_settings.CheckTransitiveDependencies && nugetFile.PackagesConfig)
                     {
-                        var projects = DotNetProject.Load(args[0]).ProjectReferences.Select(p => p.FilePath).ToArray();
-                        var specificFramework = !string.IsNullOrWhiteSpace(targetFramework);
-                        if (specificFramework) Log.Logger.Information("Target Framework: {framework}", targetFramework);
+                        var projects = DotNetProject.Load(projectFullName).ProjectReferences.Select(p => p.FilePath).ToArray();
+                        var specificFramework = !string.IsNullOrWhiteSpace(tfm);
+                        if (specificFramework) Log.Logger.Information("Target Framework: {framework}", tfm);
 
-                        _projects = LoadMultipleProjects(args[0], projects, specificFramework, targetFramework);
+                        _projects = LoadMultipleProjects(projectFullName, projects, specificFramework, tfm);
                     }
                     else
                     {
                         _projects = new Dictionary<string, NuGetPackage[]>();
-                        _projects.Add(nugetFile.Path, nugetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray());
+                        _projects.Add(nugetFile.Path, nugetFile.LoadPackages(tfm, _settings.CheckTransitiveDependencies).Values.ToArray());
                     }
                 }
 
                 GetNonSensitivePackages(out var nonSensitivePackages);
                 if (_settings.ErrorSettings.IgnoredPackages.Length > 0)
-                    foreach (var (project, packages) in _projects.ToArray())
+                    foreach (var (proj, packages) in _projects.ToArray())
                     {
                         IgnorePackages(in packages, _settings.ErrorSettings.IgnoredPackages, out var projPackages);
-                        _projects[project] = projPackages;
+                        _projects[proj] = projPackages;
                     }
 
                 Log.Logger.Information("Loaded {packageCount} packages", _projects.Sum(p => p.Value.Length));
@@ -195,7 +209,7 @@ namespace NuGetDefense
                     VulnerabilityData.IgnoreCVEs(vulnDict, _settings.ErrorSettings.IgnoredCvEs);
 
                 ReportVulnerabilities(vulnDict);
-                return _settings.WarnOnly ? 0 : NumberOfVulnerabilities;
+                commandContext.ResultCode = _settings.WarnOnly ? 0 : NumberOfVulnerabilities;
             }
             catch (Exception e)
             {
@@ -203,7 +217,7 @@ namespace NuGetDefense
                     $"Encountered a fatal exception while checking for Dependencies in {_nuGetFile}. Exception: {e}");
                 Console.WriteLine(msBuildMessage);
                 Log.Logger.Fatal(msBuildMessage);
-                return -1;
+                commandContext.ResultCode = -1;
             }
         }
 
