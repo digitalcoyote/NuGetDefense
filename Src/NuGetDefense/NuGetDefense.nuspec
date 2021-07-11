@@ -21,22 +21,23 @@
     <!-- <file src="Src/bin/Release/net461/NuGetDefense.exe" target="tools/net461/NuGetDefense.exe" /> -->
     <file src="build/nugetdefense.targets" target="build/nugetdefense.targets" />
     <file src="icon.png" target="images\" />
-    <file src="bin/Release/net5.0/NuGetDefense.deps.json" target="tools/net5.0/NuGetDefense.deps.json" />
-    <file src="bin/Release/net5.0/NuGetDefense.dll" target="tools/net5.0/NuGetDefense.dll" />
-    <file src="bin/Release/net5.0/NuGetDefense.Core.dll" target="tools/net5.0/NuGetDefense.Core.dll" />
-    <file src="bin/Release/net5.0/NuGetDefense.NVD.dll" target="tools/net5.0/NuGetDefense.NVD.dll" />
-    <file src="bin/Release/net5.0/NuGetDefense.OSSIndex.dll" target="tools/net5.0/NuGetDefense.OSSIndex.dll" />
-    <file src="bin/Release/net5.0/NuGetDefense.runtimeconfig.json" target="tools/net5.0/NuGetDefense.runtimeconfig.json" />
-    <file src="bin/Release/net5.0/ByteDev.DotNet.dll" target="tools/net5.0/ByteDev.DotNet.dll" />
-    <file src="bin/Release/net5.0/ByteDev.Xml.dll" target="tools/net5.0/ByteDev.Xml.dll" />
-    <file src="bin/Release/net5.0/MessagePack.dll" target="tools/net5.0/MessagePack.dll" />
-    <file src="bin/Release/net5.0/MessagePack.Annotations.dll" target="tools/net5.0/MessagePack.Annotations.dll" />
-    <file src="bin/Release/net5.0/Microsoft.Bcl.AsyncInterfaces.dll" target="tools/net5.0/Microsoft.Bcl.AsyncInterfaces.dll" />
-    <file src="bin/Release/net5.0/NuGet.Versioning.dll" target="tools/net5.0/NuGet.Versioning.dll" />
-    <file src="bin/Release/net5.0/Serilog.dll" target="tools/net5.0/Serilog.dll" />
-    <file src="bin/Release/net5.0/Serilog.Sinks.Console.dll" target="tools/net5.0/Serilog.Sinks.Console.dll" />
-    <file src="bin/Release/net5.0/Serilog.Sinks.File.dll" target="tools/net5.0/Serilog.Sinks.File.dll" />
-    <file src="bin/Release/net5.0/System.Text.Json.dll" target="tools/net5.0/System.Text.Json.dll" />
-    <file src="bin/Release/net5.0/VulnerabilityData.bin" target="tools/net5.0/VulnerabilityData.bin" />
+    <file src="bin/Release/net6.0/NuGetDefense.deps.json" target="tools/net6.0/NuGetDefense.deps.json" />
+    <file src="bin/Release/net6.0/NuGetDefense.dll" target="tools/net6.0/NuGetDefense.dll" />
+    <file src="bin/Release/net6.0/NuGetDefense.Core.dll" target="tools/net6.0/NuGetDefense.Core.dll" />
+    <file src="bin/Release/net6.0/NuGetDefense.NVD.dll" target="tools/net6.0/NuGetDefense.NVD.dll" />
+    <file src="bin/Release/net6.0/NuGetDefense.OSSIndex.dll" target="tools/net6.0/NuGetDefense.OSSIndex.dll" />
+    <file src="bin/Release/net6.0/NuGetDefense.runtimeconfig.json" target="tools/net6.0/NuGetDefense.runtimeconfig.json" />
+    <file src="bin/Release/net6.0/ByteDev.DotNet.dll" target="tools/net6.0/ByteDev.DotNet.dll" />
+    <file src="bin/Release/net6.0/ByteDev.Xml.dll" target="tools/net6.0/ByteDev.Xml.dll" />
+    <file src="bin/Release/net6.0/MessagePack.dll" target="tools/net6.0/MessagePack.dll" />
+    <file src="bin/Release/net6.0/MessagePack.Annotations.dll" target="tools/net6.0/MessagePack.Annotations.dll" />
+    <file src="bin/Release/net6.0/Microsoft.Bcl.AsyncInterfaces.dll" target="tools/net6.0/Microsoft.Bcl.AsyncInterfaces.dll" />
+    <file src="bin/Release/net6.0/NuGet.Versioning.dll" target="tools/net6.0/NuGet.Versioning.dll" />
+    <file src="bin/Release/net6.0/Serilog.dll" target="tools/net6.0/Serilog.dll" />
+    <file src="bin/Release/net6.0/Serilog.Sinks.Console.dll" target="tools/net6.0/Serilog.Sinks.Console.dll" />
+    <file src="bin/Release/net6.0/Serilog.Sinks.File.dll" target="tools/net6.0/Serilog.Sinks.File.dll" />
+    <file src="bin/Release/net6.0/System.CommandLine.dll" target="tools/net6.0/System.CommandLine.dll" />
+<!--    <file src="bin/Release/net6.0/System.Text.Json.dll" target="tools/net6.0/System.Text.Json.dll" /> Part of the Pre-installed Framework for .Net Core 3.0+-->
+    <file src="bin/Release/net6.0/VulnerabilityData.bin" target="tools/net6.0/VulnerabilityData.bin" />
   </files>
 </package>

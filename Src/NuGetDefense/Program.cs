@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
+using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
 using System.IO;
 using System.Linq;
@@ -37,7 +38,6 @@ namespace NuGetDefense
         /// <param name="args"></param>
         private static int Main(string[] args)
         {
-            System.CommandLine.Help.DefaultHelpText.Usage.Title = $"NuGetDefense v{Version}{Environment.NewLine}--------------------{Environment.NewLine}{Environment.NewLine}Usage:";
             var projFileOption = new Option<FileInfo>("--project-file", "Project or Solution File to scan");
             projFileOption.AddAlias("-p");
             projFileOption.AddAlias("--project");
@@ -72,7 +72,6 @@ namespace NuGetDefense
             var ignoredCvesOption = new Option<string[]>("--ignore-cves", Array.Empty<string>, "Adds listed vulnerabilities to a list that is ignored when reporting");
             ignoredCvesOption.AddAlias("--ignore-vulns");
             var ignorePackagesOption = new Option<string[]>("--ignore-packages", Array.Empty<string>,"Adds names to a list of packages to ignore");
-            
             var rootCommand = new RootCommand
             {
                 projFileOption,
@@ -85,6 +84,7 @@ namespace NuGetDefense
                 ignorePackagesOption,
                 ignoredCvesOption
             };
+            
 
 #if DOTNETTOOL
             if (args.Length == 0)
@@ -210,7 +210,7 @@ namespace NuGetDefense
                     VulnerabilityData.IgnoreCVEs(vulnDict, _settings.ErrorSettings.IgnoredCvEs);
 
                 ReportVulnerabilities(vulnDict);
-                commandContext.ResultCode = _settings.WarnOnly ? 0 : NumberOfVulnerabilities;
+                commandContext.ExitCode = _settings.WarnOnly ? 0 : NumberOfVulnerabilities;
             }
             catch (Exception e)
             {
@@ -218,7 +218,7 @@ namespace NuGetDefense
                     $"Encountered a fatal exception while checking for Dependencies in {_nuGetFile}. Exception: {e}");
                 Console.WriteLine(msBuildMessage);
                 Log.Logger.Fatal(msBuildMessage);
-                commandContext.ResultCode = -1;
+                commandContext.ExitCode = -1;
             }
         }
 
