@@ -69,9 +69,9 @@ namespace NuGetDefense
             checkProjectReferencesOption.AddAlias("--check-references");
             checkProjectReferencesOption.AddAlias("--references");
             checkProjectReferencesOption.AddAlias("--referenced-projects");
-            var ignoredCvesOption = new Option<string[]>("--ignore-cve", "Adds listed vulnerabilities to a list that is ignored when reporting");
+            var ignoredCvesOption = new Option<string[]>("--ignore-cves", Array.Empty<string>, "Adds listed vulnerabilities to a list that is ignored when reporting");
             ignoredCvesOption.AddAlias("--ignore-vulns");
-            var ignorePackagesOption = new Option<string[]>("--ignore-packages", "Adds names to a list of packages to ignore");
+            var ignorePackagesOption = new Option<string[]>("--ignore-packages", Array.Empty<string>,"Adds names to a list of packages to ignore");
             
             var rootCommand = new RootCommand
             {
@@ -103,7 +103,7 @@ namespace NuGetDefense
             return rootCommand.InvokeAsync(args).Result;
         }
         
-        private static void Scan(FileInfo project,
+        private static void Scan(FileInfo projectFile,
             string tfm,
             FileInfo settingsFile,
             FileInfo vulnDataFile,
@@ -111,15 +111,16 @@ namespace NuGetDefense
             bool checkTransitiveDependencies,
             bool checkReferencedProjects,
             string[] ignorePackages,
-            string[] ignoredCves,
+            string[] ignoreCves,
             InvocationContext commandContext)
         {
-            _settings = settingsFile == null ? Settings.LoadSettings(project.DirectoryName) : Settings.LoadSettingsFile(settingsFile.FullName);
+            _settings = settingsFile == null ? Settings.LoadSettings(projectFile.DirectoryName) : Settings.LoadSettingsFile(settingsFile.FullName);
             _settings.WarnOnly = _settings.WarnOnly || warnOnly;
-            _settings.CheckTransitiveDependencies = _settings.CheckTransitiveDependencies || checkTransitiveDependencies;
+            _settings.CheckTransitiveDependencies = _settings.CheckTransitiveDependencies && checkTransitiveDependencies;
             _settings.CheckReferencedProjects = _settings.CheckReferencedProjects || checkReferencedProjects;
             _settings.ErrorSettings.IgnoredPackages = _settings.ErrorSettings.IgnoredPackages.Union(ignorePackages.Select(p => new NuGetPackage(){Id = p})).ToArray();
-            _projectFileName = project.Name;
+            _settings.ErrorSettings.IgnoredCvEs = _settings.ErrorSettings.IgnoredCvEs.Union(ignoreCves).ToArray();
+            _projectFileName = projectFile.Name;
             ConfigureLogging();
             try
             {
@@ -127,8 +128,8 @@ namespace NuGetDefense
 
                 // Log.Logger.Verbose("Started NuGetDefense with arguments: {args}", args);
 
-                var projectFullName = project.FullName;
-                if (project.Extension.Equals(".sln", StringComparison.OrdinalIgnoreCase))
+                var projectFullName = projectFile.FullName;
+                if (projectFile.Extension.Equals(".sln", StringComparison.OrdinalIgnoreCase))
                 {
                     var projects = DotNetSolution.Load(projectFullName).Projects.Where(p => !p.Type.IsSolutionFolder).Select(p => p.Path).ToArray();
                     var specificFramework = !string.IsNullOrWhiteSpace(tfm);
