@@ -10,6 +10,7 @@
         <Platforms>AnyCPU</Platforms>
 
         <LangVersion>9</LangVersion>
+
     </PropertyGroup>
 
     <ItemGroup>

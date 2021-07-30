@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <RootNamespace>NuGetDefense</RootNamespace>
+        <LangVersion>9</LangVersion>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <NuspecFile>NuGetDefense.nuspec</NuspecFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ByteDev.DotNet" Version="7.1.0" />
+        <PackageReference Include="NuGet.Versioning" Version="5.10.0" />
+        <PackageReference Include="NuGetDefense.Core" Version="2.0.2" />
+        <PackageReference Include="NuGetDefense.NVD" Version="2.0.5" />
+        <PackageReference Include="NuGetDefense.OSSIndex" Version="2.0.2" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+        <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
+        <PackageReference Include="System.Text.Json" Version="5.0.2" />    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\NuGetDefense\icon.png">
+        <Link>icon.png</Link>
+      </Content>
+      <Content Include="NuGetDefense.nuspec" />
+    </ItemGroup>
+
+</Project>

@@ -36,15 +36,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="ByteDev.DotNet" Version="7.1.0" />
-      <PackageReference Include="NuGet.Versioning" Version="5.10.0" />
-      <PackageReference Include="NuGetDefense.Core" Version="2.0.2" />
-      <PackageReference Include="NuGetDefense.NVD" Version="2.0.5" />
-      <PackageReference Include="NuGetDefense.OSSIndex" Version="2.0.2" />
-      <PackageReference Include="Serilog.Sinks.Console" Version="[3.1.1]" />
-      <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
       <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
-      <PackageReference Include="System.Text.Json" Version="5.0.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -66,5 +58,9 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <Content Include="NuGetDefense.nuspec" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NuGetDefense.Lib\NuGetDefense.Lib.csproj" />
     </ItemGroup>
 </Project>

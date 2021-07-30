@@ -7,7 +7,7 @@
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="NuGetDefense" Version="1.0.6" />
+        <PackageReference Include="NuGetDefense" Version="2.1.2.1" />
         <PackageReference Include="Bootstrap" Version="4.0.0-beta" />
     </ItemGroup>
 </Project>
