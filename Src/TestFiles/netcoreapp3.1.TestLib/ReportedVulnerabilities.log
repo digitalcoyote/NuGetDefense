@@ -168,3 +168,326 @@ CVSS Score: -1
 CVSS Vector: UNSPECIFIED
 ---------------------------
 
+2021-08-04 18:20:24.866 -05:00 [INF] Target Framework: netcoreapp3.1
+2021-08-04 18:20:26.708 -05:00 [INF] Loaded 52 packages
+2021-08-04 18:20:27.376 -05:00 [INF] ignoring 0 Vulnerabilities
+2021-08-04 18:20:27.388 -05:00 [INF] 16 vulnerabilities found in 52 packages for /home/codingcoyote/Code/NuGetDefense/Src/TestFiles/netcoreapp3.1.TestLib/netcoreapp3.1.TestLib.csproj.
+*************************************
+Description: In Bootstrap before 3.4.1 and 4.3.x before 4.3.1, XSS is possible in the tooltip or popover data-template attribute.
+CVE: CVE-2019-8331
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 4.1.2, XSS is possible in the collapse data-parent attribute.
+CVE: CVE-2018-14040
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 4.1.2, XSS is possible in the data-container property of tooltip.
+CVE: CVE-2018-14042
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 3.4.0, XSS is possible in the tooltip data-viewport attribute.
+CVE: CVE-2018-20676
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 3.4.0, XSS is possible in the affix configuration target property.
+CVE: CVE-2018-20677
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap 3.x before 3.4.0 and 4.x-beta before 4.0.0-beta.2, XSS is possible in the data-target attribute, a different vulnerability than CVE-2018-14041.
+CVE: CVE-2016-10735
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+*************************************
+Description: A denial of service vulnerability exists when the ASP.NET Core fails to properly validate web requests. NOTE: Microsoft has not commented on third-party claims that the issue is that the TextEncoder.EncodeCore function in the System.Text.Encodings.Web package in ASP.NET Core Mvc before 1.0.4 and 1.1.x before 1.1.3 allows remote attackers to cause a denial of service by leveraging failure to properly calculate the length of 4-byte characters in the Unicode Non-Character range.
+CVE: CVE-2017-0247
+CWE: CWE-20
+CVSS Score: 7.5
+CVSS Vector: NETWORK
+---------------------------
+Description: An elevation of privilege vulnerability exists when the ASP.NET Core fails to properly sanitize web requests.
+CVE: CVE-2017-0249
+CWE: CWE-20
+CVSS Score: 7.3
+CVSS Vector: NETWORK
+---------------------------
+Description: A spoofing vulnerability exists when the ASP.NET Core fails to properly sanitize web requests.
+CVE: CVE-2017-0256
+CWE: CWE-20
+CVSS Score: 5.3
+CVSS Vector: NETWORK
+---------------------------
+*************************************
+Description: In jQuery versions greater than or equal to 1.2 and before 3.5.0, passing HTML from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code. This problem is patched in jQuery 3.5.0.
+CVE: CVE-2020-11022
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In jQuery versions greater than or equal to 1.0.3 and before 3.5.0, passing HTML containing <option> elements from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code. This problem is patched in jQuery 3.5.0.
+CVE: CVE-2020-11023
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: jQuery before 3.4.0, as used in Drupal, Backdrop CMS, and other products, mishandles jQuery.extend(true, {}, ...) because of Object.prototype pollution. If an unsanitized source object contained an enumerable __proto__ property, it could extend the native Object.prototype.
+CVE: CVE-2019-11358
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: jQuery before 3.0.0 is vulnerable to Cross-site Scripting (XSS) attacks when a cross-domain Ajax request is performed without the dataType option, causing text/javascript responses to be executed.
+CVE: CVE-2015-9251
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: jQuery 1.4.2 allows remote attackers to conduct cross-site scripting (XSS) attacks via vectors related to use of the text method inside after.
+CVE: CVE-2014-6071
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: Cross-site scripting (XSS) vulnerability in jQuery before 1.6.3, when using location.hash to select elements, allows remote attackers to inject arbitrary web script or HTML via a crafted tag.
+CVE: CVE-2011-4969
+CWE: CWE-79
+CVSS Score: -1
+CVSS Vector: UNSPECIFIED
+---------------------------
+Description: The jQuery framework exchanges data using JavaScript Object Notation (JSON) without an associated protection scheme, which allows remote attackers to obtain the data via a web page that retrieves the data through a URL in the SRC attribute of a SCRIPT element and captures the data using other JavaScript code, aka "JavaScript Hijacking."
+CVE: CVE-2007-2379
+CWE: CWE-200
+CVSS Score: -1
+CVSS Vector: UNSPECIFIED
+---------------------------
+
+2021-08-04 18:21:30.192 -05:00 [INF] Target Framework: netcoreapp3.1
+2021-08-04 18:21:32.092 -05:00 [INF] Loaded 52 packages
+2021-08-04 18:21:32.709 -05:00 [INF] ignoring 0 Vulnerabilities
+2021-08-04 18:21:32.717 -05:00 [INF] 11 vulnerabilities found in 52 packages for /home/codingcoyote/Code/NuGetDefense/Src/TestFiles/netcoreapp3.1.TestLib/netcoreapp3.1.TestLib.csproj.
+*************************************
+Description: In Bootstrap before 3.4.1 and 4.3.x before 4.3.1, XSS is possible in the tooltip or popover data-template attribute.
+CVE: CVE-2019-8331
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 4.1.2, XSS is possible in the collapse data-parent attribute.
+CVE: CVE-2018-14040
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 4.1.2, XSS is possible in the data-container property of tooltip.
+CVE: CVE-2018-14042
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 3.4.0, XSS is possible in the tooltip data-viewport attribute.
+CVE: CVE-2018-20676
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 3.4.0, XSS is possible in the affix configuration target property.
+CVE: CVE-2018-20677
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap 3.x before 3.4.0 and 4.x-beta before 4.0.0-beta.2, XSS is possible in the data-target attribute, a different vulnerability than CVE-2018-14041.
+CVE: CVE-2016-10735
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+*************************************
+Description: In jQuery versions greater than or equal to 1.2 and before 3.5.0, passing HTML from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code. This problem is patched in jQuery 3.5.0.
+CVE: CVE-2020-11022
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In jQuery versions greater than or equal to 1.0.3 and before 3.5.0, passing HTML containing <option> elements from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code. This problem is patched in jQuery 3.5.0.
+CVE: CVE-2020-11023
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: jQuery before 3.4.0, as used in Drupal, Backdrop CMS, and other products, mishandles jQuery.extend(true, {}, ...) because of Object.prototype pollution. If an unsanitized source object contained an enumerable __proto__ property, it could extend the native Object.prototype.
+CVE: CVE-2019-11358
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: jQuery before 3.0.0 is vulnerable to Cross-site Scripting (XSS) attacks when a cross-domain Ajax request is performed without the dataType option, causing text/javascript responses to be executed.
+CVE: CVE-2015-9251
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: The jQuery framework exchanges data using JavaScript Object Notation (JSON) without an associated protection scheme, which allows remote attackers to obtain the data via a web page that retrieves the data through a URL in the SRC attribute of a SCRIPT element and captures the data using other JavaScript code, aka "JavaScript Hijacking."
+CVE: CVE-2007-2379
+CWE: NVD-CWE-Other
+CVSS Score: -1
+CVSS Vector: UNSPECIFIED
+---------------------------
+
+2021-08-05 07:12:11.592 -05:00 [INF] Target Framework: netcoreapp3.1
+2021-08-05 07:12:13.507 -05:00 [INF] Loaded 52 packages
+2021-08-05 07:12:14.177 -05:00 [INF] ignoring 0 Vulnerabilities
+2021-08-05 07:12:14.189 -05:00 [INF] 11 vulnerabilities found in 52 packages for /home/codingcoyote/Code/NuGetDefense/Src/TestFiles/netcoreapp3.1.TestLib/netcoreapp3.1.TestLib.csproj.
+*************************************
+Description: In Bootstrap before 3.4.1 and 4.3.x before 4.3.1, XSS is possible in the tooltip or popover data-template attribute.
+CVE: CVE-2019-8331
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 4.1.2, XSS is possible in the collapse data-parent attribute.
+CVE: CVE-2018-14040
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 4.1.2, XSS is possible in the data-container property of tooltip.
+CVE: CVE-2018-14042
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 3.4.0, XSS is possible in the tooltip data-viewport attribute.
+CVE: CVE-2018-20676
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 3.4.0, XSS is possible in the affix configuration target property.
+CVE: CVE-2018-20677
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap 3.x before 3.4.0 and 4.x-beta before 4.0.0-beta.2, XSS is possible in the data-target attribute, a different vulnerability than CVE-2018-14041.
+CVE: CVE-2016-10735
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+*************************************
+Description: In jQuery versions greater than or equal to 1.2 and before 3.5.0, passing HTML from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code. This problem is patched in jQuery 3.5.0.
+CVE: CVE-2020-11022
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In jQuery versions greater than or equal to 1.0.3 and before 3.5.0, passing HTML containing <option> elements from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code. This problem is patched in jQuery 3.5.0.
+CVE: CVE-2020-11023
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: jQuery before 3.4.0, as used in Drupal, Backdrop CMS, and other products, mishandles jQuery.extend(true, {}, ...) because of Object.prototype pollution. If an unsanitized source object contained an enumerable __proto__ property, it could extend the native Object.prototype.
+CVE: CVE-2019-11358
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: jQuery before 3.0.0 is vulnerable to Cross-site Scripting (XSS) attacks when a cross-domain Ajax request is performed without the dataType option, causing text/javascript responses to be executed.
+CVE: CVE-2015-9251
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: The jQuery framework exchanges data using JavaScript Object Notation (JSON) without an associated protection scheme, which allows remote attackers to obtain the data via a web page that retrieves the data through a URL in the SRC attribute of a SCRIPT element and captures the data using other JavaScript code, aka "JavaScript Hijacking."
+CVE: CVE-2007-2379
+CWE: NVD-CWE-Other
+CVSS Score: -1
+CVSS Vector: UNSPECIFIED
+---------------------------
+
+2021-08-05 07:20:47.864 -05:00 [INF] Target Framework: netcoreapp3.1
+2021-08-05 07:20:49.748 -05:00 [INF] Loaded 52 packages
+2021-08-05 07:20:50.370 -05:00 [INF] ignoring 0 Vulnerabilities
+2021-08-05 07:20:50.378 -05:00 [INF] 11 vulnerabilities found in 52 packages for /home/codingcoyote/Code/NuGetDefense/Src/TestFiles/netcoreapp3.1.TestLib/netcoreapp3.1.TestLib.csproj.
+*************************************
+Description: In Bootstrap before 3.4.1 and 4.3.x before 4.3.1, XSS is possible in the tooltip or popover data-template attribute.
+CVE: CVE-2019-8331
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 4.1.2, XSS is possible in the collapse data-parent attribute.
+CVE: CVE-2018-14040
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 4.1.2, XSS is possible in the data-container property of tooltip.
+CVE: CVE-2018-14042
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 3.4.0, XSS is possible in the tooltip data-viewport attribute.
+CVE: CVE-2018-20676
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap before 3.4.0, XSS is possible in the affix configuration target property.
+CVE: CVE-2018-20677
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In Bootstrap 3.x before 3.4.0 and 4.x-beta before 4.0.0-beta.2, XSS is possible in the data-target attribute, a different vulnerability than CVE-2018-14041.
+CVE: CVE-2016-10735
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+*************************************
+Description: In jQuery versions greater than or equal to 1.2 and before 3.5.0, passing HTML from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code. This problem is patched in jQuery 3.5.0.
+CVE: CVE-2020-11022
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: In jQuery versions greater than or equal to 1.0.3 and before 3.5.0, passing HTML containing <option> elements from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code. This problem is patched in jQuery 3.5.0.
+CVE: CVE-2020-11023
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: jQuery before 3.4.0, as used in Drupal, Backdrop CMS, and other products, mishandles jQuery.extend(true, {}, ...) because of Object.prototype pollution. If an unsanitized source object contained an enumerable __proto__ property, it could extend the native Object.prototype.
+CVE: CVE-2019-11358
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: jQuery before 3.0.0 is vulnerable to Cross-site Scripting (XSS) attacks when a cross-domain Ajax request is performed without the dataType option, causing text/javascript responses to be executed.
+CVE: CVE-2015-9251
+CWE: CWE-79
+CVSS Score: 6.1
+CVSS Vector: NETWORK
+---------------------------
+Description: The jQuery framework exchanges data using JavaScript Object Notation (JSON) without an associated protection scheme, which allows remote attackers to obtain the data via a web page that retrieves the data through a URL in the SRC attribute of a SCRIPT element and captures the data using other JavaScript code, aka "JavaScript Hijacking."
+CVE: CVE-2007-2379
+CWE: NVD-CWE-Other
+CVSS Score: -1
+CVSS Vector: UNSPECIFIED
+---------------------------
+

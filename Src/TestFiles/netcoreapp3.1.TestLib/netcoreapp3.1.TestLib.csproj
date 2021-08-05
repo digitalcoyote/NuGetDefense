@@ -6,7 +6,8 @@
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
     <ItemGroup>
-      <PackageReference Include="NuGetDefense" Version="2.1.2.1" />
-        <PackageReference Include="Bootstrap" Version="3.0.0" />    
+      <PackageReference Include="NuGetDefense" Version="2.1.2" />
+        <PackageReference Include="Bootstrap" Version="3.0.0" />
+        <PackageReference Include="System.Net.Http" Version="4.3.4" />    
     </ItemGroup>
 </Project>
