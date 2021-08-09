@@ -35,6 +35,11 @@
       <OutputPath>bin\Linux\</OutputPath>
     </PropertyGroup>
     <ItemGroup>
+        <Reference Include="Bogus, Version=33.0.2.0, Culture=neutral, PublicKeyToken=fa1bb3f3f218129a">
+          <HintPath>..\packages\Bogus.33.0.2\lib\net40\Bogus.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="Microsoft.CSharp" />
         <Reference Include="mscorlib" />
         <Reference Include="System" />
         <Reference Include="System.Core" />

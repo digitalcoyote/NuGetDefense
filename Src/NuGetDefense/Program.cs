@@ -91,15 +91,15 @@ namespace NuGetDefense
             string[] ignoreCves,
             InvocationContext commandContext)
         {
-            commandContext.ExitCode = new Scanner().Scan(projectFile,
-                tfm,
-                settingsFile,
-                vulnDataFile,
-                warnOnly,
-                checkTransitiveDependencies,
-                checkReferencedProjects,
-                ignorePackages,
-                ignoreCves);
+            commandContext.ExitCode = new Scanner().Scan(new()
+            {
+                CheckReferencedProjects = checkReferencedProjects,
+                CheckTransitiveDependencies = checkReferencedProjects,
+                IgnoreCves = ignoreCves,
+                IgnorePackages = ignorePackages,
+                ProjectFile = projectFile,
+                SettingsFile = settingsFile,
+            });
         }
     }
 }
