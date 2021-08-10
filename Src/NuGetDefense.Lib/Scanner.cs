@@ -45,9 +45,7 @@ namespace NuGetDefense
             try
             {
                 Log.Logger.Verbose("Logging Configured");
-
-                // Log.Logger.Verbose("Started NuGetDefense with arguments: {args}", args);
-
+                
                 var projectFullName = options.ProjectFile.FullName;
                 if (options.ProjectFile.Extension.Equals(".sln", StringComparison.OrdinalIgnoreCase))
                 {
