@@ -18,7 +18,7 @@ namespace NuGetDefense
 {
     public class Scanner
     {
-        private const string Version = "3.0.0-pre0004";
+        private const string Version = "3.0.0-pre0006";
         private static readonly string UserAgentString = @$"NuGetDefense/{Version}";
 
         private string _nuGetFile;
@@ -40,6 +40,8 @@ namespace NuGetDefense
             _settings.CheckReferencedProjects = _settings.CheckReferencedProjects || options.CheckReferencedProjects;
             _settings.ErrorSettings.IgnoredPackages = _settings.ErrorSettings.IgnoredPackages.Union(options.IgnorePackages.Select(p => new NuGetPackage { Id = p })).ToArray();
             _settings.ErrorSettings.IgnoredCvEs = _settings.ErrorSettings.IgnoredCvEs.Union(options.IgnoreCves).ToArray();
+            // Ideally we will add a check for "CacheType" here when another type of cache is added
+            options.Cache ??= VulnerabilityCache.GetSqliteCache(_settings.Cachelocation);
             _projectFileName = options.ProjectFile.Name;
             ConfigureLogging();
             try

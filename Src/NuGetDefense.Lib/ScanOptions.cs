@@ -49,5 +49,10 @@ namespace NuGetDefense
         ///     Only Provide warnings and do not fail
         /// </summary>
         public bool WarnOnly = false;
+
+        /// <summary>
+        /// Cache to use for remote vulnerability sources
+        /// </summary>
+        public VulnerabilityCache Cache;
     }
 }

@@ -15,18 +15,19 @@ namespace NuGetDefense.Configuration
         public FileLogSettings Log
         {
             get => Logs?.Length > 0 ? Logs[0] : null;
-            set { Logs = new[] {value}; }
+            set { Logs = new[] { value }; }
         }
 
         public VulnerabilityReportsSettings VulnerabilityReports { get; set; } = new();
 
         public FileLogSettings[] Logs { get; set; }
         public bool CheckTransitiveDependencies { get; set; } = true;
-        public bool CheckReferencedProjects{ get; set; }
+        public bool CheckReferencedProjects { get; set; }
 
         public BuildErrorSettings ErrorSettings { get; set; } = new();
 
         public RemoteVulnerabilitySourceConfiguration OssIndex { get; set; } = new();
+        public string Cachelocation { get; set; }
 
         public OfflineVulnerabilitySourceConfiguration NVD { get; set; } =
             new();
@@ -41,7 +42,7 @@ namespace NuGetDefense.Configuration
             try
             {
                 if (!File.Exists(settingsFilePath) && File.Exists(Path.Combine(Directory.GetParent(directory)?.FullName ?? "", "NuGetDefense.json")))
-                        settingsFilePath = Path.Combine(Directory.GetParent(directory)?.FullName ?? "", "NuGetDefense.json");
+                    settingsFilePath = Path.Combine(Directory.GetParent(directory)?.FullName ?? "", "NuGetDefense.json");
 
                 //Edit to allow it to repeatedly check if hte file exists prior to multiple instances trying to save over it.
                 if (File.Exists(settingsFilePath))
@@ -51,7 +52,7 @@ namespace NuGetDefense.Configuration
                 else
                 {
                     settingsFilePath = Path.Combine(directory, "NuGetDefense.json");
-                    settings = new Settings();
+                    settings = new();
                     SpinWait.SpinUntil(() =>
                     {
                         try
@@ -72,7 +73,7 @@ namespace NuGetDefense.Configuration
             {
                 Console.WriteLine(MsBuild.Log(settingsFilePath, MsBuild.Category.Error,
                     $"NuGetDefense Settings failed to load. Default Settings were used instead. Exception: {e}"));
-                settings = new Settings();
+                settings = new();
             }
 
 #pragma warning disable 618
@@ -98,9 +99,9 @@ namespace NuGetDefense.Configuration
                 PropertyNameCaseInsensitive = true,
                 ReadCommentHandling = JsonCommentHandling.Skip,
                 AllowTrailingCommas = true,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)},
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
             };
-            
+
             settings = JsonSerializer.Deserialize<Settings>(settingsFileContents, ops);
             return settings;
         }
@@ -135,7 +136,7 @@ namespace NuGetDefense.Configuration
                 ReadCommentHandling = JsonCommentHandling.Skip,
                 AllowTrailingCommas = true,
                 WriteIndented = true,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)},
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
 

@@ -25,32 +25,41 @@ namespace NuGetDefense
             var targetFrameworkMonikerOption = new Option<string>("--target-framework-moniker", "Framework to use when detecting versions for 'sdk style' projects");
             targetFrameworkMonikerOption.AddAlias("--tfm");
             targetFrameworkMonikerOption.AddAlias("--framework");
+            
             var settingsOption = new Option<FileInfo>("--settings-file", () => null, "Path to Settings File (ex. NuGetDefense.json)");
             settingsOption.AddAlias("--nugetdefense-settings");
             settingsOption.AddAlias("--nugetdefense-json");
+            
             var vulnerabilityDataBinOption = new Option<FileInfo>("--vulnerability-data-bin", "Path to VulnerabilityData for NVD Scanner (ex. VulnerabilityData.bin)");
             vulnerabilityDataBinOption.AddAlias("--nvd-data");
             vulnerabilityDataBinOption.AddAlias("--nvd-data-bin");
             vulnerabilityDataBinOption.AddAlias("--nvd-bin");
             vulnerabilityDataBinOption.AddAlias("--vulnerability-bin");
             vulnerabilityDataBinOption.AddAlias("--vulnerability-data");
+            
             var warnOnlyOption = new Option<bool>("--warn-only", () => false, "Disables errors that would break a build, but outputs warnings for each report");
             warnOnlyOption.AddAlias("--do-not-break");
             warnOnlyOption.AddAlias("--warn");
+            
             var checkTransitiveDependenciesOption = new Option<bool>("--check-transitive-dependencies", () => true, "Enables scanning of transitive dependencies");
             checkTransitiveDependenciesOption.AddAlias("--check-transitive");
             checkTransitiveDependenciesOption.AddAlias("--transitive");
             checkTransitiveDependenciesOption.AddAlias("--check-dependencies");
             checkTransitiveDependenciesOption.AddAlias("--dependencies");
+            
             var checkProjectReferencesOption = new Option<bool>("--check-project-references", () => false, "Enables scanning projects referenced by the target project");
             checkProjectReferencesOption.AddAlias("--check-referenced-projects");
             checkProjectReferencesOption.AddAlias("--check-referenced");
             checkProjectReferencesOption.AddAlias("--check-references");
             checkProjectReferencesOption.AddAlias("--references");
             checkProjectReferencesOption.AddAlias("--referenced-projects");
+            
             var ignoredCvesOption = new Option<string[]>("--ignore-cves", Array.Empty<string>, "Adds listed vulnerabilities to a list that is ignored when reporting");
             ignoredCvesOption.AddAlias("--ignore-vulns");
+            
             var ignorePackagesOption = new Option<string[]>("--ignore-packages", Array.Empty<string>, "Adds names to a list of packages to ignore");
+            
+            var cacheLocationOption = new Option<string>("--cache-location", "location used to retrieve the cache");
             var rootCommand = new RootCommand
             {
                 projFileOption,
@@ -61,7 +70,8 @@ namespace NuGetDefense
                 checkTransitiveDependenciesOption,
                 checkProjectReferencesOption,
                 ignorePackagesOption,
-                ignoredCvesOption
+                ignoredCvesOption,
+                cacheLocationOption
             };
 
             var NvdUpdateCommand = new Command("Update", "Updates the Embedded Offline Vulnerability source");
@@ -69,12 +79,13 @@ namespace NuGetDefense
             NvdUpdateCommand.Handler = CommandHandler.Create<InvocationContext>(Update);
             RecreateNVDCommand.Handler = CommandHandler.Create<string, InvocationContext>(RecreateNVD);
             rootCommand.Add(NvdUpdateCommand);
+            rootCommand.Add(RecreateNVDCommand);
 
-            rootCommand.Handler = CommandHandler.Create<FileInfo, string, FileInfo, FileInfo, bool, bool, bool, string[], string[], InvocationContext>(Scan);
+            rootCommand.Handler = CommandHandler.Create<FileInfo, string, FileInfo, FileInfo, bool, bool, bool, string[], string[], string, InvocationContext>(Scan);
             return rootCommand.InvokeAsync(args).Result;
         }
 
-        public static void Update(InvocationContext commandContext)
+        private static void Update(InvocationContext commandContext)
         {
             var str = Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "VulnerabilityData.bin");
             var dateTime = DateTime.Now.Add(TimeSpan.FromMinutes(5));
@@ -93,7 +104,7 @@ namespace NuGetDefense
                 catch (Exception ex)
                 {
                     flag = DateTime.Now <= dateTime;
-                    if (!flag) throw new TimeoutException("Reading vulnerability data failed:'" + str + "'", ex);
+                    if (!flag) throw new TimeoutException($"Reading vulnerability data failed:'{str}'", ex);
                 }
             } while (flag);
 
@@ -132,6 +143,7 @@ namespace NuGetDefense
             bool checkReferencedProjects,
             string[] ignorePackages,
             string[] ignoreCves,
+            string cacheLocation,
             InvocationContext commandContext)
         {
             commandContext.ExitCode = new Scanner().Scan(new()
@@ -141,7 +153,8 @@ namespace NuGetDefense
                 IgnoreCves = ignoreCves,
                 IgnorePackages = ignorePackages,
                 ProjectFile = projectFile,
-                SettingsFile = settingsFile
+                SettingsFile = settingsFile,
+                Cache = VulnerabilityCache.GetSqliteCache(cacheLocation)
             });
         }
     }
