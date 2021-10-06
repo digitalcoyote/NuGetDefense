@@ -53,6 +53,6 @@ namespace NuGetDefense
         /// <summary>
         /// Cache to use for remote vulnerability sources
         /// </summary>
-        public VulnerabilityCache Cache;
+        public SqlLiteVulnerabilityCache Cache;
     }
 }

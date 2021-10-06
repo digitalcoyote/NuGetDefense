@@ -107,10 +107,12 @@ namespace NuGetDefense
                 Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null;
                 if (_settings.OssIndex.Enabled)
                 {
-                    Log.Logger.Verbose("Checking with OSSIndex for Vulnerabilities");
+                    var nonSensitivePackageIDs = nonSensitivePackages.SelectMany(p => p.Value).ToArray();
+                    options.Cache.GetUncachedPackages(nonSensitivePackageIDs, TimeSpan.FromDays(1), out var cachedPackages);
+                    Log.Logger.Verbose("Checking with OSSIndex for {} Vulnerabilities");
                     vulnDict =
                         new OSSIndex.Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun, UserAgentString, _settings.OssIndex.Username, _settings.OssIndex.ApiToken)
-                            .GetVulnerabilitiesForPackages(nonSensitivePackages.SelectMany(p => p.Value).ToArray());
+                            .GetVulnerabilitiesForPackages(nonSensitivePackageIDs);
                 }
 
                 if (_settings.NVD.Enabled)
