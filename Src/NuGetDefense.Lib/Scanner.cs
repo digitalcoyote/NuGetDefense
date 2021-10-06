@@ -108,11 +108,17 @@ namespace NuGetDefense
                 if (_settings.OssIndex.Enabled)
                 {
                     var nonSensitivePackageIDs = nonSensitivePackages.SelectMany(p => p.Value).ToArray();
-                    options.Cache.GetUncachedPackages(nonSensitivePackageIDs, TimeSpan.FromDays(1), out var cachedPackages);
+                    var uncachedPkgs = options.Cache.GetUncachedPackages(nonSensitivePackageIDs, TimeSpan.FromDays(1), out var cachedPackages);
+                    
+                    // Round out the calls to have a full set of packages each to refresh oldest cached packages
+                    if(uncachedPkgs.Count > 0) uncachedPkgs.AddRange(cachedPackages.Take(128 - uncachedPkgs.Count %  128));
+                    
                     Log.Logger.Verbose("Checking with OSSIndex for {} Vulnerabilities");
                     vulnDict =
                         new OSSIndex.Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun, UserAgentString, _settings.OssIndex.Username, _settings.OssIndex.ApiToken)
-                            .GetVulnerabilitiesForPackages(nonSensitivePackageIDs);
+                            .GetVulnerabilitiesForPackages(uncachedPkgs.ToArray());
+                    // Skipping the packages we refreshed
+                    options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages.Skip(128 - uncachedPkgs.Count % 128), "OSSIndex", vulnDict);
                 }
 
                 if (_settings.NVD.Enabled)
