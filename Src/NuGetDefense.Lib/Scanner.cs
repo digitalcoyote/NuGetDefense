@@ -12,13 +12,14 @@ using ByteDev.DotNet.Solution;
 using NuGet.Versioning;
 using NuGetDefense.Configuration;
 using NuGetDefense.Core;
+using NuGetDefense.GitHubAdvisoryDatabase;
 using Serilog;
 
 namespace NuGetDefense
 {
     public class Scanner
     {
-        private const string Version = "3.0.0-pre0007";
+        private const string Version = "3.0.0-pre0008";
         private static readonly string UserAgentString = @$"NuGetDefense/{Version}";
 
         private string _nuGetFile;
@@ -40,7 +41,7 @@ namespace NuGetDefense
             _settings.CheckReferencedProjects = _settings.CheckReferencedProjects || options.CheckReferencedProjects;
             _settings.ErrorSettings.IgnoredPackages = _settings.ErrorSettings.IgnoredPackages.Union(options.IgnorePackages.Select(p => new NuGetPackage { Id = p })).ToArray();
             _settings.ErrorSettings.IgnoredCvEs = _settings.ErrorSettings.IgnoredCvEs.Union(options.IgnoreCves).ToArray();
-            // Ideally we will add a check for "CacheType" here when another type of cache is added
+            // TODO: Ideally we will add a check for "CacheType" here when another type of cache is added
             options.Cache ??= VulnerabilityCache.GetSqliteCache(_settings.Cachelocation);
             _projectFileName = options.ProjectFile.Name;
             ConfigureLogging();
@@ -105,20 +106,45 @@ namespace NuGetDefense
                 if (_settings.ErrorSettings.BlockedPackages.Length > 0) CheckBlockedPackages();
                 if (_settings.ErrorSettings.AllowedPackages.Length > 0) CheckAllowedPackages();
                 Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null;
+                var nonSensitivePackageIDs = nonSensitivePackages.SelectMany(p => p.Value).ToArray();
                 if (_settings.OssIndex.Enabled)
                 {
-                    var nonSensitivePackageIDs = nonSensitivePackages.SelectMany(p => p.Value).ToArray();
-                    var uncachedPkgs = options.Cache.GetUncachedPackages(nonSensitivePackageIDs, TimeSpan.FromDays(1), out var cachedPackages);
+                    const string OssIndexSourceID = "OSSIndex";
+                    var uncachedPkgs = options.Cache.GetUncachedPackages(nonSensitivePackageIDs, TimeSpan.FromDays(1), OssIndexSourceID, out var cachedPackages);
                     
                     // Round out the calls to have a full set of packages each to refresh oldest cached packages
                     if(uncachedPkgs.Count > 0) uncachedPkgs.AddRange(cachedPackages.Take(128 - uncachedPkgs.Count %  128));
                     
-                    Log.Logger.Verbose("Checking with OSSIndex for {} Vulnerabilities");
+                    Log.Logger.Verbose("Checking with OSSIndex for Vulnerabilities");
                     vulnDict =
                         new OSSIndex.Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun, UserAgentString, _settings.OssIndex.Username, _settings.OssIndex.ApiToken)
                             .GetVulnerabilitiesForPackages(uncachedPkgs.ToArray());
                     // Skipping the packages we refreshed
-                    options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages.Skip(128 - uncachedPkgs.Count % 128), "OSSIndex", vulnDict);
+                    options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages.Skip(128 - uncachedPkgs.Count % 128), OssIndexSourceID, vulnDict);
+                }
+
+                if (_settings.GitHubAdvisoryDatabase.Enabled)
+                {
+                    if (String.IsNullOrWhiteSpace(_settings.GitHubAdvisoryDatabase.ApiToken))
+                    {
+                        var msBuildMessage = MsBuild.Log(_nuGetFile, _settings.GitHubAdvisoryDatabase.BreakIfCannotRun ? MsBuild.Category.Error : MsBuild.Category.Warning,
+                            "GitHub Security Advisory Database Access Requires a GitHub Personal Access Toke (no special permissions): https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token");
+                        Console.WriteLine(msBuildMessage);
+                        Log.Logger.Error(msBuildMessage);
+                    }
+                    else
+                    {
+
+                        const string GitHubAdvisoryDatabaseSourceId = "GitHubSecurityAdvisoryDatabase";
+                        var uncachedPkgs = options.Cache.GetUncachedPackages(nonSensitivePackageIDs, TimeSpan.FromDays(1), GitHubAdvisoryDatabaseSourceId, out var cachedPackages);
+
+                        Log.Logger.Verbose("Checking the GitHub Security Advisory Database for Vulnerabilities");
+                        vulnDict =
+                            new GitHubAdvisoryDatabase.Scanner(_nuGetFile, _settings.GitHubAdvisoryDatabase.ApiToken, _settings.GitHubAdvisoryDatabase.BreakIfCannotRun)
+                                .GetVulnerabilitiesForPackages(uncachedPkgs.ToArray());
+                        // Skipping the packages we refreshed
+                        options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages, GitHubAdvisoryDatabaseSourceId, vulnDict);
+                    }
                 }
 
                 if (_settings.NVD.Enabled)
