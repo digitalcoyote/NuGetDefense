@@ -27,7 +27,7 @@ namespace NuGetDefense.Configuration
         public BuildErrorSettings ErrorSettings { get; set; } = new();
 
         public RemoteVulnerabilitySourceConfiguration OssIndex { get; set; } = new();
-        public RemoteVulnerabilitySourceConfiguration GitHubAdvisoryDatabase { get; set; } = new();
+        public RemoteVulnerabilitySourceConfiguration GitHubAdvisoryDatabase { get; set; } = new(){BreakIfCannotRun = false};
         public string Cachelocation { get; set; }
 
         public OfflineVulnerabilitySourceConfiguration NVD { get; set; } =
