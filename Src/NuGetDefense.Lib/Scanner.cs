@@ -41,8 +41,10 @@ namespace NuGetDefense
             _settings.CheckReferencedProjects = _settings.CheckReferencedProjects || options.CheckReferencedProjects;
             _settings.ErrorSettings.IgnoredPackages = _settings.ErrorSettings.IgnoredPackages.Union(options.IgnorePackages.Select(p => new NuGetPackage { Id = p })).ToArray();
             _settings.ErrorSettings.IgnoredCvEs = _settings.ErrorSettings.IgnoredCvEs.Union(options.IgnoreCves).ToArray();
+            
             // TODO: Ideally we will add a check for "CacheType" here when another type of cache is added
             options.Cache ??= VulnerabilityCache.GetSqliteCache(_settings.Cachelocation);
+            
             _projectFileName = options.ProjectFile.Name;
             ConfigureLogging();
             try
@@ -247,7 +249,6 @@ namespace NuGetDefense
         {
             nonSensitives = new();
             var sensitiveRegexSet = _settings.SensitivePackages.Select(sp => Regex.Escape(sp).Replace(@"\*", ".*")).ToArray();
-            if (!sensitiveRegexSet.Any()) return;
             foreach (var (project, packages) in _projects) nonSensitives.Add(project, packages.Where(p => !sensitiveRegexSet.Any(x => Regex.IsMatch(p.Id, x))).ToArray());
         }
 
