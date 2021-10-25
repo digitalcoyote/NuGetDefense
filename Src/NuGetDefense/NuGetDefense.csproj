@@ -29,38 +29,42 @@
         <PackageId>NuGetDefense.Tool</PackageId>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>nugetdefense</ToolCommandName>
-        <Version>3.0.0-pre0009</Version>
+        <Version>3.0.0-pre0010</Version>
     </PropertyGroup>
     <ItemGroup>
-        <None Include="icon.png" Pack="true" PackagePath="\"/>
+        <None Include="icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1"/>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Remove="Tests\**"/>
+        <Compile Remove="Tests\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Remove="Tests\**"/>
+        <EmbeddedResource Remove="Tests\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="Tests\**"/>
-        <None Include="TestFiles\test.csproj"/>
+        <None Remove="Tests\**" />
+        <None Include="TestFiles\test.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="NuGetDefense.nuspec"/>
+        <None Remove="NuGetDefense.nuspec" />
         <Content Condition="'$(Configuration)'=='DOTNETTOOL'" Include="bin\Release\netcoreapp3.1\VulnerabilityData.bin">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
-        <Content Include="NuGetDefense.nuspec"/>
+        <Content Include="NuGetDefense.nuspec" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NuGetDefense.Lib\NuGetDefense.Lib.csproj"/>
+        <ProjectReference Include="..\NuGetDefense.Lib\NuGetDefense.Lib.csproj" />
     </ItemGroup>
 </Project>

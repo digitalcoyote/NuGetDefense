@@ -11,7 +11,11 @@
     <ItemGroup>
         <PackageReference Include="ByteDev.DotNet" Version="7.1.0" />
         <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.0-preview.7.21378.4" />
-        <PackageReference Include="NuGet.Versioning" Version="5.10.0" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="NuGet.Versioning" Version="5.11.0" />
         <PackageReference Include="NuGetDefense.Core" Version="2.0.2" />
         <PackageReference Include="NuGetDefense.GitHubAdvisoryDatabase" Version="1.0.0-pre0001" />
         <PackageReference Include="NuGetDefense.NVD" Version="2.0.6-pre0001" />
