@@ -3,7 +3,7 @@
   <metadata>
     <id>NuGetDefense</id>
     <title>NuGetDefense</title>
-    <version>1.0.19-pre0001</version>
+    <version>1.0.19-pre0002</version>
     <authors>Curtis Carter</authors>
     <owners>Curtis Carter</owners>
     <projectUrl>https://digitalcoyote.github.io/NuGetDefense/</projectUrl>
@@ -36,6 +36,8 @@
     <file src="bin/Release/netcoreapp3.1/Serilog.dll" target="tools/netcoreapp3.1/Serilog.dll" />
     <file src="bin/Release/netcoreapp3.1/Serilog.Sinks.Console.dll" target="tools/netcoreapp3.1/Serilog.Sinks.Console.dll" />
     <file src="bin/Release/netcoreapp3.1/Serilog.Sinks.File.dll" target="tools/netcoreapp3.1/Serilog.Sinks.File.dll" />
+    <file src="bin/Release/netcoreapp3.1/System.Runtime.CompilerServices.Unsafe.dll" target="tools/netcoreapp3.1/System.Runtime.CompilerServices.Unsafe.dll" />
+    <file src="bin/Release/netcoreapp3.1/System.Text.Encodings.Web.dll" target="tools/netcoreapp3.1/System.Text.Encodings.Web.dll" />
     <file src="bin/Release/netcoreapp3.1/System.Text.Json.dll" target="tools/netcoreapp3.1/System.Text.Json.dll" />
     <file src="bin/Release/netcoreapp3.1/VulnerabilityData.bin" target="tools/netcoreapp3.1/VulnerabilityData.bin" />
   </files>
