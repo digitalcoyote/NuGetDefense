@@ -19,7 +19,7 @@ namespace NuGetDefense
 {
     public class Scanner
     {
-        private const string Version = "3.0.0-pre0010";
+        private const string Version = "3.0.0-pre0011";
         private static readonly string UserAgentString = @$"NuGetDefense/{Version}";
 
         private string _nuGetFile;
@@ -121,13 +121,14 @@ namespace NuGetDefense
                     vulnDict =
                         new OSSIndex.Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun, UserAgentString, _settings.OssIndex.Username, _settings.OssIndex.ApiToken)
                             .GetVulnerabilitiesForPackages(uncachedPkgs.ToArray());
+                    options.Cache.UpdateCache(vulnDict, OssIndexSourceID);
                     // Skipping the packages we refreshed
                     options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages.Skip(128 - uncachedPkgs.Count % 128), OssIndexSourceID, vulnDict);
                 }
 
                 if (_settings.GitHubAdvisoryDatabase.Enabled)
                 {
-                    if (String.IsNullOrWhiteSpace(_settings.GitHubAdvisoryDatabase.ApiToken))
+                    if (string.IsNullOrWhiteSpace(_settings.GitHubAdvisoryDatabase.ApiToken))
                     {
                         var msBuildMessage = MsBuild.Log(_nuGetFile, _settings.GitHubAdvisoryDatabase.BreakIfCannotRun ? MsBuild.Category.Error : MsBuild.Category.Warning,
                             "GitHub Security Advisory Database Access Requires a GitHub Personal Access Toke (no special permissions): https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token");
@@ -141,10 +142,11 @@ namespace NuGetDefense
                         var uncachedPkgs = options.Cache.GetUncachedPackages(nonSensitivePackageIDs, TimeSpan.FromDays(1), GitHubAdvisoryDatabaseSourceId, out var cachedPackages);
 
                         Log.Logger.Verbose("Checking the GitHub Security Advisory Database for Vulnerabilities");
-                        vulnDict =
+                        var ghsaVulnDict =
                             new GitHubAdvisoryDatabase.Scanner(_nuGetFile, _settings.GitHubAdvisoryDatabase.ApiToken, _settings.GitHubAdvisoryDatabase.BreakIfCannotRun)
                                 .GetVulnerabilitiesForPackages(uncachedPkgs.ToArray());
-                        // Skipping the packages we refreshed
+                        options.Cache.UpdateCache(ghsaVulnDict, GitHubAdvisoryDatabaseSourceId);
+                        MergeVulnDict(ref vulnDict, ref ghsaVulnDict);
                         options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages, GitHubAdvisoryDatabaseSourceId, vulnDict);
                     }
                 }
@@ -178,6 +180,22 @@ namespace NuGetDefense
             }
 
             return ExitCode;
+        }
+
+        private void MergeVulnDict(ref Dictionary<string, Dictionary<string, Vulnerability>> vulnDict, ref Dictionary<string, Dictionary<string, Vulnerability>> vulnDict2)
+        {
+
+            foreach (var vulnDict2Key in vulnDict2.Keys)
+            {
+                if (vulnDict.ContainsKey(vulnDict2Key))
+                {
+                    foreach (var cve in vulnDict2[vulnDict2Key].Keys)
+                        if (!vulnDict[vulnDict2Key].ContainsKey(cve))
+                            vulnDict[vulnDict2Key].Add(cve, vulnDict2[vulnDict2Key][cve]);
+                }
+                else
+                    vulnDict.Add(vulnDict2Key, vulnDict2[vulnDict2Key]);
+            }
         }
 
         private static void GetProjectsReferenced(in string proj, in List<string> projectList)
