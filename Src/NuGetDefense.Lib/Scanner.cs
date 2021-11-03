@@ -19,7 +19,7 @@ namespace NuGetDefense
 {
     public class Scanner
     {
-        private const string Version = "3.0.0-pre0011";
+        private const string Version = "3.0.0-pre0012";
         private static readonly string UserAgentString = @$"NuGetDefense/{Version}";
 
         private string _nuGetFile;
@@ -121,9 +121,9 @@ namespace NuGetDefense
                     vulnDict =
                         new OSSIndex.Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun, UserAgentString, _settings.OssIndex.Username, _settings.OssIndex.ApiToken)
                             .GetVulnerabilitiesForPackages(uncachedPkgs.ToArray());
-                    options.Cache.UpdateCache(vulnDict, OssIndexSourceID);
+                    options.Cache.UpdateCache(vulnDict, uncachedPkgs, OssIndexSourceID);
                     // Skipping the packages we refreshed
-                    options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages.Skip(128 - uncachedPkgs.Count % 128), OssIndexSourceID, vulnDict);
+                    options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages.Skip(128 - uncachedPkgs.Count % 128), OssIndexSourceID, ref vulnDict);
                 }
 
                 if (_settings.GitHubAdvisoryDatabase.Enabled)
@@ -145,9 +145,9 @@ namespace NuGetDefense
                         var ghsaVulnDict =
                             new GitHubAdvisoryDatabase.Scanner(_nuGetFile, _settings.GitHubAdvisoryDatabase.ApiToken, _settings.GitHubAdvisoryDatabase.BreakIfCannotRun)
                                 .GetVulnerabilitiesForPackages(uncachedPkgs.ToArray());
-                        options.Cache.UpdateCache(ghsaVulnDict, GitHubAdvisoryDatabaseSourceId);
+                        options.Cache.UpdateCache(ghsaVulnDict, uncachedPkgs, GitHubAdvisoryDatabaseSourceId);
                         MergeVulnDict(ref vulnDict, ref ghsaVulnDict);
-                        options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages, GitHubAdvisoryDatabaseSourceId, vulnDict);
+                        options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages, GitHubAdvisoryDatabaseSourceId, ref vulnDict);
                     }
                 }
 
