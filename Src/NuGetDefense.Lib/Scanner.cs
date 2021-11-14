@@ -19,7 +19,7 @@ namespace NuGetDefense
 {
     public class Scanner
     {
-        private const string Version = "3.0.0-pre0012";
+        private const string Version = "3.0.0-pre0013";
         private static readonly string UserAgentString = @$"NuGetDefense/{Version}";
 
         private string _nuGetFile;
