@@ -7,6 +7,14 @@
   </PropertyGroup>
   
   <Target Name="CheckForVulnerableNuGetPkgs" AfterTargets="Build">
-    <Exec Command="$(NuGetDefenseExe) -p &quot;$(MSBuildProjectFullPath)&quot; --tfm $(TargetFramework)" IgnoreExitCode="false" />
+    <Choose>
+      <When Condition="$([System.Text.RegularExpressions.Regex]::IsMatch(
+         $(DefineConstants), '^(.*;)*TargetFramework(;.*)*$'))">
+        <Exec Command="$(NuGetDefenseExe) -p &quot;$(MSBuildProjectFullPath)&quot; --tfm $(TargetFramework)" IgnoreExitCode="false" />
+      </When>
+      <Otherwise>
+        <Exec Command="$(NuGetDefenseExe) -p &quot;$(MSBuildProjectFullPath)&quot;" IgnoreExitCode="false" />
+      </Otherwise>
+    </Choose>
   </Target>
 </Project>
