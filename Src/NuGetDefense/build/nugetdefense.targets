@@ -4,17 +4,10 @@
     <!-- <NuGetDefenseExe Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' OR '$(TargetFrameworkIdentifier)' == '.NETStandard'">dotnet "$(MSBuildThisFileDirectory)/net5.0/NuGetDefense.dll"</TsGenFileExe> -->
     <NuGetDefenseExe Condition="'$(OS)' == Unix">dotnet "$(MSBuildThisFileDirectory)../tools/net6.0/NuGetDefense.dll"</NuGetDefenseExe>
     <NuGetDefenseExe Condition="'$(OS)' == 'Windows_NT'">dotnet "$(MSBuildThisFileDirectory)..\tools\net6.0\NuGetDefense.dll"</NuGetDefenseExe>
+    <NugetDefenseTFM Condition="$(TargetFramework) != ''" >--tfm $(TargetFramework)</NugetDefenseTFM>
   </PropertyGroup>
   
   <Target Name="CheckForVulnerableNuGetPkgs" AfterTargets="Build">
-    <Choose>
-      <When Condition="$([System.Text.RegularExpressions.Regex]::IsMatch(
-         $(DefineConstants), '^(.*;)*TargetFramework(;.*)*$'))">
-        <Exec Command="$(NuGetDefenseExe) -p &quot;$(MSBuildProjectFullPath)&quot; --tfm $(TargetFramework)" IgnoreExitCode="false" />
-      </When>
-      <Otherwise>
-        <Exec Command="$(NuGetDefenseExe) -p &quot;$(MSBuildProjectFullPath)&quot;" IgnoreExitCode="false" />
-      </Otherwise>
-    </Choose>
+    <Exec Command="$(NuGetDefenseExe) -p &quot;$(MSBuildProjectFullPath)&quot; $(NugetDefenseTFM)" IgnoreExitCode="false" />
   </Target>
 </Project>

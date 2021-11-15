@@ -1,5 +1,5 @@
 
-# [![NuGetDefense](images/logo.png)](https://digitalcoyote.github.io/NuGetDefense/)
+# [![NuGetDefense](https://raw.githubusercontent.com/digitalcoyote/NuGetDefense/master/.github/images/logo.png)](https://digitalcoyote.github.io/NuGetDefense/)
 
 [![Join the chat at https://gitter.im/NuGetDefense/community](https://badges.gitter.im/NuGetDefense/community.svg)](https://gitter.im/NuGetDefense/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  [![NuGet version](https://badge.fury.io/nu/NugetDefense.svg)](https://badge.fury.io/nu/NugetDefense)
 
