@@ -1,58 +1,58 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace NuGetDefense
+namespace NuGetDefense;
+
+public class ScanOptions
 {
-    public class ScanOptions
-    {
-        /// <summary>
-        ///     Scans projects referenced by the current project as well
-        /// </summary>
-        public bool CheckReferencedProjects = false;
+    /// <summary>
+    ///     Cache to use for remote vulnerability sources
+    /// </summary>
+    public SqlLiteVulnerabilityCache? Cache;
 
-        /// <summary>
-        ///     Includes Transitive Dependencies when possible
-        /// </summary>
-        public bool CheckTransitiveDependencies = false;
+    /// <summary>
+    ///     Scans projects referenced by the current project as well
+    /// </summary>
+    public bool CheckReferencedProjects = false;
 
-        /// <summary>
-        ///     CVE's to ignore when scanning
-        /// </summary>
-        public IEnumerable<string> IgnoreCves = System.Array.Empty<string>();
+    /// <summary>
+    ///     Includes Transitive Dependencies when possible
+    /// </summary>
+    public bool CheckTransitiveDependencies = false;
 
-        /// <summary>
-        ///     Packages to ignore when scanning
-        /// </summary>
-        public IEnumerable<string> IgnorePackages = System.Array.Empty<string>();
+    /// <summary>
+    ///     CVE's to ignore when scanning
+    /// </summary>
+    public IEnumerable<string> IgnoreCves = Array.Empty<string>();
 
-        /// <summary>
-        ///     File used to obtain the dependencies
-        /// </summary>
-        public FileInfo ProjectFile;
+    /// <summary>
+    ///     Packages to ignore when scanning
+    /// </summary>
+    public IEnumerable<string> IgnorePackages = Array.Empty<string>();
 
-        /// <summary>
-        ///     File to use for Settings
-        /// </summary>
-        public FileInfo SettingsFile;
+    /// <summary>
+    ///     File used to obtain the dependencies
+    /// </summary>
+    public FileInfo? ProjectFile;
 
-        /// <summary>
-        ///     Target Framework Moniker
-        /// </summary>
-        public string Tfm;
+    /// <summary>
+    ///     File to use for Settings
+    /// </summary>
+    public FileInfo? SettingsFile;
 
-        /// <summary>
-        ///     location of NVD Vulnerability File
-        /// </summary>
-        public FileInfo VulnDataFile;
+    /// <summary>
+    ///     Target Framework Moniker
+    /// </summary>
+    public string? Tfm;
+ 
+    /// <summary>
+    ///     location of NVD Vulnerability File
+    /// </summary>
+    public FileInfo? VulnDataFile;
 
-        /// <summary>
-        ///     Only Provide warnings and do not fail
-        /// </summary>
-        public bool WarnOnly = false;
-
-        /// <summary>
-        /// Cache to use for remote vulnerability sources
-        /// </summary>
-        public SqlLiteVulnerabilityCache Cache;
-    }
+    /// <summary>
+    ///     Only Provide warnings and do not fail
+    /// </summary>
+    public bool WarnOnly = false;
 }

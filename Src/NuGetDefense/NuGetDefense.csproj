@@ -8,8 +8,8 @@
         <Authors>Curtis Carter</Authors>
         <Description>NuGetDefense ~ Check for Known Vulnerabilities at Build</Description>
         <PackageDescription>NuGetDefense was inspired by [OWASP SafeNuGet](https://nuget.org/packages/SafeNuGet/) but aims to check with multiple sources for known vulnerabilities.</PackageDescription>
-        <Copyright>Curtis Carter 2020</Copyright>
-        <LangVersion>9</LangVersion>
+        <Copyright>Curtis Carter 2022</Copyright>
+        <LangVersion>10</LangVersion>
         <Configurations>Debug;Release;DotNetTool</Configurations>
         <Platforms>AnyCPU</Platforms>
         <PackageProjectUrl>https://digitalcoyote.github.io/NuGetDefense/</PackageProjectUrl>
@@ -17,6 +17,11 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageTags>Security</PackageTags>
         <RepositoryType>git</RepositoryType>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)'!='DOTNETTOOL'">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -29,42 +34,42 @@
         <PackageId>NuGetDefense.Tool</PackageId>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>nugetdefense</ToolCommandName>
-        <Version>3.0.0-pre0017</Version>
+        <Version>3.0.0</Version>
     </PropertyGroup>
     <ItemGroup>
-        <None Include="icon.png" Pack="true" PackagePath="\" />
+        <None Include="icon.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
+        <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Remove="Tests\**" />
+        <Compile Remove="Tests\**"/>
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Remove="Tests\**" />
+        <EmbeddedResource Remove="Tests\**"/>
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="Tests\**" />
-        <None Include="TestFiles\test.csproj" />
+        <None Remove="Tests\**"/>
+        <None Include="TestFiles\test.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="NuGetDefense.nuspec" />
+        <None Remove="NuGetDefense.nuspec"/>
         <Content Condition="'$(Configuration)'=='DOTNETTOOL'" Include="bin\Release\net6.0\VulnerabilityData.bin">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
-        <Content Include="NuGetDefense.nuspec" />
+        <Content Include="NuGetDefense.nuspec"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NuGetDefense.Lib\NuGetDefense.Lib.csproj" />
+        <ProjectReference Include="..\NuGetDefense.Lib\NuGetDefense.Lib.csproj"/>
     </ItemGroup>
 </Project>

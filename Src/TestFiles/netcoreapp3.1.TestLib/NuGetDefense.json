@@ -1,55 +1,41 @@
 {
   "WarnOnly": false,
-  "Log": {
-    "OutPut": "ReportedVulnerabilities.log",
-    "LogLevel": 2,
-    "RollingInterval": 0
+  "VulnerabilityReports": {
+    "OutputTextReport": true
   },
-  "Logs": [
-    {
-      "OutPut": "ReportedVulnerabilities.log",
-      "LogLevel": 2,
-      "RollingInterval": 0
-    }
-  ],
   "CheckTransitiveDependencies": true,
+  "CheckReferencedProjects": false,
   "ErrorSettings": {
-    "ErrorSeverityThreshold": 5,
-    "CVSS3Threshold": -1,
+    "ErrorSeverityThreshold": "any",
+    "Cvss3Threshold": -1,
     "IgnoredPackages": [
       {
-        "Id": "NugetDefense",
-        "Version": "1.0.8.0"
+        "Id": "NugetDefense"
       }
     ],
     "IgnoredCvEs": [],
-    "BlockedPackages": [
-      {
-        "Package": {
-          "Id": "BlockList.Example",
-          "Version": "1.0.1"
-        },
-        "CustomErrorMessage": "Custom Error Message"
-      }
-    ],
-    "BlacklistedPackages": [
-      {
-        "Package": {
-          "Id": "BlackListed.Example",
-          "Version": "1.0.1"
-        },
-        "CustomErrorMessage": "Custom Error Message"
-      }
-    ]
+    "AllowedPackages": [],
+    "WhiteListedPackages": [],
+    "BlockedPackages": [],
+    "BlacklistedPackages": []
   },
   "OssIndex": {
+    "ApiToken": "",
+    "Username": "",
     "Enabled": true,
     "BreakIfCannotRun": true
+  },
+  "GitHubAdvisoryDatabase": {
+    "ApiToken": "",
+    "Username": "",
+    "Enabled": true,
+    "BreakIfCannotRun": false
   },
   "NVD": {
     "SelfUpdate": false,
     "TimeoutInSeconds": 15,
     "Enabled": true,
     "BreakIfCannotRun": true
-  }
+  },
+  "SensitivePackages": []
 }

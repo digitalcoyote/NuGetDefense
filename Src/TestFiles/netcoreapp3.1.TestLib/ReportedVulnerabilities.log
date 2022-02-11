@@ -491,3 +491,74 @@ CVSS Score: -1
 CVSS Vector: UNSPECIFIED
 ---------------------------
 
+2022-02-08 18:55:15.910 -06:00 [INF] Target Framework: Undefined
+2022-02-08 18:55:16.565 -06:00 [INF] Loaded 4 packages
+2022-02-08 18:55:22.448 -06:00 [ERR] /home/codingcoyote/Code/NuGetDefense/Src/TestFiles/netcoreapp3.1.TestLib/netcoreapp3.1.TestLib.csproj: Warning : GitHub Security Advisory Database Access Requires a GitHub Personal Access Toke (no special permissions): https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+2022-02-08 18:55:23.141 -06:00 [INF] ignoring 0 Vulnerabilities
+2022-02-08 18:55:23.153 -06:00 [INF] 8 vulnerabilities found in 4 packages for /home/codingcoyote/Code/NuGetDefense/Src/TestFiles/netcoreapp3.1.TestLib/netcoreapp3.1.TestLib.csproj.
+*************************************
+Description: The software does not neutralize or incorrectly neutralizes user-controllable input before it is placed in output that is used as a web page that is served to other users.
+CVE: OSS Index ID: 6dd9e321-93cd-4d79-b33a-ff7e01b15ad9
+CWE: CWE-79
+CVSS Score: 6.099999904632568
+CVSS Vector: NETWORK
+References:
+https://ossindex.sonatype.org/vulnerability/6dd9e321-93cd-4d79-b33a-ff7e01b15ad9?component-type=nuget&component-name=Bootstrap&utm_source=nugetdefense&utm_medium=integration&utm_content=3.0.0
+---------------------------
+Description: In Bootstrap before 4.1.2, XSS is possible in the data-container property of tooltip.
+CVE: CVE-2018-14042
+CWE: 
+CVSS Score: 6.099999904632568
+CVSS Vector: NETWORK
+References:
+https://ossindex.sonatype.org/vulnerability/e98acd45-5fe5-45d1-8bf2-01631d6b1260?component-type=nuget&component-name=Bootstrap&utm_source=nugetdefense&utm_medium=integration&utm_content=3.0.0
+---------------------------
+Description: In Bootstrap before 3.4.0, XSS is possible in the affix configuration target property.
+CVE: CVE-2018-20677
+CWE: 
+CVSS Score: 6.099999904632568
+CVSS Vector: NETWORK
+References:
+https://ossindex.sonatype.org/vulnerability/b50e5a59-fc61-4f4c-9872-5900d205a7d2?component-type=nuget&component-name=Bootstrap&utm_source=nugetdefense&utm_medium=integration&utm_content=3.0.0
+---------------------------
+Description: In Bootstrap before 3.4.0, XSS is possible in the tooltip data-viewport attribute.
+CVE: CVE-2018-20676
+CWE: 
+CVSS Score: 6.099999904632568
+CVSS Vector: NETWORK
+References:
+https://ossindex.sonatype.org/vulnerability/88d9ae04-16c2-4eee-9d6b-960afe3682ab?component-type=nuget&component-name=Bootstrap&utm_source=nugetdefense&utm_medium=integration&utm_content=3.0.0
+---------------------------
+Description: In Bootstrap before 4.1.2, XSS is possible in the collapse data-parent attribute.
+CVE: CVE-2018-14040
+CWE: 
+CVSS Score: 6.099999904632568
+CVSS Vector: NETWORK
+References:
+https://ossindex.sonatype.org/vulnerability/d8419399-889a-4681-ac38-de52c83e9cc7?component-type=nuget&component-name=Bootstrap&utm_source=nugetdefense&utm_medium=integration&utm_content=3.0.0
+---------------------------
+Description: In Bootstrap before 3.4.1 and 4.3.x before 4.3.1, XSS is possible in the tooltip or popover data-template attribute.
+CVE: CVE-2019-8331
+CWE: 
+CVSS Score: 6.099999904632568
+CVSS Vector: NETWORK
+References:
+https://ossindex.sonatype.org/vulnerability/b919d516-c1db-4060-bb17-ef25a07f9fb3?component-type=nuget&component-name=Bootstrap&utm_source=nugetdefense&utm_medium=integration&utm_content=3.0.0
+---------------------------
+Description: The software does not neutralize or incorrectly neutralizes user-controllable input before it is placed in output that is used as a web page that is served to other users.
+CVE: OSS Index ID: 3e831af5-428b-4712-874f-8f6ff932e2b2
+CWE: CWE-79
+CVSS Score: 6.099999904632568
+CVSS Vector: NETWORK
+References:
+https://ossindex.sonatype.org/vulnerability/3e831af5-428b-4712-874f-8f6ff932e2b2?component-type=nuget&component-name=Bootstrap&utm_source=nugetdefense&utm_medium=integration&utm_content=3.0.0
+---------------------------
+Description: In Bootstrap 3.x before 3.4.0 and 4.x-beta before 4.0.0-beta.2, XSS is possible in the data-target attribute, a different vulnerability than CVE-2018-14041.
+CVE: CVE-2016-10735
+CWE: 
+CVSS Score: 4.300000190734863
+CVSS Vector: NETWORK
+References:
+https://ossindex.sonatype.org/vulnerability/20efb6c8-d8b6-40cb-a6f7-e531181023b0?component-type=nuget&component-name=Bootstrap&utm_source=nugetdefense&utm_medium=integration&utm_content=3.0.0
+---------------------------
+
