@@ -15,3 +15,5 @@ Src/TestFiles/net461.TestLib/Scripts/
 
 *.user
 **/.vs/*
+
+*.sqlite

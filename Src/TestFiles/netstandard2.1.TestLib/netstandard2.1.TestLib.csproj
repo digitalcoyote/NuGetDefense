@@ -7,7 +7,9 @@
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="NuGetDefense" Version="1.0.6" />
+        <PackageReference Include="Bogus" Version="33.0.2" />
+        <PackageReference Include="NuGetDefense" Version="2.1.2" />
         <PackageReference Include="Bootstrap" Version="4.0.0-beta" />
+        <PackageReference Include="System.Net.Http" Version="4.3.4" />
     </ItemGroup>
 </Project>
