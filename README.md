@@ -9,7 +9,7 @@ An MSBuildTask that checks for known vulnerabilities. Inspired by [OWASP SafeNuG
 
 View the full documentation for NuGetDefense [here](https://digitalcoyote.github.io/NuGetDefense/)
 
-3.x preview documentation van be found by running `dotnet /path/to/NuGetDefense.dll -?`
+3.x preview documentation can be found by running `dotnet /path/to/NuGetDefense.dll -?`
   
 ## Features  
 
@@ -38,8 +38,13 @@ View the full documentation for NuGetDefense [here](https://digitalcoyote.github
 ## Requirements
 
 * NuGetDefense v1.x is built only in .Net Core 3.1 so you will need the runtime/SDK installed.
-* NuGetDefense v2.x is built only in .Net 5.0 so you will need the runtime/SDK installed.
+* NuGetDefense v2.x is built only in .Net 5.0 so you will need the runtime/SDK installed. (.Net 5.0 is our of support)
 * NuGetDefense v3.x is built only in .Net 6.0 so you will need the runtime/SDK installed.
+
+## Unsupported Versions
+* Official Support follows support for the underlying framework.
+* Supporters can request support of unsupported versions (such as v2.x running on .Net 5) but are advised to use a supported runtime (for better overall security)
+  * .Net 5 projects can use 3.x as long as the .Net 6 runtime is installed.
   
 ## How does it work?
 

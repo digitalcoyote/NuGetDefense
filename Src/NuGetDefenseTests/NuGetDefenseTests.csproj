@@ -9,7 +9,7 @@
 
         <Platforms>AnyCPU</Platforms>
 
-        <LangVersion>9</LangVersion>
+        <LangVersion>10</LangVersion>
 
     </PropertyGroup>
 
