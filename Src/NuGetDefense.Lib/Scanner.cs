@@ -7,11 +7,15 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
+
 using ByteDev.DotNet.Project;
 using ByteDev.DotNet.Solution;
+
 using NuGet.Versioning;
+
 using NuGetDefense.Configuration;
 using NuGetDefense.Core;
+
 using Serilog;
 
 namespace NuGetDefense;
@@ -120,7 +124,14 @@ public class Scanner
                 vulnDict =
                     new OSSIndex.Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun, UserAgentString, _settings.OssIndex.Username, _settings.OssIndex.ApiToken)
                         .GetVulnerabilitiesForPackages(uncachedPkgs.ToArray());
-                options.Cache.UpdateCache(vulnDict, uncachedPkgs, OssIndexSourceID);
+                if (vulnDict != null)
+                {
+                    // If we failed to update the OSS Index data don't clear out old cached data as that will
+                    // increase the number of requests next time, increasing the liklihood of further
+                    // TooManyRequeusts responses.
+                    options.Cache.UpdateCache(vulnDict, uncachedPkgs, OssIndexSourceID);
+                }
+
                 // Skipping the packages we refreshed
                 options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages.Skip(128 - uncachedPkgs.Count % 128), OssIndexSourceID, ref vulnDict);
             }
@@ -144,7 +155,15 @@ public class Scanner
                         new GitHubAdvisoryDatabase.Scanner(_nuGetFile, _settings.GitHubAdvisoryDatabase.ApiToken, _settings.GitHubAdvisoryDatabase.BreakIfCannotRun)
                             .GetVulnerabilitiesForPackages(uncachedPkgs.ToArray());
                     options.Cache.UpdateCache(ghsaVulnDict, uncachedPkgs, GitHubAdvisoryDatabaseSourceId);
-                    MergeVulnDict(ref vulnDict, ref ghsaVulnDict);
+
+                    if (vulnDict == null)
+                    {
+                        vulnDict = ghsaVulnDict;
+                    }
+                    else
+                    {
+                        MergeVulnDict(ref vulnDict, ref ghsaVulnDict);
+                    }
                     options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages, GitHubAdvisoryDatabaseSourceId, ref vulnDict);
                 }
             }
@@ -223,14 +242,21 @@ public class Scanner
             var proj = DotNetProject.Load(path);
             if (!specificFramework && proj.Format == ProjectFormat.New)
             {
-                var monikersListBuilder = new StringBuilder();
-                var monikers = proj.ProjectTargets.Select(t => t.Moniker).ToArray();
-                monikersListBuilder.Append(monikers[0]);
-                for (var index = 1; index < monikers.Length; index++) monikersListBuilder.Append($", {monikers[index]}");
+                if (proj.ProjectTargets.Any())
+                {
+                    var monikersListBuilder = new StringBuilder();
+                    var monikers = proj.ProjectTargets.Select(t => t.Moniker).ToArray();
+                    monikersListBuilder.Append(monikers[0]);
+                    for (var index = 1; index < monikers.Length; index++) monikersListBuilder.Append($", {monikers[index]}");
 
-                Log.Logger.Information("Target Frameworks for {project}: {frameworks}", project, monikersListBuilder.ToString());
-                var nugetFile = new NuGetFile(path);
-                pkgs.AddDistinctPackages(monikers.SelectMany(m => nugetFile.LoadPackages(m, _settings.CheckTransitiveDependencies).Values));
+                    Log.Logger.Information("Target Frameworks for {project}: {frameworks}", project, monikersListBuilder.ToString());
+                    var nugetFile = new NuGetFile(path);
+                    pkgs.AddDistinctPackages(monikers.SelectMany(m => nugetFile.LoadPackages(m, _settings.CheckTransitiveDependencies).Values));
+                }
+                else
+                {
+                    Log.Logger.Information("No Target Frameworks found in {project}", project);
+                }
             }
             else
             {
@@ -272,17 +298,17 @@ public class Scanner
         Log.Logger.Verbose("Checking Allowed Packages");
 
         foreach (var (project, packages) in _projects)
-        foreach (var pkg in packages.Where(p => !_settings.ErrorSettings.AllowedPackages.Any(b =>
-                     b.Id == p.Id &&
-                     (string.IsNullOrWhiteSpace(b.Version) || VersionRange.Parse(p.Version).Satisfies(new(b.Version))))))
-        {
-            Log.Logger.Error("{packageName}:{version} was included in {nugetFile} but is not in the Allowed List", pkg.Id, pkg.Version, _nuGetFile);
+            foreach (var pkg in packages.Where(p => !_settings.ErrorSettings.AllowedPackages.Any(b =>
+                         b.Id == p.Id &&
+                         (string.IsNullOrWhiteSpace(b.Version) || VersionRange.Parse(p.Version).Satisfies(new(b.Version))))))
+            {
+                Log.Logger.Error("{packageName}:{version} was included in {nugetFile} but is not in the Allowed List", pkg.Id, pkg.Version, _nuGetFile);
 
-            var msBuildMessage = MsBuild.Log(_nuGetFile, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
-                $"{pkg.Id} is not listed as an allowed package and may not be used in this project");
-            Console.WriteLine(msBuildMessage);
-            Log.Logger.Error(msBuildMessage);
-        }
+                var msBuildMessage = MsBuild.Log(_nuGetFile, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
+                    $"{pkg.Id} is not listed as an allowed package and may not be used in this project");
+                Console.WriteLine(msBuildMessage);
+                Log.Logger.Error(msBuildMessage);
+            }
     }
 
     private void ReportVulnerabilities(Dictionary<string, Dictionary<string, Vulnerability>> vulnDict)
@@ -355,23 +381,23 @@ public class Scanner
     private void CheckBlockedPackages()
     {
         foreach (var (proj, pkgs) in _projects)
-        foreach (var pkg in pkgs)
-        {
-            Log.Logger.Verbose("Checking to see if {packageName}:{version} is Blocked", pkg.Id, pkg.Version);
-
-            var blockedPackage = _settings.ErrorSettings.BlockedPackages.FirstOrDefault(b =>
-                b.Package.Id == pkg.Id &&
-                (string.IsNullOrWhiteSpace(b.Package.Version) || VersionRange.Parse(pkg.Version).Satisfies(new(b.Package.Version))));
-            if (blockedPackage == null)
+            foreach (var pkg in pkgs)
             {
-                Log.Logger.Verbose("{packageName}:{version} is not Blocked", pkg.Id, pkg.Version);
-                continue;
-            }
+                Log.Logger.Verbose("Checking to see if {packageName}:{version} is Blocked", pkg.Id, pkg.Version);
 
-            var msBuildMessage = MsBuild.Log(proj, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
-                $"{pkg.Id}: {(string.IsNullOrEmpty(blockedPackage.CustomErrorMessage) ? "has been blocked and may not be used in this project" : blockedPackage.CustomErrorMessage)}");
-            Console.WriteLine(msBuildMessage);
-            Log.Logger.Error(msBuildMessage);
-        }
+                var blockedPackage = _settings.ErrorSettings.BlockedPackages.FirstOrDefault(b =>
+                    b.Package.Id == pkg.Id &&
+                    (string.IsNullOrWhiteSpace(b.Package.Version) || VersionRange.Parse(pkg.Version).Satisfies(new(b.Package.Version))));
+                if (blockedPackage == null)
+                {
+                    Log.Logger.Verbose("{packageName}:{version} is not Blocked", pkg.Id, pkg.Version);
+                    continue;
+                }
+
+                var msBuildMessage = MsBuild.Log(proj, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
+                    $"{pkg.Id}: {(string.IsNullOrEmpty(blockedPackage.CustomErrorMessage) ? "has been blocked and may not be used in this project" : blockedPackage.CustomErrorMessage)}");
+                Console.WriteLine(msBuildMessage);
+                Log.Logger.Error(msBuildMessage);
+            }
     }
 }
