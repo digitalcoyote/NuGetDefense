@@ -29,20 +29,20 @@
 
     <ItemGroup>
         <PackageReference Include="ByteDev.DotNet" Version="7.2.0" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.2" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.6" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="NuGet.Versioning" Version="6.1.0" />
-        <PackageReference Include="NuGetDefense.Core" Version="2.0.2" />
-        <PackageReference Include="NuGetDefense.GitHubAdvisoryDatabase" Version="1.0.3" />
-        <PackageReference Include="NuGetDefense.NVD" Version="2.0.6-pre0001" />
-        <PackageReference Include="NuGetDefense.OSSIndex" Version="2.0.2" />
+        <PackageReference Include="NuGet.Versioning" Version="6.2.1" />
+        <PackageReference Include="NuGetDefense.Core" Version="2.0.3" />
+        <PackageReference Include="NuGetDefense.GitHubAdvisoryDatabase" Version="2.0.0" />
+        <PackageReference Include="NuGetDefense.NVD" Version="2.0.7" />
+        <PackageReference Include="NuGetDefense.OSSIndex" Version="2.0.4" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
         <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
-        <PackageReference Include="System.Text.Json" Version="6.0.2" />
+        <PackageReference Include="System.Text.Json" Version="6.0.5" />
     </ItemGroup>
 
     <ItemGroup>
