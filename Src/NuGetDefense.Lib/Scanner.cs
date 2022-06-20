@@ -226,11 +226,11 @@ public class Scanner
         }
     }
 
-    private Dictionary<string, NuGetPackage[]> LoadMultipleProjects(string TopLevelProject, string[] projects, bool specificFramework, string targetFramework,
+    private Dictionary<string, NuGetPackage[]> LoadMultipleProjects(string TopLevelProject, IReadOnlyList<string> projects, bool specificFramework, string targetFramework,
         bool solutionFile = false)
     {
         var projectPackages = new Dictionary<string, NuGetPackage[]>();
-        for (var i = 0; i < projects.Length; i++)
+        for (var i = 0; i < projects.Count; i++)
         {
             var pkgs = new List<NuGetPackage>();
 

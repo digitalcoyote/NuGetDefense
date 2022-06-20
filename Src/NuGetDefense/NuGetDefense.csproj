@@ -3,7 +3,6 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net6.0</TargetFramework>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>NuGetDefense</Title>
         <Authors>Curtis Carter</Authors>
         <Description>NuGetDefense ~ Check for Known Vulnerabilities at Build</Description>
@@ -23,12 +22,13 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)'!='DOTNETTOOL'">
+    <PropertyGroup Condition="'$(Configuration)'=='RELEASE'">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <NuspecFile>NuGetDefense.nuspec</NuspecFile>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)'=='DOTNETTOOL'">
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <OutputType>Exe</OutputType>
         <PackageId>NuGetDefense.Tool</PackageId>
