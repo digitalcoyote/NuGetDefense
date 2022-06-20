@@ -324,9 +324,14 @@ public class Scanner
 
             foreach (var (project, packages) in _projects)
             {
+                var projectNumberOfVulnerabilities = 0;
+
                 //TODO: Losing the right file somewhere here
                 vulnReporter.BuildVulnerabilityTextReport(vulnDict, packages, project, _settings.WarnOnly,
-                    _settings.ErrorSettings.Cvss3Threshold, out NumberOfVulnerabilities);
+                    _settings.ErrorSettings.Cvss3Threshold, out projectNumberOfVulnerabilities);
+
+                NumberOfVulnerabilities += projectNumberOfVulnerabilities;
+
                 if (_settings.VulnerabilityReports.OutputTextReport) Log.Logger.Information(vulnReporter.VulnerabilityTextReport);
                 foreach (var msBuildMessage in vulnReporter.MsBuildMessages)
                 {
