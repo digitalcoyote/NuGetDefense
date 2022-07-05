@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NuGetDefense": {
+      "commandName": "Project",
+      "commandLineArgs": "--nugetdefense-json xyz.json"
+    }
+  }
+}
