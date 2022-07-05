@@ -37,23 +37,59 @@ public class Scanner
     /// <returns></returns>
     public int Scan(ScanOptions options)
     {
-        var ExitCode = 0;
-        _settings = options.SettingsFile == null ? Settings.LoadSettings(options.ProjectFile.DirectoryName) : Settings.LoadSettingsFile(options.SettingsFile.FullName);
-        _settings.WarnOnly = _settings.WarnOnly || options.WarnOnly;
-        _settings.CheckTransitiveDependencies = _settings.CheckTransitiveDependencies && options.CheckTransitiveDependencies;
-        _settings.CheckReferencedProjects = _settings.CheckReferencedProjects || options.CheckReferencedProjects;
-        _settings.ErrorSettings.IgnoredPackages = _settings.ErrorSettings.IgnoredPackages.Union(options.IgnorePackages.Select(p => new NuGetPackage { Id = p })).ToArray();
-        _settings.ErrorSettings.IgnoredCvEs = _settings.ErrorSettings.IgnoredCvEs.Union(options.IgnoreCves).ToArray();
-
-        // TODO: Ideally we will add a check for "CacheType" here when another type of cache is added
-        options.Cache ??= VulnerabilityCache.GetSqliteCache(_settings.CacheLocation);
-
-        _projectFileName = options.ProjectFile!.Name;
-        ConfigureLogging();
+        int exitCode;
         try
         {
-            Log.Logger.Verbose("Logging Configured");
+            LoadSettings(options);
+            ConfigureLogging();
+            ScanVulnerabilities(options);
+            exitCode = _settings.WarnOnly ? 0 : NumberOfVulnerabilities;
+        }
+        catch (Exception)
+        {
+            exitCode = -1;
+        }
 
+        return exitCode;
+    }
+
+    private void LoadSettings(ScanOptions options)
+    {
+        try
+        {
+            _settings = options.SettingsFile == null
+                ? Settings.LoadSettings(options.ProjectFile.DirectoryName)
+                : Settings.LoadSettingsFile(options.SettingsFile.FullName);
+            _settings.WarnOnly = _settings.WarnOnly || options.WarnOnly;
+            _settings.CheckTransitiveDependencies =
+                _settings.CheckTransitiveDependencies && options.CheckTransitiveDependencies;
+            _settings.CheckReferencedProjects = _settings.CheckReferencedProjects || options.CheckReferencedProjects;
+            _settings.ErrorSettings.IgnoredPackages = _settings.ErrorSettings.IgnoredPackages
+                .Union(options.IgnorePackages.Select(p => new NuGetPackage {Id = p})).ToArray();
+            _settings.ErrorSettings.IgnoredCvEs =
+                _settings.ErrorSettings.IgnoredCvEs.Union(options.IgnoreCves).ToArray();
+
+            // TODO: Ideally we will add a check for "CacheType" here when another type of cache is added
+            options.Cache ??= VulnerabilityCache.GetSqliteCache(_settings.CacheLocation);
+
+            _projectFileName = options.ProjectFile!.Name;
+
+        }
+        catch (Exception e)
+        {
+            var msBuildMessage = MsBuild.Log(_nuGetFile, MsBuild.Category.Error,
+                $"Encountered a fatal exception while load settings. Exception: {e}");
+            Console.WriteLine(msBuildMessage);
+            Log.Logger.Fatal(msBuildMessage);
+
+            throw;
+        }
+    }
+
+    private void ScanVulnerabilities(ScanOptions options)
+    {
+        try
+        {
             var projectFullName = options.ProjectFile.FullName;
             if (options.ProjectFile.Extension.Equals(".sln", StringComparison.OrdinalIgnoreCase))
             {
@@ -185,7 +221,6 @@ public class Scanner
                 VulnerabilityData.IgnoreCVEs(vulnDict, _settings.ErrorSettings.IgnoredCvEs);
 
             ReportVulnerabilities(vulnDict);
-            ExitCode = _settings.WarnOnly ? 0 : NumberOfVulnerabilities;
         }
         catch (Exception e)
         {
@@ -193,12 +228,10 @@ public class Scanner
                 $"Encountered a fatal exception while checking for Dependencies in {_nuGetFile}. Exception: {e}");
             Console.WriteLine(msBuildMessage);
             Log.Logger.Fatal(msBuildMessage);
-            ExitCode = -1;
+
+            throw;
         }
-
-        return ExitCode;
     }
-
     private void MergeVulnDict(ref Dictionary<string, Dictionary<string, Vulnerability>> vulnDict, ref Dictionary<string, Dictionary<string, Vulnerability>> vulnDict2)
     {
         foreach (var vulnDict2Key in vulnDict2.Keys)
@@ -381,6 +414,7 @@ public class Scanner
 
         loggerConfiguration.WriteTo.Console();
         Log.Logger = loggerConfiguration.CreateLogger();
+        Log.Logger.Verbose("Logging Configured");
     }
 
     private void CheckBlockedPackages()
