@@ -110,20 +110,29 @@ public class Settings
     private static string ReadSettingsFileWhenAble(string settingsFile, TimeSpan timeout)
     {
         var settingsFileContents = string.Empty;
-        SpinWait.SpinUntil(() =>
+
+        if (File.Exists(settingsFile))
         {
-            try
+            SpinWait.SpinUntil(() =>
             {
-                using Stream settingsStream = File.Open(settingsFile, FileMode.Open, FileAccess.Read, FileShare.Read);
-                using var settingsReader = new StreamReader(settingsStream);
-                settingsFileContents = settingsReader.ReadToEnd();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }, timeout);
+                try
+                {
+                    using Stream settingsStream =
+                        File.Open(settingsFile, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    using var settingsReader = new StreamReader(settingsStream);
+                    settingsFileContents = settingsReader.ReadToEnd();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }, timeout);
+        }
+        else
+        {
+            throw new FileNotFoundException("Settings file not Found!", settingsFile);
+        }
 
         return settingsFileContents;
     }
