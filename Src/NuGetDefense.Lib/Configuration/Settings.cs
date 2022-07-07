@@ -112,7 +112,6 @@ public class Settings
         var settingsFileContents = string.Empty;
 
         if (File.Exists(settingsFile))
-        {
             SpinWait.SpinUntil(() =>
             {
                 try
@@ -128,11 +127,8 @@ public class Settings
                     return false;
                 }
             }, timeout);
-        }
         else
-        {
             throw new FileNotFoundException("Settings file not Found!", settingsFile);
-        }
 
         return settingsFileContents;
     }

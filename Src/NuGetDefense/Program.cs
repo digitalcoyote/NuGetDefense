@@ -147,9 +147,8 @@ public static class Program
         string? cacheLocation,
         InvocationContext commandContext)
     {
-        if(settingsFile is null && projectFile is null) Console.WriteLine("Run `nugetdefense -?` for usage information");
+        if (settingsFile is null && projectFile is null) Console.WriteLine("Run `nugetdefense -?` for usage information");
         else
-        {
             commandContext.ExitCode = new Scanner().Scan(new()
             {
                 CheckReferencedProjects = checkReferencedProjects,
@@ -160,6 +159,5 @@ public static class Program
                 SettingsFile = settingsFile,
                 Cache = VulnerabilityCache.GetSqliteCache(cacheLocation)
             });
-        }
     }
 }
