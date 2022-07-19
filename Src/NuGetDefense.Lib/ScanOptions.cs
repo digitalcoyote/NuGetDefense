@@ -45,7 +45,7 @@ public class ScanOptions
     ///     Target Framework Moniker
     /// </summary>
     public string? Tfm;
- 
+
     /// <summary>
     ///     location of NVD Vulnerability File
     /// </summary>

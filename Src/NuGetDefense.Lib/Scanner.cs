@@ -7,29 +7,25 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
-
 using ByteDev.DotNet.Project;
 using ByteDev.DotNet.Solution;
-
 using NuGet.Versioning;
-
 using NuGetDefense.Configuration;
 using NuGetDefense.Core;
-
 using Serilog;
 
 namespace NuGetDefense;
 
 public class Scanner
 {
-    private const string Version = "3.0.4";
+    private const string Version = "3.0.5";
     private static readonly string UserAgentString = @$"NuGetDefense/{Version}";
 
     private string _nuGetFile;
     private string _projectFileName;
     private Dictionary<string, NuGetPackage[]> _projects;
     private Settings _settings;
-    public int NumberOfVulnerabilities;
+    private int NumberOfVulnerabilities;
 
     /// <summary>
     ///     Scans the provided project's NuGet Dependencies for known vulnerabilities
@@ -37,23 +33,58 @@ public class Scanner
     /// <returns></returns>
     public int Scan(ScanOptions options)
     {
-        var ExitCode = 0;
-        _settings = options.SettingsFile == null ? Settings.LoadSettings(options.ProjectFile.DirectoryName) : Settings.LoadSettingsFile(options.SettingsFile.FullName);
-        _settings.WarnOnly = _settings.WarnOnly || options.WarnOnly;
-        _settings.CheckTransitiveDependencies = _settings.CheckTransitiveDependencies && options.CheckTransitiveDependencies;
-        _settings.CheckReferencedProjects = _settings.CheckReferencedProjects || options.CheckReferencedProjects;
-        _settings.ErrorSettings.IgnoredPackages = _settings.ErrorSettings.IgnoredPackages.Union(options.IgnorePackages.Select(p => new NuGetPackage { Id = p })).ToArray();
-        _settings.ErrorSettings.IgnoredCvEs = _settings.ErrorSettings.IgnoredCvEs.Union(options.IgnoreCves).ToArray();
-
-        // TODO: Ideally we will add a check for "CacheType" here when another type of cache is added
-        options.Cache ??= VulnerabilityCache.GetSqliteCache(_settings.CacheLocation);
-
-        _projectFileName = options.ProjectFile!.Name;
-        ConfigureLogging();
+        int exitCode;
         try
         {
-            Log.Logger.Verbose("Logging Configured");
+            LoadSettings(options);
+            ConfigureLogging();
+            ScanVulnerabilities(options);
+            exitCode = _settings.WarnOnly ? 0 : NumberOfVulnerabilities;
+        }
+        catch (Exception)
+        {
+            exitCode = -1;
+        }
 
+        return exitCode;
+    }
+
+    private void LoadSettings(ScanOptions options)
+    {
+        try
+        {
+            _settings = options.SettingsFile == null
+                ? Settings.LoadSettings(options.ProjectFile.DirectoryName)
+                : Settings.LoadSettingsFile(options.SettingsFile.FullName);
+            _settings.WarnOnly = _settings.WarnOnly || options.WarnOnly;
+            _settings.CheckTransitiveDependencies =
+                _settings.CheckTransitiveDependencies && options.CheckTransitiveDependencies;
+            _settings.CheckReferencedProjects = _settings.CheckReferencedProjects || options.CheckReferencedProjects;
+            _settings.ErrorSettings.IgnoredPackages = _settings.ErrorSettings.IgnoredPackages
+                .Union(options.IgnorePackages.Select(p => new NuGetPackage { Id = p })).ToArray();
+            _settings.ErrorSettings.IgnoredCvEs =
+                _settings.ErrorSettings.IgnoredCvEs.Union(options.IgnoreCves).ToArray();
+
+            // TODO: Ideally we will add a check for "CacheType" here when another type of cache is added
+            options.Cache ??= VulnerabilityCache.GetSqliteCache(_settings.CacheLocation);
+
+            _projectFileName = options.ProjectFile!.Name;
+        }
+        catch (Exception e)
+        {
+            var msBuildMessage = MsBuild.Log(_nuGetFile, MsBuild.Category.Error,
+                $"Encountered a fatal exception while load settings. Exception: {e}");
+            Console.WriteLine(msBuildMessage);
+            Log.Logger.Fatal(msBuildMessage);
+
+            throw;
+        }
+    }
+
+    private void ScanVulnerabilities(ScanOptions options)
+    {
+        try
+        {
             var projectFullName = options.ProjectFile.FullName;
             if (options.ProjectFile.Extension.Equals(".sln", StringComparison.OrdinalIgnoreCase))
             {
@@ -125,12 +156,10 @@ public class Scanner
                     new OSSIndex.Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun, UserAgentString, _settings.OssIndex.Username, _settings.OssIndex.ApiToken)
                         .GetVulnerabilitiesForPackages(uncachedPkgs.ToArray());
                 if (vulnDict != null)
-                {
                     // If we failed to update the OSS Index data don't clear out old cached data as that will
                     // increase the number of requests next time, increasing the liklihood of further
                     // TooManyRequeusts responses.
                     options.Cache.UpdateCache(vulnDict, uncachedPkgs, OssIndexSourceID);
-                }
 
                 // Skipping the packages we refreshed
                 options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages.Skip(128 - uncachedPkgs.Count % 128), OssIndexSourceID, ref vulnDict);
@@ -157,13 +186,9 @@ public class Scanner
                     options.Cache.UpdateCache(ghsaVulnDict, uncachedPkgs, GitHubAdvisoryDatabaseSourceId);
 
                     if (vulnDict == null)
-                    {
                         vulnDict = ghsaVulnDict;
-                    }
                     else
-                    {
                         MergeVulnDict(ref vulnDict, ref ghsaVulnDict);
-                    }
                     options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages, GitHubAdvisoryDatabaseSourceId, ref vulnDict);
                 }
             }
@@ -185,7 +210,6 @@ public class Scanner
                 VulnerabilityData.IgnoreCVEs(vulnDict, _settings.ErrorSettings.IgnoredCvEs);
 
             ReportVulnerabilities(vulnDict);
-            ExitCode = _settings.WarnOnly ? 0 : NumberOfVulnerabilities;
         }
         catch (Exception e)
         {
@@ -193,10 +217,9 @@ public class Scanner
                 $"Encountered a fatal exception while checking for Dependencies in {_nuGetFile}. Exception: {e}");
             Console.WriteLine(msBuildMessage);
             Log.Logger.Fatal(msBuildMessage);
-            ExitCode = -1;
-        }
 
-        return ExitCode;
+            throw;
+        }
     }
 
     private void MergeVulnDict(ref Dictionary<string, Dictionary<string, Vulnerability>> vulnDict, ref Dictionary<string, Dictionary<string, Vulnerability>> vulnDict2)
@@ -298,17 +321,17 @@ public class Scanner
         Log.Logger.Verbose("Checking Allowed Packages");
 
         foreach (var (project, packages) in _projects)
-            foreach (var pkg in packages.Where(p => !_settings.ErrorSettings.AllowedPackages.Any(b =>
-                         b.Id == p.Id &&
-                         (string.IsNullOrWhiteSpace(b.Version) || VersionRange.Parse(p.Version).Satisfies(new(b.Version))))))
-            {
-                Log.Logger.Error("{packageName}:{version} was included in {nugetFile} but is not in the Allowed List", pkg.Id, pkg.Version, _nuGetFile);
+        foreach (var pkg in packages.Where(p => !_settings.ErrorSettings.AllowedPackages.Any(b =>
+                     b.Id == p.Id &&
+                     (string.IsNullOrWhiteSpace(b.Version) || VersionRange.Parse(p.Version).Satisfies(new(b.Version))))))
+        {
+            Log.Logger.Error("{packageName}:{version} was included in {nugetFile} but is not in the Allowed List", pkg.Id, pkg.Version, _nuGetFile);
 
-                var msBuildMessage = MsBuild.Log(_nuGetFile, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
-                    $"{pkg.Id} is not listed as an allowed package and may not be used in this project");
-                Console.WriteLine(msBuildMessage);
-                Log.Logger.Error(msBuildMessage);
-            }
+            var msBuildMessage = MsBuild.Log(_nuGetFile, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
+                $"{pkg.Id} is not listed as an allowed package and may not be used in this project");
+            Console.WriteLine(msBuildMessage);
+            Log.Logger.Error(msBuildMessage);
+        }
     }
 
     private void ReportVulnerabilities(Dictionary<string, Dictionary<string, Vulnerability>> vulnDict)
@@ -324,11 +347,9 @@ public class Scanner
 
             foreach (var (project, packages) in _projects)
             {
-                var projectNumberOfVulnerabilities = 0;
-
                 //TODO: Losing the right file somewhere here
                 vulnReporter.BuildVulnerabilityTextReport(vulnDict, packages, project, _settings.WarnOnly,
-                    _settings.ErrorSettings.Cvss3Threshold, out projectNumberOfVulnerabilities);
+                    _settings.ErrorSettings.Cvss3Threshold, out var projectNumberOfVulnerabilities);
 
                 NumberOfVulnerabilities += projectNumberOfVulnerabilities;
 
@@ -381,28 +402,29 @@ public class Scanner
 
         loggerConfiguration.WriteTo.Console();
         Log.Logger = loggerConfiguration.CreateLogger();
+        Log.Logger.Verbose("Logging Configured");
     }
 
     private void CheckBlockedPackages()
     {
         foreach (var (proj, pkgs) in _projects)
-            foreach (var pkg in pkgs)
+        foreach (var pkg in pkgs)
+        {
+            Log.Logger.Verbose("Checking to see if {packageName}:{version} is Blocked", pkg.Id, pkg.Version);
+
+            var blockedPackage = _settings.ErrorSettings.BlockedPackages.FirstOrDefault(b =>
+                b.Package.Id == pkg.Id &&
+                (string.IsNullOrWhiteSpace(b.Package.Version) || VersionRange.Parse(pkg.Version).Satisfies(new(b.Package.Version))));
+            if (blockedPackage == null)
             {
-                Log.Logger.Verbose("Checking to see if {packageName}:{version} is Blocked", pkg.Id, pkg.Version);
-
-                var blockedPackage = _settings.ErrorSettings.BlockedPackages.FirstOrDefault(b =>
-                    b.Package.Id == pkg.Id &&
-                    (string.IsNullOrWhiteSpace(b.Package.Version) || VersionRange.Parse(pkg.Version).Satisfies(new(b.Package.Version))));
-                if (blockedPackage == null)
-                {
-                    Log.Logger.Verbose("{packageName}:{version} is not Blocked", pkg.Id, pkg.Version);
-                    continue;
-                }
-
-                var msBuildMessage = MsBuild.Log(proj, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
-                    $"{pkg.Id}: {(string.IsNullOrEmpty(blockedPackage.CustomErrorMessage) ? "has been blocked and may not be used in this project" : blockedPackage.CustomErrorMessage)}");
-                Console.WriteLine(msBuildMessage);
-                Log.Logger.Error(msBuildMessage);
+                Log.Logger.Verbose("{packageName}:{version} is not Blocked", pkg.Id, pkg.Version);
+                continue;
             }
+
+            var msBuildMessage = MsBuild.Log(proj, MsBuild.Category.Error, pkg.LineNumber, pkg.LinePosition,
+                $"{pkg.Id}: {(string.IsNullOrEmpty(blockedPackage.CustomErrorMessage) ? "has been blocked and may not be used in this project" : blockedPackage.CustomErrorMessage)}");
+            Console.WriteLine(msBuildMessage);
+            Log.Logger.Error(msBuildMessage);
+        }
     }
 }
