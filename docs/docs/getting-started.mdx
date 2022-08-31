@@ -1,0 +1,125 @@
+---
+title: "Getting Started"
+sidebar_position: 2
+---
+
+## Prerequisites
+NuGetDefense can scan any projects using the legacy project style (default for .Net Framework projects) or the sdk
+project style (default for .Net Core and .Net projects).  `project.json`-based projects are not currently supported.
+
+Depending on the version of NuGetDefense, you will need a specific runtime installed however:
+ * NuGetDefense v1.x is built only in .Net Core 3.1 so you will need the runtime/SDK installed.
+ * NuGetDefense v2.x is built only in .Net 5.0 so you will need the runtime/SDK installed.
+ * NuGetDefense v3.x is built only in .Net 6.0 so you will need the runtime/SDK installed.
+
+## Install NuGetDefense
+NuGetDefense has 2 main methods of installation:
+
+ 1. [.Net Global Tool](https://www.nuget.org/packages/NuGetDefense.Tool) [![NuGet version](https://badge.fury.io/nu/NugetDefense.svg)](https://badge.fury.io/nu/NugetDefense)
+ 2. [Nuget Package](https://www.nuget.org/packages/NuGetDefense) [![NuGet version](https://badge.fury.io/nu/NugetDefense.svg)](https://badge.fury.io/nu/NugetDefense)
+
+
+Typical users will just want to install the nuget package directly to the projects in question. This injects an msbuild task that runs the scan immediately after the software is built.
+
+### NuGet Package
+After building once with the nuget package installed, a file named `NuGetDefense.json` will be created at the root of the project.
+
+### .Net Tool
+`dotnet tool install --global NuGetDefense.Tool`
+
+Run `NugetDefense -p <path/to/your/project/file --nugetdefense-json <path/to/store/config>` to create a NuGetDefense.json at the specified location after your first scan.
+
+To start configure the whole solution at once, move this file to the root of the solution (where the `*.sln` file is) or use `--solution` and provide a path to your solution file
+
+
+```json title="NuGetDefense.json"
+{
+  "WarnOnly": false,
+  "VulnerabilityReports": {
+    "OutputTextReport": true
+  },
+  "CheckTransitiveDependencies": true,
+  "CheckReferencedProjects": false,
+  "ErrorSettings": {
+    "ErrorSeverityThreshold": "any",
+    "Cvss3Threshold": -1,
+    "IgnoredPackages": [
+      {
+        "Id": "NugetDefense"
+      }
+    ],
+    "IgnoredCvEs": [],
+    "AllowedPackages": [],
+    "WhiteListedPackages": [],
+    "BlockedPackages": [],
+    "BlacklistedPackages": []
+  },
+  "OssIndex": {
+    "ApiToken": "",
+    "Username": "",
+    "Enabled": true,
+    "BreakIfCannotRun": true
+  },
+  "GitHubAdvisoryDatabase": {
+    "ApiToken": "",
+    "Username": "",
+    "Enabled": true,
+    "BreakIfCannotRun": false
+  },
+  "NVD": {
+    "SelfUpdate": false,
+    "TimeoutInSeconds": 15,
+    "Enabled": true,
+    "BreakIfCannotRun": true
+  },
+  "SensitivePackages": []
+}
+
+```
+
+### .Net Global Tool w/ MSBuild Task
+For those that want a single global installation to use with their projects on build, you can add an MSBuild ExecTask to your project file:
+
+```xml
+  <PropertyGroup>
+    <NuGetDefenseExe Condition="'$(OS)' == Unix">dotnet "$(MSBuildThisFileDirectory)../tools/net6.0/NuGetDefense.dll"</NuGetDefenseExe>
+    <NuGetDefenseExe Condition="'$(OS)' == 'Windows_NT'">dotnet "$(MSBuildThisFileDirectory)..\tools\net6.0\NuGetDefense.dll"</NuGetDefenseExe>
+    <NugetDefenseTFM Condition="$(TargetFramework) != ''" >--tfm $(TargetFramework)</NugetDefenseTFM>
+  </PropertyGroup>
+  <Target Name="CheckForVulnerableNuGetPkgs" AfterTargets="Build">
+    <Exec Command="$(NuGetDefenseExe) -p &quot;$(MSBuildProjectFullPath)&quot; $(NugetDefenseTFM)" IgnoreExitCode="false" />
+  </Target>
+```
+
+See the [MSBuild Reference](https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild-reference) for a more in depth overview of how this functions.
+
+# Configuration
+The default settings are meant to be as "turn-key" as possible, but if you're reading the docs you probably will want to dig into these:
+
+## Sources
+Vulnerability sources are split into two main categories: Remote and Local. NVD is currently the onlyu local source and can operate without sending any information to third parties. The others such as GitHubAdvisoryDatabase and OssIndex require sending a set of packages to the respective API's to determine if any vulnerabilities exist in their sources. SensitivePackages are excluded when packages are sent to Remote Sources, but will use the cache.
+
+### GitHubAdvisoryDatabase
+the GitHubAdvisoryDatabase is the only source that does not run by default. GitHub requires you to register and create an api token before you can query their Security Advisories.
+
+Creating an [API token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for this purpose requires 0 special permissions:
+1. Log into GitHub and go to `https://github.com/settings/tokens`
+2. Click 'Generate New Token'
+3. Make sure *ALL* permissions are DISABLED (This makes it safer in case of accidentally committing it to your repository)
+4. Give it a named and click `Generate Token`
+5. Copy it and place in the NugetDefense.json
+
+ex:
+```json
+"GitHubAdvisoryDatabase": {
+    "ApiToken": "2bb3f5ea-7d38-482f-87a0-19ce48935523",
+    "Username": "notarealdeveloperusername",
+    "Enabled": true,
+    "BreakIfCannotRun": false
+  }
+```
+
+If company/organizational policy doesn't permit that, just set Enabled to `false` to avoid a warning in your build log.
+
+### OssIndex
+OssIndex has a higher rate-limit for users who register for an API token, but it is not required to use their source.
