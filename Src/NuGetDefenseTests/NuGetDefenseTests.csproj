@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
 
         <IsPackable>false</IsPackable>
 
@@ -9,7 +9,7 @@
 
         <Platforms>AnyCPU</Platforms>
 
-        <LangVersion>9</LangVersion>
+        <LangVersion>11</LangVersion>
 
     </PropertyGroup>
 

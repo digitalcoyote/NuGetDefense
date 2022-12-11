@@ -26,8 +26,7 @@
     "BreakIfCannotRun": true
   },
   "GitHubAdvisoryDatabase": {
-    "ApiToken": "",
-    "Username": "",
+    "ApiToken": "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",
     "Enabled": true,
     "BreakIfCannotRun": false
   },
