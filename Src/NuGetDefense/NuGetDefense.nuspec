@@ -3,14 +3,14 @@
     <metadata>
         <id>NuGetDefense</id>
         <title>NuGetDefense</title>
-        <version>3.0.10</version>
+        <version>3.0.11-pre109</version>
         <authors>Curtis Carter</authors>
         <owners>Curtis Carter</owners>
         <projectUrl>https://digitalcoyote.github.io/NuGetDefense/</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <summary>NuGetDefense ~ Check for Known Vulnerabilities at Build</summary>
         <description>NuGetDefense was inspired by OWASP SafeNuGet but checks with multiple sources for known vulnerabilities.</description>
-        <releaseNotes>https://github.com/digitalcoyote/NuGetDefense/releases/tag/v3.0.10</releaseNotes>
+        <releaseNotes>https://github.com/digitalcoyote/NuGetDefense/releases/tag/v3.0.11-pre109</releaseNotes>
         <repository type="git" url="https://github.com/digitalcoyote/NuGetDefense.git"/>
         <license type="expression">MIT</license>
         <icon>images\icon.png</icon>
