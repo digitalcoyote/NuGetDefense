@@ -23,7 +23,7 @@
         <Description>NuGetDefense ~ Check for Known Vulnerabilities at Build</Description>
         <PackageDescription>NuGetDefense was inspired by [OWASP SafeNuGet](https://nuget.org/packages/SafeNuGet/) but aims to check with multiple sources for known vulnerabilities.</PackageDescription>
         <Copyright>Curtis Carter 2022</Copyright>
-        <Version>3.0.11-pre109</Version>
+        <Version>3.0.11</Version>
         <RepositoryType>git</RepositoryType>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
@@ -40,7 +40,7 @@
         <PackageReference Include="NuGetDefense.Core" Version="2.0.5" />
         <PackageReference Include="NuGetDefense.GitHubAdvisoryDatabase" Version="2.0.3" />
         <PackageReference Include="NuGetDefense.NVD" Version="2.0.9.1" />
-        <PackageReference Include="NuGetDefense.OSSIndex" Version="2.0.5" />
+        <PackageReference Include="NuGetDefense.OSSIndex" Version="2.1.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
         <PackageReference Include="System.Text.Json" Version="7.0.2" />
