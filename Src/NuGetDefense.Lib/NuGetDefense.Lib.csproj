@@ -30,7 +30,7 @@
 
     <ItemGroup>
         <None Include="../../README.md" Pack="true" PackagePath="\" />
-        <PackageReference Include="ByteDev.DotNet" Version="7.2.0" />
+        <PackageReference Include="ByteDev.DotNet" Version="7.2.1" />
         <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.4" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
             <PrivateAssets>all</PrivateAssets>
