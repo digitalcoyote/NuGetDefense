@@ -9,7 +9,9 @@
         <projectUrl>https://digitalcoyote.github.io/NuGetDefense/</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <summary>NuGetDefense ~ Check for Known Vulnerabilities at Build</summary>
-        <description>NuGetDefense was inspired by OWASP SafeNuGet but checks with multiple sources for known vulnerabilities.</description>
+        <description>NuGetDefense was inspired by OWASP SafeNuGet but checks with multiple sources for known
+            vulnerabilities.
+        </description>
         <releaseNotes>https://github.com/digitalcoyote/NuGetDefense/releases/tag/v3.0.11.1</releaseNotes>
         <repository type="git" url="https://github.com/digitalcoyote/NuGetDefense.git"/>
         <license type="expression">MIT</license>
@@ -23,7 +25,7 @@
         <file src="build/nugetdefense.targets" target="build/nugetdefense.targets"/>
         <file src="icon.png" target="images\"/>
         <file src="bin/Release/net6.0/**/*" target="tools/net6.0/"/>
-        <file src="..\..\README.md" target="\" />
+        <file src="..\..\README.md" target="\"/>
         <!--    <file src="bin/Release/net6.0/System.Text.Json.dll" target="tools/net6.0/System.Text.Json.dll" /> Part of the Pre-installed Framework for .Net Core 3.0+-->
         <!--        <file src="bin/Release/net6.0/VulnerabilityData.bin" target="tools/net6.0/VulnerabilityData.bin"/>-->
     </files>

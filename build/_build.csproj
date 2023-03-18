@@ -13,11 +13,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageDownload Include="GitVersion.Tool" Version="[5.1.1]" />
+        <PackageDownload Include="GitVersion.Tool" Version="[5.1.1]"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Nuke.Common" Version="6.3.0" />
+        <PackageReference Include="Nuke.Common" Version="6.3.0"/>
     </ItemGroup>
 
 </Project>
