@@ -35,24 +35,19 @@ public class Settings
 
     public string[] SensitivePackages { get; set; } = new string[0];
 
-    public static Settings LoadSettings(string directory)
+    public static Settings LoadSettings(string settingsFilePath)
     {
         Settings settings;
 
-        var settingsFilePath = Path.Combine(directory, "NuGetDefense.json");
         try
         {
-            if (!File.Exists(settingsFilePath) && File.Exists(Path.Combine(Directory.GetParent(directory)?.FullName ?? "", "NuGetDefense.json")))
-                settingsFilePath = Path.Combine(Directory.GetParent(directory)?.FullName ?? "", "NuGetDefense.json");
-
-            //Edit to allow it to repeatedly check if hte file exists prior to multiple instances trying to save over it.
+            // Edit to allow it to repeatedly check if hte file exists prior to multiple instances trying to save over it.
             if (File.Exists(settingsFilePath))
             {
                 settings = LoadSettingsFile(settingsFilePath);
             }
             else
             {
-                settingsFilePath = Path.Combine(directory, "NuGetDefense.json");
                 settings = new();
                 SpinWait.SpinUntil(() =>
                 {
@@ -72,7 +67,7 @@ public class Settings
         }
         catch (Exception e)
         {
-            Console.WriteLine(MsBuild.Log(settingsFilePath, MsBuild.Category.Error,
+            Console.WriteLine(MsBuild.Log(settingsFilePath, MsBuild.Category.Warning,
                 $"NuGetDefense Settings failed to load. Default Settings were used instead. Exception: {e}"));
             settings = new();
         }

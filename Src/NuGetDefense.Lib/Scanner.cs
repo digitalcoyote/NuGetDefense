@@ -48,14 +48,44 @@ public class Scanner
 
         return exitCode;
     }
-
+    
+    const string DefaultSettingsFileName = DefaultSettingsFileName;
+    
     private void LoadSettings(ScanOptions options)
     {
         try
         {
-            _settings = options.SettingsFile == null
-                ? Settings.LoadSettings(options.ProjectFile.DirectoryName)
-                : Settings.LoadSettingsFile(options.SettingsFile.FullName);
+            if (options.SettingsFile == null)
+            {
+                string settingsFilePath = null;
+                if (!string.IsNullOrWhiteSpace(options.ProjectFile?.DirectoryName))
+                {
+                    var projectSettingsPath = Path.Combine(options.ProjectFile?.DirectoryName, DefaultSettingsFileName);
+                    // Check Project Directory First for Settings
+                    if (File.Exists(projectSettingsPath))
+                    {
+                        settingsFilePath = projectSettingsPath;
+                    }
+                    else if (File.Exists(Path.Combine(Directory.GetParent(projectSettingsPath)?.FullName ?? "", DefaultSettingsFileName)))
+                    {
+                        // Use Parent Directory of Project if the Settings File exists there instead
+                        settingsFilePath = Path.Combine(Directory.GetParent(projectSettingsPath)?.FullName ?? "", DefaultSettingsFileName);
+                    }
+                }
+                
+                // If SettingsPath is still not decided, use the global settings file or create it.
+                if (string.IsNullOrWhiteSpace(settingsFilePath))
+                {
+                    settingsFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".nugetDefense", DefaultSettingsFileName);
+                }
+
+                Settings.LoadSettings(settingsFilePath);
+            }
+            else
+            {
+                _settings = Settings.LoadSettingsFile(options.SettingsFile.FullName);
+            }
+           
             _settings.WarnOnly = _settings.WarnOnly || options.WarnOnly;
             _settings.CheckTransitiveDependencies =
                 _settings.CheckTransitiveDependencies && options.CheckTransitiveDependencies;
