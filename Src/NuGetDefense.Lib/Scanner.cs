@@ -19,7 +19,27 @@ namespace NuGetDefense;
 public class Scanner
 {
     private const string Version = "3.0.11.1";
-    private static readonly string UserAgentString = @$"NuGetDefense/{Version}";
+    private const string UserAgentString = @$"NuGetDefense/{Version}";
+    private const string DefaultSettingsFileName = "NuGetDefense.json";
+    public const string DefaultVulnerabilityDataFileName = "VulnerabilityData.bin";
+
+    /// <summary>
+    /// Folder for NuGetDefense configuration and caching
+    /// </summary>
+    private static readonly string NuGetDefenseFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create), ".nugetDefense");
+    
+    /// <summary>
+    /// The global vulnerability data used by NuGetDefense
+    /// </summary>
+    public static readonly string VulnerabilityDataBin = Path.Combine(NuGetDefenseFolder, DefaultVulnerabilityDataFileName);
+    
+    /// <summary>
+    /// The global NuGetDefense.json path
+    /// </summary>
+    private static readonly string GlobalConfigFile = Path.Combine(NuGetDefenseFolder, DefaultSettingsFileName);
+
+
+
 
     private string _nuGetFile;
     private string _projectFileName;
@@ -49,8 +69,6 @@ public class Scanner
         return exitCode;
     }
     
-    const string DefaultSettingsFileName = DefaultSettingsFileName;
-    
     private void LoadSettings(ScanOptions options)
     {
         try
@@ -76,7 +94,7 @@ public class Scanner
                 // If SettingsPath is still not decided, use the global settings file or create it.
                 if (string.IsNullOrWhiteSpace(settingsFilePath))
                 {
-                    settingsFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".nugetDefense", DefaultSettingsFileName);
+                    settingsFilePath = GlobalConfigFile;
                 }
 
                 Settings.LoadSettings(settingsFilePath);

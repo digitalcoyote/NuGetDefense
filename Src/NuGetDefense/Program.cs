@@ -31,13 +31,6 @@ public static class Program
         settingsOption.AddAlias("--nugetdefense-settings");
         settingsOption.AddAlias("--nugetdefense-json");
 
-        var vulnerabilityDataBinOption = new Option<FileInfo>("--vulnerability-data-bin", "Path to VulnerabilityData for NVD Scanner (ex. VulnerabilityData.bin)");
-        vulnerabilityDataBinOption.AddAlias("--nvd-data");
-        vulnerabilityDataBinOption.AddAlias("--nvd-data-bin");
-        vulnerabilityDataBinOption.AddAlias("--nvd-bin");
-        vulnerabilityDataBinOption.AddAlias("--vulnerability-bin");
-        vulnerabilityDataBinOption.AddAlias("--vulnerability-data");
-
         var warnOnlyOption = new Option<bool>("--warn-only", () => false, "Disables errors that would break a build, but outputs warnings for each report");
         warnOnlyOption.AddAlias("--do-not-break");
         warnOnlyOption.AddAlias("--warn");
@@ -66,7 +59,6 @@ public static class Program
             projFileOption,
             targetFrameworkMonikerOption,
             settingsOption,
-            vulnerabilityDataBinOption,
             warnOnlyOption,
             checkTransitiveDependenciesOption,
             checkProjectReferencesOption,
@@ -75,45 +67,51 @@ public static class Program
             cacheLocationOption
         };
 
-        var NvdUpdateCommand = new Command("Update", "Updates the Embedded Offline Vulnerability source");
-        var RecreateNVDCommand = new Command("Recreate-NVD", "Recreates the NVD at the specified location");
-        NvdUpdateCommand.Handler = CommandHandler.Create<InvocationContext>(Update);
-        RecreateNVDCommand.Handler = CommandHandler.Create<string, InvocationContext>(RecreateNVD);
-        rootCommand.Add(NvdUpdateCommand);
-        rootCommand.Add(RecreateNVDCommand);
+        var nvdUpdateCommand = new Command("Update", "Updates the Offline NVD Vulnerability source");
+        var recreateNVDCommand = new Command("Recreate-NVD", "Recreates the Offline NVD Vulnerability source");
+        nvdUpdateCommand.Handler = CommandHandler.Create<InvocationContext>(Update);
+        recreateNVDCommand.Handler = CommandHandler.Create<string, InvocationContext>(RecreateNVD);
+        rootCommand.Add(nvdUpdateCommand);
+        rootCommand.Add(recreateNVDCommand);
 
-        rootCommand.Handler = CommandHandler.Create<FileInfo, string, FileInfo, FileInfo, bool, bool, bool, string[], string[], string, InvocationContext>(Scan);
+        rootCommand.Handler = CommandHandler.Create<FileInfo, string, FileInfo, bool, bool, bool, string[], string[], string, InvocationContext>(Scan);
         return rootCommand.InvokeAsync(args).Result;
     }
 
-    private static void Update(InvocationContext commandContext)
+    private static async void Update(InvocationContext commandContext)
     {
-        var str = Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "VulnerabilityData.bin");
+        if (!File.Exists(Scanner.VulnerabilityDataBin))
+        {
+            // NVD Data does not exist, create it.
+            await RecreateNVD(Scanner.VulnerabilityDataBin, commandContext);
+            return;
+        }
+        
         var dateTime = DateTime.Now.Add(TimeSpan.FromMinutes(5));
         bool flag;
-        Dictionary<string, Dictionary<string, VulnerabilityEntry>> _nvdDict = new();
+        Dictionary<string, Dictionary<string, VulnerabilityEntry>> nvdDict = new();
         do
         {
             try
             {
-                var fileStream = File.Open(str, FileMode.Open, FileAccess.Read);
+                var fileStream = File.Open(Scanner.VulnerabilityDataBin, FileMode.Open, FileAccess.Read);
                 flag = false;
                 var options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray).WithSecurity(MessagePackSecurity.UntrustedData);
-                _nvdDict = MessagePackSerializer.Deserialize<Dictionary<string, Dictionary<string, VulnerabilityEntry>>>(fileStream, options);
+                nvdDict = MessagePackSerializer.Deserialize<Dictionary<string, Dictionary<string, VulnerabilityEntry>>>(fileStream, options);
                 fileStream.Close();
             }
             catch (Exception ex)
             {
                 flag = DateTime.Now <= dateTime;
-                if (!flag) throw new TimeoutException($"Reading vulnerability data failed:'{str}'", ex);
+                if (!flag) throw new TimeoutException($"Reading vulnerability data failed:'{Scanner.VulnerabilityDataBin}'", ex);
             }
         } while (flag);
 
         var result1 = FeedUpdater.GetRecentFeedAsync().Result;
         var result2 = FeedUpdater.GetModifiedFeedAsync().Result;
-        FeedUpdater.AddFeedToVulnerabilityData(result1, _nvdDict);
-        FeedUpdater.AddFeedToVulnerabilityData(result2, _nvdDict);
-        VulnerabilityData.SaveToBinFile(_nvdDict, "VulnerabilityData.bin", TimeSpan.FromMinutes(5));
+        FeedUpdater.AddFeedToVulnerabilityData(result1, nvdDict);
+        FeedUpdater.AddFeedToVulnerabilityData(result2, nvdDict);
+        VulnerabilityData.SaveToBinFile(nvdDict, Scanner.DefaultVulnerabilityDataFileName, TimeSpan.FromMinutes(5));
     }
 
     public static async Task RecreateNVD(string VulnDataFile, InvocationContext commandContext)
@@ -135,10 +133,9 @@ public static class Program
             vulnDict["twilio"].Remove("CVE-2014-9023");
     }
 
-    public static void Scan(FileInfo projectFile,
+    public static void Scan(FileInfo? projectFile,
         string tfm,
-        FileInfo settingsFile,
-        FileInfo vulnDataFile,
+        FileInfo? settingsFile,
         bool warnOnly,
         bool checkTransitiveDependencies,
         bool checkReferencedProjects,
@@ -147,7 +144,7 @@ public static class Program
         string? cacheLocation,
         InvocationContext commandContext)
     {
-        if (settingsFile is null && projectFile is null) Console.WriteLine("Run `nugetdefense -?` for usage information");
+        if (projectFile is null) Console.WriteLine("Run `nugetdefense -?` for usage information");
         else
             commandContext.ExitCode = new Scanner().Scan(new()
             {

@@ -47,11 +47,6 @@ public class ScanOptions
     public string? Tfm;
 
     /// <summary>
-    ///     location of NVD Vulnerability File
-    /// </summary>
-    public FileInfo? VulnDataFile;
-
-    /// <summary>
     ///     Only Provide warnings and do not fail
     /// </summary>
     public bool WarnOnly = false;
