@@ -18,7 +18,7 @@ namespace NuGetDefense;
 
 public class Scanner
 {
-    private const string Version = "3.0.11.1";
+    private const string Version = "3.1.0.0";
     private const string UserAgentString = @$"NuGetDefense/{Version}";
     private const string DefaultSettingsFileName = "NuGetDefense.json";
     public const string DefaultVulnerabilityDataFileName = "VulnerabilityData.bin";
