@@ -97,7 +97,7 @@ public class Scanner
                     settingsFilePath = GlobalConfigFile;
                 }
 
-                Settings.LoadSettings(settingsFilePath);
+                _settings = Settings.LoadSettings(settingsFilePath);
             }
             else
             {
