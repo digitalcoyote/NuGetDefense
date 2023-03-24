@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-**What is is the feature?*
+**What is is the feature?**
 
 **[Optional] What formats, details, etc are oyu looking for?**
 A clear and concise description of what the use for this feature is.
