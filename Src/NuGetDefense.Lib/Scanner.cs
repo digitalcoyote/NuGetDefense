@@ -306,6 +306,8 @@ public class Scanner
             var pkgs = new List<NuGetPackage>();
 
             var project = projects[i];
+            // If the project is an SSIS project, skip it
+            if (project.EndsWith(".dtproj")) continue;
             var path = Path.Combine(Path.GetDirectoryName(TopLevelProject)!, project
                 .Replace('\\', Path.DirectorySeparatorChar)
                 .Replace('/', Path.DirectorySeparatorChar));
