@@ -15,6 +15,7 @@ View the full documentation for NuGetDefense [here](https://digitalcoyote.github
 * Uses Multiple Sources to check for known vulnerabilities in third-party libraries (NuGet packages)
     * [OSS Index](https://ossindex.sonatype.org/)
     * [National Vulnerability Database](https://nvd.nist.gov/) (Optionally Self-Updating)
+        * This product uses the NVD API but is not endorsed or certified by the NVD.
     * [GitHub Security Advisory Database](https://nvd.nist.gov/)
     * [Google's Open Source Vulnerabilities Database](https://osv.dev/) ([Coming Soon!](https://github.com/digitalcoyote/NuGetDefense/discussions/53))
 * Simple installation/configuration: the [NuGet Package](https://www.nuget.org/packages/NuGetDefense/) is all you need.
