@@ -22,8 +22,8 @@
         <Authors>Curtis Carter</Authors>
         <Description>NuGetDefense ~ Check for Known Vulnerabilities at Build</Description>
         <PackageDescription>NuGetDefense was inspired by [OWASP SafeNuGet](https://nuget.org/packages/SafeNuGet/) but aims to check with multiple sources for known vulnerabilities.</PackageDescription>
-        <Copyright>Curtis Carter 2022</Copyright>
-        <Version>3.1.0.0</Version>
+        <Copyright>Curtis Carter 2023</Copyright>
+        <Version>3.2.0.0-prerelease2</Version>
         <RepositoryType>git</RepositoryType>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
@@ -39,7 +39,7 @@
         <PackageReference Include="NuGet.Versioning" Version="6.6.0" />
         <PackageReference Include="NuGetDefense.Core" Version="2.0.5" />
         <PackageReference Include="NuGetDefense.GitHubAdvisoryDatabase" Version="2.0.3" />
-        <PackageReference Include="NuGetDefense.NVD" Version="2.0.9.1" />
+        <PackageReference Include="NuGetDefense.NVD" Version="2.1.0-prelease2" />
         <PackageReference Include="NuGetDefense.OSSIndex" Version="2.1.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />

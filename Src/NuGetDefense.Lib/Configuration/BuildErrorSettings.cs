@@ -36,7 +36,7 @@ public class BuildErrorSettings
     ///     (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
     ///     Version is "any" if omitted
     /// </summary>
-    public NuGetPackage[] IgnoredPackages { get; set; } =
+    public NuGetPackage[]? IgnoredPackages { get; set; } =
     {
         new() { Id = "NugetDefense" }
     };
@@ -45,7 +45,7 @@ public class BuildErrorSettings
     ///     List CVE to be ignored
     ///     (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
     /// </summary>
-    public string[] IgnoredCvEs { get; set; } =
+    public string[]? IgnoredCvEs { get; set; } =
     {
     };
 
@@ -54,10 +54,13 @@ public class BuildErrorSettings
     ///     (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
     ///     Version is "any" if omitted
     /// </summary>
-    public NuGetPackage[] AllowedPackages { get; set; } = Array.Empty<NuGetPackage>();
+    public NuGetPackage[]? AllowedPackages { get; set; } = Array.Empty<NuGetPackage>();
 
+    /// <summary>
+    /// Old name for <see cref="AllowedPackages"/>.
+    /// </summary>
     [Obsolete("Here for support of old config files")]
-    public NuGetPackage[] WhiteListedPackages { get; set; } = Array.Empty<NuGetPackage>();
+    public NuGetPackage[]? WhiteListedPackages { get; set; } = Array.Empty<NuGetPackage>();
 
 
     /// <summary>
@@ -65,8 +68,11 @@ public class BuildErrorSettings
     ///     (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
     ///     Version is "any" if omitted
     /// </summary>
-    public BlockedPackage[] BlockedPackages { get; set; } = Array.Empty<BlockedPackage>();
+    public BlockedPackage[]? BlockedPackages { get; set; } = Array.Empty<BlockedPackage>();
 
+    /// <summary>
+    /// Old name for <see cref="BlockedPackages"/>.
+    /// </summary>
     [Obsolete("Here for support of old config files")]
-    public BlockedPackage[] BlacklistedPackages { get; set; } = Array.Empty<BlockedPackage>();
+    public BlockedPackage[]? BlacklistedPackages { get; set; } = Array.Empty<BlockedPackage>();
 }
