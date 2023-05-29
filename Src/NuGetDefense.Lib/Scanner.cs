@@ -15,7 +15,6 @@ using NuGet.Versioning;
 using NuGetDefense.Configuration;
 using NuGetDefense.Core;
 using NuGetDefense.NVD;
-using NugetDefense.NVD.API;
 using Serilog;
 
 namespace NuGetDefense;
@@ -26,22 +25,23 @@ public class Scanner
     public const string UserAgentString = @$"NuGetDefense/{Version}";
     public const string DefaultSettingsFileName = "NuGetDefense.json";
     public const string DefaultVulnerabilityDataFileName = "VulnerabilityData.bin";
-    
+
     /// <summary>
-    /// Folder for NuGetDefense configuration and caching
+    ///     Folder for NuGetDefense configuration and caching
     /// </summary>
-    private static readonly string NuGetDefenseFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create), ".nugetDefense");
-    
+    private static readonly string NuGetDefenseFolder =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create), ".nugetDefense");
+
     /// <summary>
-    /// The global vulnerability data used by NuGetDefense
+    ///     The global vulnerability data used by NuGetDefense
     /// </summary>
     public static readonly string VulnerabilityDataBin = Path.Combine(NuGetDefenseFolder, DefaultVulnerabilityDataFileName);
-    
+
     /// <summary>
-    /// The global NuGetDefense.json path
+    ///     The global NuGetDefense.json path
     /// </summary>
     public static readonly string GlobalConfigFile = Path.Combine(NuGetDefenseFolder, DefaultSettingsFileName);
-    
+
     private string _nuGetFile;
     private string _projectFileName;
     private Dictionary<string, NuGetPackage[]> _projects;
@@ -69,7 +69,7 @@ public class Scanner
 
         return exitCode;
     }
-    
+
     private void LoadSettings(ScanOptions options)
     {
         try
@@ -82,21 +82,14 @@ public class Scanner
                     var projectSettingsPath = Path.Combine(options.ProjectFile?.DirectoryName, DefaultSettingsFileName);
                     // Check Project Directory First for Settings
                     if (File.Exists(projectSettingsPath))
-                    {
                         settingsFilePath = projectSettingsPath;
-                    }
                     else if (File.Exists(Path.Combine(Directory.GetParent(projectSettingsPath)?.FullName ?? "", DefaultSettingsFileName)))
-                    {
                         // Use Parent Directory of Project if the Settings File exists there instead
                         settingsFilePath = Path.Combine(Directory.GetParent(projectSettingsPath)?.FullName ?? "", DefaultSettingsFileName);
-                    }
                 }
-                
+
                 // If SettingsPath is still not decided, use the global settings file or create it.
-                if (string.IsNullOrWhiteSpace(settingsFilePath))
-                {
-                    settingsFilePath = GlobalConfigFile;
-                }
+                if (string.IsNullOrWhiteSpace(settingsFilePath)) settingsFilePath = GlobalConfigFile;
 
                 _settings = Settings.LoadSettings(settingsFilePath);
             }
@@ -104,7 +97,7 @@ public class Scanner
             {
                 _settings = Settings.LoadSettingsFile(options.SettingsFile.FullName);
             }
-           
+
             _settings.WarnOnly = _settings.WarnOnly || options.WarnOnly;
             _settings.CheckTransitiveDependencies =
                 _settings.CheckTransitiveDependencies && options.CheckTransitiveDependencies;
@@ -245,17 +238,16 @@ public class Scanner
             if (_settings.NVD.Enabled)
             {
                 Log.Logger.Verbose("Checking the embedded NVD source for Vulnerabilities");
-                
+
                 if (File.Exists(VulnerabilityDataBin))
                 {
-
                 }
 
                 foreach (var (_, pkgs) in _projects)
                     vulnDict =
                         new NVD.Scanner(_nuGetFile, TimeSpan.FromSeconds(_settings.NVD.TimeoutInSeconds),
-                                new (_settings.NvdApi.ApiToken, UserAgentString),
-                                new Dictionary<string, Dictionary<string, VulnerabilityEntry>>(),
+                                new(_settings.NvdApi.ApiToken, UserAgentString),
+                                new(),
                                 _settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate)
                             .GetVulnerabilitiesForPackages(pkgs,
                                 vulnDict);
@@ -287,37 +279,27 @@ public class Scanner
             .WithSecurity(MessagePackSecurity.UntrustedData);
 
         if (!File.Exists(vulnDataFile))
-        {
             // TODO: Pass in API Key
             return await VulnerabilityDataUpdater.CreateNewVulnDataBin(vulnDataFile, new(null, UserAgentString));
-        }
-        else
+
+        var startDateTime = DateTime.Now.AddSeconds(_settings.NVD.TimeoutInSeconds);
+        bool ableToReadVulnerabilityData;
+        do
         {
-            var startDateTime = DateTime.Now.AddSeconds(_settings.NVD.TimeoutInSeconds);
-            bool ableToReadVulnerabilityData;
-            do
+            try
             {
-                try
-                {
-                    var _nvdDict = new Dictionary<string, Dictionary<string, VulnerabilityEntry>>();
-                    var nvdData = File.Open(vulnDataFile, FileMode.Open, FileAccess.Read);
-                    ableToReadVulnerabilityData = false;
-                    _nvdDict = MessagePackSerializer
-                        .Deserialize<
-                            Dictionary<string, Dictionary<string, VulnerabilityEntry>>>(nvdData, lz4Options);
-                    nvdData.Close();
+                await using var nvdData = File.Open(vulnDataFile, FileMode.Open, FileAccess.Read);
+                return await MessagePackSerializer.DeserializeAsync<Dictionary<string, Dictionary<string, VulnerabilityEntry>>>(nvdData, lz4Options);
+            }
+            catch (Exception e)
+            {
+                ableToReadVulnerabilityData = DateTime.Now <= startDateTime;
+                if (!ableToReadVulnerabilityData && _settings.NVD.BreakIfCannotRun)
+                    throw new TimeoutException($"Reading vulnerability data failed:'{vulnDataFile}'", e);
+            }
+        } while (ableToReadVulnerabilityData);
 
-                    return _nvdDict;
-                }
-                catch (Exception e)
-                {
-                    ableToReadVulnerabilityData = DateTime.Now <= startDateTime;
-                    if (!ableToReadVulnerabilityData && _settings.NVD.BreakIfCannotRun)
-                        throw new TimeoutException($"Reading vulnerability data failed:'{vulnDataFile}'", e);
-                }
-            } while (ableToReadVulnerabilityData);
-
-        }
+        return new();
     }
 
     private void MergeVulnDict(ref Dictionary<string, Dictionary<string, Vulnerability>> vulnDict, ref Dictionary<string, Dictionary<string, Vulnerability>> vulnDict2)
@@ -396,12 +378,6 @@ public class Scanner
             projectPackages.Add(topLevelProject, nuGetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray());
 
         return projectPackages;
-    }
-
-    private static void ParseSolutionForProjects(string s)
-    {
-        // TODO: This will parse hte solution file into a list of projects relative to the solution file.
-        throw new NotImplementedException();
     }
 
     /// <summary>

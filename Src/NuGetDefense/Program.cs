@@ -86,8 +86,8 @@ public static class Program
             apiKeyOption,
             vulnDataFileOption,
         };
-        nvdUpdateCommand.Handler = CommandHandler.Create<InvocationContext>(Update);
-        recreateNVDCommand.Handler = CommandHandler.Create<FileInfo, string, FileInfo, InvocationContext>(RecreateNVD);
+        nvdUpdateCommand.Handler = CommandHandler.Create<FileInfo?, string, FileInfo?, InvocationContext>(Update);
+        recreateNVDCommand.Handler = CommandHandler.Create<FileInfo?, string, FileInfo?, InvocationContext>(RecreateNVDAsync);
         rootCommand.Add(nvdUpdateCommand);
         rootCommand.Add(recreateNVDCommand);
 
@@ -95,12 +95,41 @@ public static class Program
         return rootCommand.InvokeAsync(args).Result;
     }
 
-    private static async void Update(InvocationContext commandContext)
+    private static async void Update(FileInfo? vulnDataFile, string? apiKey, FileInfo? settingsFile,  InvocationContext commandContext)
     {
-        if (!File.Exists(Scanner.VulnerabilityDataBin))
+        
+        if (string.IsNullOrWhiteSpace(apiKey)  )
+        {
+            if (settingsFile is { Exists: true })
+            {
+                apiKey = Settings.LoadSettingsFile(settingsFile.FullName).NvdApi.ApiToken;
+            }
+            else if(File.Exists(Scanner.GlobalConfigFile))
+            {
+                apiKey = Settings.LoadSettingsFile(Scanner.GlobalConfigFile).NvdApi.ApiToken;
+            }
+        }
+        if (vulnDataFile == null)
+        {
+            if (File.Exists(Scanner.DefaultVulnerabilityDataFileName))
+            {
+                vulnDataFile = new(Scanner.DefaultVulnerabilityDataFileName);
+            }
+            else if (File.Exists(Scanner.VulnerabilityDataBin))
+            {
+                vulnDataFile = new(Scanner.VulnerabilityDataBin);
+            }
+            else
+            {
+                // NVD Data was not specified and does not exist in global location or in current directory
+                await RecreateNVDAsync(new (Scanner.VulnerabilityDataBin), apiKey, settingsFile, commandContext);
+                return;
+            }
+        }
+        else if (!vulnDataFile.Exists)
         {
             // NVD Data does not exist, create it.
-            await RecreateNVD(Scanner.VulnerabilityDataBin, commandContext);
+            await RecreateNVDAsync(vulnDataFile, apiKey, settingsFile, commandContext);
             return;
         }
         
@@ -111,7 +140,7 @@ public static class Program
         {
             try
             {
-                var fileStream = File.Open(Scanner.VulnerabilityDataBin, FileMode.Open, FileAccess.Read);
+                var fileStream = vulnDataFile.Open(FileMode.Open, FileAccess.Read);
                 flag = false;
                 var options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray).WithSecurity(MessagePackSecurity.UntrustedData);
                 nvdDict = MessagePackSerializer.Deserialize<Dictionary<string, Dictionary<string, VulnerabilityEntry>>>(fileStream, options);
@@ -124,14 +153,11 @@ public static class Program
             }
         } while (flag);
 
-        var result1 = FeedUpdater.GetRecentFeedAsync().Result;
-        var result2 = FeedUpdater.GetModifiedFeedAsync().Result;
-        FeedUpdater.AddFeedToVulnerabilityData(result1, nvdDict);
-        FeedUpdater.AddFeedToVulnerabilityData(result2, nvdDict);
+        await VulnerabilityDataUpdater.UpdateVulnerabilityDataFromApi(new (apiKey, Scanner.UserAgentString), new (){LastModStartDate = vulnDataFile.LastWriteTime}, nvdDict);
         VulnerabilityData.SaveToBinFile(nvdDict, Scanner.DefaultVulnerabilityDataFileName, TimeSpan.FromMinutes(5));
     }
 
-    public static async Task RecreateNVD(FileInfo? vulnDataFile, string? apiKey, FileInfo? settingsFile,  InvocationContext commandContext)
+    public static async Task RecreateNVDAsync(FileInfo? vulnDataFile, string? apiKey, FileInfo? settingsFile,  InvocationContext commandContext)
     {
         if (string.IsNullOrWhiteSpace(apiKey)  )
         {
