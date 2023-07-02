@@ -37,8 +37,13 @@ public class Settings
 
     public string[] SensitivePackages { get; set; } = Array.Empty<string>();
 
-    public static Settings LoadSettings(string settingsFilePath)
+    public static Settings LoadSettings(string? settingsFilePath = "")
     {
+        if (string.IsNullOrWhiteSpace(settingsFilePath))
+        {
+            settingsFilePath = Scanner.GlobalConfigFile;
+        }
+        
         Settings settings;
 
         try

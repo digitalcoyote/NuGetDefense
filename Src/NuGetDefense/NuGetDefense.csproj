@@ -34,7 +34,7 @@
         <PackageId>NuGetDefense.Tool</PackageId>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>nugetdefense</ToolCommandName>
-        <Version>3.2.0.0-prerelease4</Version>
+        <Version>3.2.0.0-prerelease5</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
     <ItemGroup>

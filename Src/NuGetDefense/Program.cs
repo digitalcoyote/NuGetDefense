@@ -108,6 +108,10 @@ public static class Program
             {
                 apiKey = Settings.LoadSettingsFile(Scanner.GlobalConfigFile).NvdApi.ApiToken;
             }
+            else
+            {
+                Settings.LoadSettings();
+            }
         }
         if (vulnDataFile == null)
         {
@@ -168,6 +172,10 @@ public static class Program
             else if(File.Exists(Scanner.GlobalConfigFile))
             {
                 apiKey = Settings.LoadSettingsFile(Scanner.GlobalConfigFile).NvdApi.ApiToken;
+            }
+            else
+            {
+                Settings.LoadSettings();
             }
         }
 
