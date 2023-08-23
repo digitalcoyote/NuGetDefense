@@ -263,7 +263,7 @@ public class Scanner
             if (vulnDict != null) ReportVulnerabilities(vulnDict);
             // did not want to change the signature of the scan function
             // might be better to return int here?
-            NumberOfVulnerabilities = vulnDict == null ? 0 : vulnDict.Count;
+            NumberOfVulnerabilities = vulnDict == null ? 0 : vulnDict.Select(x => x.Value.Count).Sum();
         }
         catch (Exception e)
         {
@@ -430,6 +430,7 @@ public class Scanner
                 vulnReporter.BuildVulnerabilityTextReport(vulnDict, packages, project, _settings.WarnOnly,
                     _settings.ErrorSettings.Cvss3Threshold, out var projectNumberOfVulnerabilities);
 
+                // why is this not doing anything?
                 NumberOfVulnerabilities += projectNumberOfVulnerabilities;
 
                 if (_settings.VulnerabilityReports.OutputTextReport) Log.Logger.Information(vulnReporter.VulnerabilityTextReport);
