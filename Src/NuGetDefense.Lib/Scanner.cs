@@ -261,6 +261,9 @@ public class Scanner
             }
 
             if (vulnDict != null) ReportVulnerabilities(vulnDict);
+            // did not want to change the signature of the scan function
+            // might be better to return int here?
+            NumberOfVulnerabilities = vulnDict == null ? 0 : vulnDict.Count;
         }
         catch (Exception e)
         {
