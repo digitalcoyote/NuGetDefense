@@ -21,7 +21,7 @@ namespace NuGetDefense;
 
 public class Scanner
 {
-    public const string Version = "3.2.0.0-prerelease6";
+    public const string Version = "3.2.0.0";
     public const string UserAgentString = @$"NuGetDefense/{Version}";
     public const string DefaultSettingsFileName = "NuGetDefense.json";
     public const string DefaultVulnerabilityDataFileName = "VulnerabilityData.bin";
@@ -263,7 +263,7 @@ public class Scanner
             if (vulnDict != null) ReportVulnerabilities(vulnDict);
             // did not want to change the signature of the scan function
             // might be better to return int here?
-            NumberOfVulnerabilities = vulnDict == null ? 0 : vulnDict.Select(x => x.Value.Count).Sum();
+            NumberOfVulnerabilities = vulnDict == null ? 0 : vulnDict.Sum(x => x.Value.Count);
         }
         catch (Exception e)
         {
