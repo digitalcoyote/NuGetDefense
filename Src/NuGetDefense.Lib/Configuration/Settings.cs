@@ -33,10 +33,17 @@ public class Settings
     public OfflineVulnerabilitySourceConfiguration NVD { get; set; } =
         new();
 
-    public string[] SensitivePackages { get; set; } = new string[0];
+    public RemoteVulnerabilitySourceConfiguration NvdApi { get; set; } = new();
 
-    public static Settings LoadSettings(string settingsFilePath)
+    public string[] SensitivePackages { get; set; } = Array.Empty<string>();
+
+    public static Settings LoadSettings(string? settingsFilePath = "")
     {
+        if (string.IsNullOrWhiteSpace(settingsFilePath))
+        {
+            settingsFilePath = Scanner.GlobalConfigFile;
+        }
+        
         Settings settings;
 
         try

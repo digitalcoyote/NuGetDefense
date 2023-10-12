@@ -6,7 +6,9 @@ using System.CommandLine.NamingConventionBinder;
 using System.IO;
 using System.Threading.Tasks;
 using MessagePack;
+using NuGetDefense.Configuration;
 using NuGetDefense.NVD;
+using NugetDefense.NVD.API;
 
 namespace NuGetDefense;
 
@@ -27,7 +29,7 @@ public static class Program
         targetFrameworkMonikerOption.AddAlias("--tfm");
         targetFrameworkMonikerOption.AddAlias("--framework");
 
-        var settingsOption = new Option<FileInfo>("--settings-file", () => null, "Path to Settings File (ex. NuGetDefense.json)");
+        var settingsOption = new Option<FileInfo?>("--settings-file", () => null, "Path to Settings File (ex. NuGetDefense.json)");
         settingsOption.AddAlias("--nugetdefense-settings");
         settingsOption.AddAlias("--nugetdefense-json");
 
@@ -54,6 +56,10 @@ public static class Program
         var ignorePackagesOption = new Option<string[]>("--ignore-packages", Array.Empty<string>, "Adds names to a list of packages to ignore");
 
         var cacheLocationOption = new Option<string>("--cache-location", "location used to retrieve the cache");
+
+        var apiKeyOption = new Option<string>("--api-key", "NVD API key");
+        
+        var vulnDataFileOption = new Option<FileInfo?>("--vuln-data-file", "Path to use for the vuln data file");
         var rootCommand = new RootCommand
         {
             projFileOption,
@@ -67,10 +73,21 @@ public static class Program
             cacheLocationOption
         };
 
-        var nvdUpdateCommand = new Command("Update", "Updates the Offline NVD Vulnerability source");
-        var recreateNVDCommand = new Command("Recreate-NVD", "Recreates the Offline NVD Vulnerability source");
-        nvdUpdateCommand.Handler = CommandHandler.Create<InvocationContext>(Update);
-        recreateNVDCommand.Handler = CommandHandler.Create<string, InvocationContext>(RecreateNVD);
+        var nvdUpdateCommand = new Command("Update", "Updates the Offline NVD Vulnerability source")
+        {
+            settingsOption,
+            apiKeyOption,
+            vulnDataFileOption,
+        };
+        
+        var recreateNVDCommand = new Command("Recreate-NVD", "Recreates the Offline NVD Vulnerability source")
+        {
+            settingsOption,
+            apiKeyOption,
+            vulnDataFileOption,
+        };
+        nvdUpdateCommand.Handler = CommandHandler.Create<FileInfo?, string, FileInfo?, InvocationContext>(Update);
+        recreateNVDCommand.Handler = CommandHandler.Create<FileInfo?, string, FileInfo?, InvocationContext>(RecreateNVDAsync);
         rootCommand.Add(nvdUpdateCommand);
         rootCommand.Add(recreateNVDCommand);
 
@@ -78,12 +95,45 @@ public static class Program
         return rootCommand.InvokeAsync(args).Result;
     }
 
-    private static async void Update(InvocationContext commandContext)
+    private static async void Update(FileInfo? vulnDataFile, string? apiKey, FileInfo? settingsFile,  InvocationContext commandContext)
     {
-        if (!File.Exists(Scanner.VulnerabilityDataBin))
+        
+        if (string.IsNullOrWhiteSpace(apiKey)  )
+        {
+            if (settingsFile is { Exists: true })
+            {
+                apiKey = Settings.LoadSettingsFile(settingsFile.FullName).NvdApi.ApiToken;
+            }
+            else if(File.Exists(Scanner.GlobalConfigFile))
+            {
+                apiKey = Settings.LoadSettingsFile(Scanner.GlobalConfigFile).NvdApi.ApiToken;
+            }
+            else
+            {
+                Settings.LoadSettings();
+            }
+        }
+        if (vulnDataFile == null)
+        {
+            if (File.Exists(Scanner.DefaultVulnerabilityDataFileName))
+            {
+                vulnDataFile = new(Scanner.DefaultVulnerabilityDataFileName);
+            }
+            else if (File.Exists(Scanner.VulnerabilityDataBin))
+            {
+                vulnDataFile = new(Scanner.VulnerabilityDataBin);
+            }
+            else
+            {
+                // NVD Data was not specified and does not exist in global location or in current directory
+                await RecreateNVDAsync(new (Scanner.VulnerabilityDataBin), apiKey, settingsFile, commandContext);
+                return;
+            }
+        }
+        else if (!vulnDataFile.Exists)
         {
             // NVD Data does not exist, create it.
-            await RecreateNVD(Scanner.VulnerabilityDataBin, commandContext);
+            await RecreateNVDAsync(vulnDataFile, apiKey, settingsFile, commandContext);
             return;
         }
         
@@ -94,7 +144,7 @@ public static class Program
         {
             try
             {
-                var fileStream = File.Open(Scanner.VulnerabilityDataBin, FileMode.Open, FileAccess.Read);
+                var fileStream = vulnDataFile.Open(FileMode.Open, FileAccess.Read);
                 flag = false;
                 var options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray).WithSecurity(MessagePackSecurity.UntrustedData);
                 nvdDict = MessagePackSerializer.Deserialize<Dictionary<string, Dictionary<string, VulnerabilityEntry>>>(fileStream, options);
@@ -107,22 +157,34 @@ public static class Program
             }
         } while (flag);
 
-        var result1 = FeedUpdater.GetRecentFeedAsync().Result;
-        var result2 = FeedUpdater.GetModifiedFeedAsync().Result;
-        FeedUpdater.AddFeedToVulnerabilityData(result1, nvdDict);
-        FeedUpdater.AddFeedToVulnerabilityData(result2, nvdDict);
+        await VulnerabilityDataUpdater.UpdateVulnerabilityDataFromApi(new (apiKey, Scanner.UserAgentString), new (){LastModStartDate = vulnDataFile.LastWriteTime}, nvdDict);
         VulnerabilityData.SaveToBinFile(nvdDict, Scanner.DefaultVulnerabilityDataFileName, TimeSpan.FromMinutes(5));
     }
 
-    public static async Task RecreateNVD(string VulnDataFile, InvocationContext commandContext)
+    public static async Task RecreateNVDAsync(FileInfo? vulnDataFile, string? apiKey, FileInfo? settingsFile,  InvocationContext commandContext)
     {
+        if (string.IsNullOrWhiteSpace(apiKey)  )
+        {
+            if (settingsFile is { Exists: true })
+            {
+                apiKey = Settings.LoadSettingsFile(settingsFile.FullName).NvdApi.ApiToken;
+            }
+            else if(File.Exists(Scanner.GlobalConfigFile))
+            {
+                apiKey = Settings.LoadSettingsFile(Scanner.GlobalConfigFile).NvdApi.ApiToken;
+            }
+            else
+            {
+                Settings.LoadSettings();
+            }
+        }
+
         var vulnDict =
             new Dictionary<string, Dictionary<string, VulnerabilityEntry>>();
-        await foreach (var feed in FeedUpdater.GetFeedsAsync())
-            FeedUpdater.AddFeedToVulnerabilityData(feed, vulnDict);
+        await VulnerabilityDataUpdater.CreateNewVulnDataBin(vulnDataFile?.FullName ?? Scanner.DefaultVulnerabilityDataFileName, new (apiKey, Scanner.UserAgentString));
         vulnDict.MakeCorrections();
 
-        VulnerabilityData.SaveToBinFile(vulnDict, VulnDataFile, TimeSpan.FromMinutes(10));
+        VulnerabilityData.SaveToBinFile(vulnDict, vulnDataFile?.FullName ?? Scanner.DefaultVulnerabilityDataFileName, TimeSpan.FromMinutes(10));
     }
 
     public static void MakeCorrections(this Dictionary<string, Dictionary<string, VulnerabilityEntry>> vulnDict)

@@ -21,8 +21,10 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Nullable>enable</Nullable>
+        <AssemblyVersion>3.2.0.0-prerelease6</AssemblyVersion>
+        <FileVersion>3.2.0.0</FileVersion>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)'=='RELEASE'">
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <NuspecFile>NuGetDefense.nuspec</NuspecFile>
     </PropertyGroup>
@@ -34,7 +36,7 @@
         <PackageId>NuGetDefense.Tool</PackageId>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>nugetdefense</ToolCommandName>
-        <Version>3.1.0.0</Version>
+        <Version>3.2.0.0-prerelease6</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
     <ItemGroup>

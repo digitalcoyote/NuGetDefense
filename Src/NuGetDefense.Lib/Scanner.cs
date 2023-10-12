@@ -5,41 +5,42 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using ByteDev.DotNet.Project;
 using ByteDev.DotNet.Solution;
+using MessagePack;
 using NuGet.Versioning;
 using NuGetDefense.Configuration;
 using NuGetDefense.Core;
+using NuGetDefense.NVD;
 using Serilog;
 
 namespace NuGetDefense;
 
 public class Scanner
 {
-    private const string Version = "3.1.0.0";
-    private const string UserAgentString = @$"NuGetDefense/{Version}";
-    private const string DefaultSettingsFileName = "NuGetDefense.json";
+    public const string Version = "3.2.0.0-prerelease6";
+    public const string UserAgentString = @$"NuGetDefense/{Version}";
+    public const string DefaultSettingsFileName = "NuGetDefense.json";
     public const string DefaultVulnerabilityDataFileName = "VulnerabilityData.bin";
 
     /// <summary>
-    /// Folder for NuGetDefense configuration and caching
+    ///     Folder for NuGetDefense configuration and caching
     /// </summary>
-    private static readonly string NuGetDefenseFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create), ".nugetDefense");
-    
+    private static readonly string NuGetDefenseFolder =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create), ".nugetDefense");
+
     /// <summary>
-    /// The global vulnerability data used by NuGetDefense
+    ///     The global vulnerability data used by NuGetDefense
     /// </summary>
     public static readonly string VulnerabilityDataBin = Path.Combine(NuGetDefenseFolder, DefaultVulnerabilityDataFileName);
-    
+
     /// <summary>
-    /// The global NuGetDefense.json path
+    ///     The global NuGetDefense.json path
     /// </summary>
-    private static readonly string GlobalConfigFile = Path.Combine(NuGetDefenseFolder, DefaultSettingsFileName);
-
-
-
+    public static readonly string GlobalConfigFile = Path.Combine(NuGetDefenseFolder, DefaultSettingsFileName);
 
     private string _nuGetFile;
     private string _projectFileName;
@@ -68,34 +69,27 @@ public class Scanner
 
         return exitCode;
     }
-    
+
     private void LoadSettings(ScanOptions options)
     {
         try
         {
             if (options.SettingsFile == null)
             {
-                string settingsFilePath = null;
+                string? settingsFilePath = null;
                 if (!string.IsNullOrWhiteSpace(options.ProjectFile?.DirectoryName))
                 {
                     var projectSettingsPath = Path.Combine(options.ProjectFile?.DirectoryName, DefaultSettingsFileName);
                     // Check Project Directory First for Settings
                     if (File.Exists(projectSettingsPath))
-                    {
                         settingsFilePath = projectSettingsPath;
-                    }
                     else if (File.Exists(Path.Combine(Directory.GetParent(projectSettingsPath)?.FullName ?? "", DefaultSettingsFileName)))
-                    {
                         // Use Parent Directory of Project if the Settings File exists there instead
                         settingsFilePath = Path.Combine(Directory.GetParent(projectSettingsPath)?.FullName ?? "", DefaultSettingsFileName);
-                    }
                 }
-                
+
                 // If SettingsPath is still not decided, use the global settings file or create it.
-                if (string.IsNullOrWhiteSpace(settingsFilePath))
-                {
-                    settingsFilePath = GlobalConfigFile;
-                }
+                if (string.IsNullOrWhiteSpace(settingsFilePath)) settingsFilePath = GlobalConfigFile;
 
                 _settings = Settings.LoadSettings(settingsFilePath);
             }
@@ -103,7 +97,7 @@ public class Scanner
             {
                 _settings = Settings.LoadSettingsFile(options.SettingsFile.FullName);
             }
-           
+
             _settings.WarnOnly = _settings.WarnOnly || options.WarnOnly;
             _settings.CheckTransitiveDependencies =
                 _settings.CheckTransitiveDependencies && options.CheckTransitiveDependencies;
@@ -245,19 +239,28 @@ public class Scanner
             {
                 Log.Logger.Verbose("Checking the embedded NVD source for Vulnerabilities");
 
-                foreach (var (proj, pkgs) in _projects)
+                if (File.Exists(VulnerabilityDataBin))
+                {
+                }
+
+                foreach (var (_, pkgs) in _projects)
                     vulnDict =
                         new NVD.Scanner(_nuGetFile, TimeSpan.FromSeconds(_settings.NVD.TimeoutInSeconds),
+                                new(_settings.NvdApi.ApiToken, UserAgentString),
+                                new(),
                                 _settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate)
                             .GetVulnerabilitiesForPackages(pkgs,
                                 vulnDict);
             }
 
-            Log.Logger.Information("ignoring {ignoredCVECount} Vulnerabilities", _settings.ErrorSettings.IgnoredCvEs.Length);
-            if (_settings.ErrorSettings.IgnoredCvEs.Length > 0)
-                VulnerabilityData.IgnoreCVEs(vulnDict, _settings.ErrorSettings.IgnoredCvEs);
+            if (_settings.ErrorSettings.IgnoredCvEs != null)
+            {
+                Log.Logger.Information("ignoring {ignoredCVECount} Vulnerabilities", _settings.ErrorSettings.IgnoredCvEs.Length);
+                if (_settings.ErrorSettings.IgnoredCvEs.Length > 0)
+                    VulnerabilityData.IgnoreCVEs(vulnDict, _settings.ErrorSettings.IgnoredCvEs);
+            }
 
-            ReportVulnerabilities(vulnDict);
+            if (vulnDict != null) ReportVulnerabilities(vulnDict);
         }
         catch (Exception e)
         {
@@ -268,6 +271,35 @@ public class Scanner
 
             throw;
         }
+    }
+
+    private async Task<Dictionary<string, Dictionary<string, VulnerabilityEntry>>> ReadFromBinFileAsync(string vulnDataFile)
+    {
+        var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray)
+            .WithSecurity(MessagePackSecurity.UntrustedData);
+
+        if (!File.Exists(vulnDataFile))
+            // TODO: Pass in API Key
+            return await VulnerabilityDataUpdater.CreateNewVulnDataBin(vulnDataFile, new(null, UserAgentString));
+
+        var startDateTime = DateTime.Now.AddSeconds(_settings.NVD.TimeoutInSeconds);
+        bool ableToReadVulnerabilityData;
+        do
+        {
+            try
+            {
+                await using var nvdData = File.Open(vulnDataFile, FileMode.Open, FileAccess.Read);
+                return await MessagePackSerializer.DeserializeAsync<Dictionary<string, Dictionary<string, VulnerabilityEntry>>>(nvdData, lz4Options);
+            }
+            catch (Exception e)
+            {
+                ableToReadVulnerabilityData = DateTime.Now <= startDateTime;
+                if (!ableToReadVulnerabilityData && _settings.NVD.BreakIfCannotRun)
+                    throw new TimeoutException($"Reading vulnerability data failed:'{vulnDataFile}'", e);
+            }
+        } while (ableToReadVulnerabilityData);
+
+        return new();
     }
 
     private void MergeVulnDict(ref Dictionary<string, Dictionary<string, Vulnerability>> vulnDict, ref Dictionary<string, Dictionary<string, Vulnerability>> vulnDict2)
@@ -297,7 +329,7 @@ public class Scanner
         }
     }
 
-    private Dictionary<string, NuGetPackage[]> LoadMultipleProjects(string TopLevelProject, IReadOnlyList<string> projects, bool specificFramework, string targetFramework,
+    private Dictionary<string, NuGetPackage[]> LoadMultipleProjects(string topLevelProject, IReadOnlyList<string> projects, bool specificFramework, string targetFramework,
         bool solutionFile = false)
     {
         var projectPackages = new Dictionary<string, NuGetPackage[]>();
@@ -308,7 +340,7 @@ public class Scanner
             var project = projects[i];
             // If the project is an SSIS project, skip it
             if (project.EndsWith(".dtproj")) continue;
-            var path = Path.Combine(Path.GetDirectoryName(TopLevelProject)!, project
+            var path = Path.Combine(Path.GetDirectoryName(topLevelProject)!, project
                 .Replace('\\', Path.DirectorySeparatorChar)
                 .Replace('/', Path.DirectorySeparatorChar));
 
@@ -339,25 +371,19 @@ public class Scanner
             projectPackages.Add(path, pkgs.ToArray());
         }
 
-        var nuGetFile = new NuGetFile(TopLevelProject);
+        var nuGetFile = new NuGetFile(topLevelProject);
         _nuGetFile = nuGetFile.Path;
 
-        if (!solutionFile && !projectPackages.ContainsKey(TopLevelProject))
-            projectPackages.Add(TopLevelProject, nuGetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray());
+        if (!solutionFile && !projectPackages.ContainsKey(topLevelProject))
+            projectPackages.Add(topLevelProject, nuGetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray());
 
         return projectPackages;
-    }
-
-    private static void ParseSolutionForProjects(string s)
-    {
-        // TODO: This will parse hte solution file into a list of projects relative to the solution file.
-        throw new NotImplementedException();
     }
 
     /// <summary>
     ///     Escapes all characters for Regex, then replaces '*' with '.*' (Regex wild Card for 0 or more of any character)
     /// </summary>
-    /// <param name="nuGetPackages"></param>
+    /// <param name="nonSensitives"></param>
     /// <returns>a list of packages that do not match the wild card strings in SensitivePackages</returns>
     public void GetNonSensitivePackages(out Dictionary<string, NuGetPackage[]> nonSensitives)
     {
@@ -371,7 +397,7 @@ public class Scanner
         Log.Logger.Verbose("Checking Allowed Packages");
 
         foreach (var (project, packages) in _projects)
-        foreach (var pkg in packages.Where(p => !_settings.ErrorSettings.AllowedPackages.Any(b =>
+        foreach (var pkg in packages.Where(p => _settings.ErrorSettings.AllowedPackages != null && !_settings.ErrorSettings.AllowedPackages.Any(b =>
                      b.Id == p.Id &&
                      (string.IsNullOrWhiteSpace(b.Version) || VersionRange.Parse(p.Version).Satisfies(new(b.Version))))))
         {
@@ -384,7 +410,7 @@ public class Scanner
         }
     }
 
-    private void ReportVulnerabilities(Dictionary<string, Dictionary<string, Vulnerability>> vulnDict)
+    private void ReportVulnerabilities(Dictionary<string, Dictionary<string, Vulnerability>>? vulnDict)
     {
         if (vulnDict == null)
         {
@@ -404,6 +430,7 @@ public class Scanner
                 NumberOfVulnerabilities += projectNumberOfVulnerabilities;
 
                 if (_settings.VulnerabilityReports.OutputTextReport) Log.Logger.Information(vulnReporter.VulnerabilityTextReport);
+                if (vulnReporter.MsBuildMessages == null) continue;
                 foreach (var msBuildMessage in vulnReporter.MsBuildMessages)
                 {
                     Console.WriteLine(msBuildMessage);
@@ -432,9 +459,9 @@ public class Scanner
 
             if (string.IsNullOrWhiteSpace(_settings.VulnerabilityReports.XmlReportPath)) return;
             var filename = _settings.VulnerabilityReports.XmlReportPath.Replace("{project}", _projectFileName);
-            var xmlser = new XmlTextWriter(File.Create(filename), Encoding.Default);
-            var xser = new XmlSerializer(typeof(VulnerabilityReport));
-            xser.Serialize(xmlser, vulnReporter.Report);
+            var xmlTextWriter = new XmlTextWriter(File.Create(filename), Encoding.Default);
+            var xmlSerializer = new XmlSerializer(typeof(VulnerabilityReport));
+            xmlSerializer.Serialize(xmlTextWriter, vulnReporter.Report);
         }
     }
 

@@ -22,8 +22,8 @@
         <Authors>Curtis Carter</Authors>
         <Description>NuGetDefense ~ Check for Known Vulnerabilities at Build</Description>
         <PackageDescription>NuGetDefense was inspired by [OWASP SafeNuGet](https://nuget.org/packages/SafeNuGet/) but aims to check with multiple sources for known vulnerabilities.</PackageDescription>
-        <Copyright>Curtis Carter 2022</Copyright>
-        <Version>3.1.0.0</Version>
+        <Copyright>Curtis Carter 2023</Copyright>
+        <Version>3.2.0.0-prerelease6</Version>
         <RepositoryType>git</RepositoryType>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
@@ -31,19 +31,19 @@
     <ItemGroup>
         <None Include="../../README.md" Pack="true" PackagePath="\" />
         <PackageReference Include="ByteDev.DotNet" Version="7.2.1" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.4" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.11" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="NuGet.Versioning" Version="6.5.0" />
-        <PackageReference Include="NuGetDefense.Core" Version="2.0.5" />
-        <PackageReference Include="NuGetDefense.GitHubAdvisoryDatabase" Version="2.0.3" />
-        <PackageReference Include="NuGetDefense.NVD" Version="2.0.9.1" />
-        <PackageReference Include="NuGetDefense.OSSIndex" Version="2.1.0" />
+        <PackageReference Include="NuGet.Versioning" Version="6.7.0" />
+        <PackageReference Include="NuGetDefense.Core" Version="2.0.6" />
+        <PackageReference Include="NuGetDefense.GitHubAdvisoryDatabase" Version="2.0.4" />
+        <PackageReference Include="NuGetDefense.NVD" Version="2.1.0-prelease3" />
+        <PackageReference Include="NuGetDefense.OSSIndex" Version="2.1.1" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-        <PackageReference Include="System.Text.Json" Version="7.0.2" />
+        <PackageReference Include="System.Text.Json" Version="7.0.3" />
     </ItemGroup>
 
     <ItemGroup>

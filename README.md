@@ -10,11 +10,16 @@ View the full documentation for NuGetDefense [here](https://digitalcoyote.github
 
 3.x preview documentation can be found by running `dotnet /path/to/NuGetDefense.dll -?`
 
+## Prerelease
+
+This prerelease uses the NVD 2.0 API and does not support offline NVD scanning. This includes offline vuln data support that is updatable using the dotnet tool.
+
 ## Features
 
 * Uses Multiple Sources to check for known vulnerabilities in third-party libraries (NuGet packages)
     * [OSS Index](https://ossindex.sonatype.org/)
     * [National Vulnerability Database](https://nvd.nist.gov/) (Optionally Self-Updating)
+        * This product uses the NVD API but is not endorsed or certified by the NVD.
     * [GitHub Security Advisory Database](https://nvd.nist.gov/)
     * [Google's Open Source Vulnerabilities Database](https://osv.dev/) ([Coming Soon!](https://github.com/digitalcoyote/NuGetDefense/discussions/53))
 * Simple installation/configuration: the [NuGet Package](https://www.nuget.org/packages/NuGetDefense/) is all you need.
