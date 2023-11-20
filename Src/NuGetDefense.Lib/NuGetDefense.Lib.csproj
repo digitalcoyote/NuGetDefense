@@ -31,8 +31,8 @@
     <ItemGroup>
         <None Include="../../README.md" Pack="true" PackagePath="\" />
         <PackageReference Include="ByteDev.DotNet" Version="7.2.1" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.11" />
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.13" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -41,9 +41,9 @@
         <PackageReference Include="NuGetDefense.GitHubAdvisoryDatabase" Version="2.0.4" />
         <PackageReference Include="NuGetDefense.NVD" Version="2.1.0-prelease3" />
         <PackageReference Include="NuGetDefense.OSSIndex" Version="2.1.1" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="5.0.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-        <PackageReference Include="System.Text.Json" Version="7.0.3" />
+        <PackageReference Include="System.Text.Json" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
