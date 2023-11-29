@@ -41,7 +41,7 @@
         <PackageReference Include="NuGetDefense.GitHubAdvisoryDatabase" Version="2.0.4" />
         <PackageReference Include="NuGetDefense.NVD" Version="2.1.0-prelease3" />
         <PackageReference Include="NuGetDefense.OSSIndex" Version="2.1.1" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="5.0.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
         <PackageReference Include="System.Text.Json" Version="8.0.0" />
     </ItemGroup>
