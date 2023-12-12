@@ -17,3 +17,4 @@ Src/TestFiles/net461.TestLib/Scripts/
 **/.vs/*
 
 *.sqlite
+/Src/NuGetDefense/Properties/launchSettings.json

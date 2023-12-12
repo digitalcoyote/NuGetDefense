@@ -1,27 +1,48 @@
 {
   "WarnOnly": false,
-  "VulnerabilityReports": {},
+  "VulnerabilityReports": {
+    "OutputTextReport": true
+  },
   "CheckTransitiveDependencies": true,
+  "CheckReferencedProjects": false,
   "ErrorSettings": {
-    "ErrorSeverityThreshold": 5,
+    "ErrorSeverityThreshold": "any",
     "Cvss3Threshold": -1,
     "IgnoredPackages": [
       {
         "Id": "NugetDefense"
+      },
+      {
+        "Id": "Microsoft.AspNetCore.SpaServices"
+      },
+      {
+        "Id": "Microsoft.AspNetCore.SpaServices.Extension"
       }
     ],
     "IgnoredCvEs": [],
     "AllowedPackages": [],
-    "BlockedPackages": []
+    "WhiteListedPackages": [],
+    "BlockedPackages": [],
+    "BlacklistedPackages": []
   },
   "OssIndex": {
+    "ApiToken": "",
+    "Username": "",
+    "Enabled": false,
+    "BreakIfCannotRun": false
+  },
+  "GitHubAdvisoryDatabase": {
+    "ApiTokenComment": "Embedding an API Key in a configuration file is usually a bad idea and this will hopefully be short-lived. However it is safe here because the API key actually has 0 permissions, but it allows an increased API rate just for it's existance'",
+    "ApiToken": "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",
+    "Username": "a-teece",
     "Enabled": true,
     "BreakIfCannotRun": true
   },
   "NVD": {
     "SelfUpdate": false,
     "TimeoutInSeconds": 15,
-    "Enabled": true,
+    "Enabled": false,
     "BreakIfCannotRun": true
-  }
+  },
+  "SensitivePackages": []
 }
