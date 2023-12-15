@@ -37,9 +37,9 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="NuGet.Versioning" Version="6.8.0" />
-        <PackageReference Include="NuGetDefense.Core" Version="2.0.6" />
+        <PackageReference Include="NuGetDefense.Core" Version="2.0.7" />
         <PackageReference Include="NuGetDefense.GitHubAdvisoryDatabase" Version="2.0.4" />
-        <PackageReference Include="NuGetDefense.NVD" Version="2.1.0-prelease3" />
+        <PackageReference Include="NuGetDefense.NVD" Version="2.1.0" />
         <PackageReference Include="NuGetDefense.OSSIndex" Version="2.1.1" />
         <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
