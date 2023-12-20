@@ -41,16 +41,15 @@ This prerelease uses the NVD 2.0 API and does not support offline NVD scanning. 
 
 ## Requirements
 
-* NuGetDefense v1.x is built only in .Net Core 3.1 so you will need the runtime/SDK installed.
-* NuGetDefense v2.x is built only in .Net 5.0 so you will need the runtime/SDK installed. (.Net 5.0 is our of support)
 * NuGetDefense v3.x is built only in .Net 6.0 so you will need the runtime/SDK installed.
+* NuGetDefense v4.x is built only in .Net 8.0 so you will need the runtime/SDK installed.
 
 ## Unsupported Versions
 
 * Official Support follows support for the underlying framework.
 * Supporters can request support of unsupported versions (such as v2.x running on .Net 5) but are advised to use a
   supported runtime (for better overall security)
-    * .Net 5 projects can use 3.x as long as the .Net 6 runtime is installed.
+    * older .Net projects can use 4.x as long as the .Net 8 runtime is installed.
 
 ## How does it work?
 

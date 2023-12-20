@@ -2,13 +2,13 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Title>NuGetDefense</Title>
         <Authors>Curtis Carter</Authors>
         <Description>NuGetDefense ~ Check for Known Vulnerabilities at Build</Description>
         <PackageDescription>NuGetDefense was inspired by [OWASP SafeNuGet](https://nuget.org/packages/SafeNuGet/) but aims to check with multiple sources for known vulnerabilities.</PackageDescription>
         <Copyright>Curtis Carter 2022</Copyright>
-        <LangVersion>10</LangVersion>
+        <LangVersion>12</LangVersion>
         <Configurations>Debug;Release;DotNetTool</Configurations>
         <Platforms>AnyCPU</Platforms>
         <PackageProjectUrl>https://digitalcoyote.github.io/NuGetDefense/</PackageProjectUrl>
@@ -21,8 +21,9 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Nullable>enable</Nullable>
-        <AssemblyVersion>3.2.0.0</AssemblyVersion>
-        <FileVersion>3.2.0.0</FileVersion>
+        <AssemblyVersion>4.0.0.0-prerelase1</AssemblyVersion>
+        <FileVersion>4.0.0.0-prerelase1</FileVersion>
+        <PackageIcon>icon.png</PackageIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -36,7 +37,7 @@
         <PackageId>NuGetDefense.Tool</PackageId>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>nugetdefense</ToolCommandName>
-        <Version>3.2.0.0</Version>
+        <Version>4.0.0.0-prerelase1</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
     <ItemGroup>
@@ -68,7 +69,7 @@
 
     <ItemGroup>
         <None Remove="NuGetDefense.nuspec"/>
-        <Content Condition="'$(Configuration)'=='DOTNETTOOL'" Include="bin\Release\net6.0\VulnerabilityData.bin">
+        <Content Condition="'$(Configuration)'=='DOTNETTOOL'" Include="bin\Release\net8.0\VulnerabilityData.bin">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
         <Content Include="NuGetDefense.nuspec"/>
