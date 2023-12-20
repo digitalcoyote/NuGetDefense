@@ -8,7 +8,7 @@ An MSBuildTask that checks for known vulnerabilities. Inspired by [OWASP SafeNuG
 
 View the full documentation for NuGetDefense [here](https://digitalcoyote.github.io/NuGetDefense/)
 
-3.x preview documentation can be found by running `dotnet /path/to/NuGetDefense.dll -?`
+4.x preview documentation can be found by running `dotnet /path/to/NuGetDefense.dll -?`
 
 ## Prerelease
 
