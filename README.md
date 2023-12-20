@@ -10,9 +10,6 @@ View the full documentation for NuGetDefense [here](https://digitalcoyote.github
 
 4.x preview documentation can be found by running `dotnet /path/to/NuGetDefense.dll -?`
 
-## Prerelease
-
-This prerelease uses the NVD 2.0 API and does not support offline NVD scanning. This includes offline vuln data support that is updatable using the dotnet tool.
 
 ## Features
 
