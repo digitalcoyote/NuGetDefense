@@ -3,7 +3,7 @@
     <metadata>
         <id>NuGetDefense</id>
         <title>NuGetDefense</title>
-        <version>4.0.0.0</version>
+        <version>4.0.0.1</version>
         <authors>Curtis Carter</authors>
         <owners>Curtis Carter</owners>
         <projectUrl>https://digitalcoyote.github.io/NuGetDefense/</projectUrl>
@@ -12,7 +12,7 @@
         <description>
             vulnerabilities.
         </description>
-        <releaseNotes>https://github.com/digitalcoyote/NuGetDefense/releases/tag/v4.0.0.0</releaseNotes>
+        <releaseNotes>https://github.com/digitalcoyote/NuGetDefense/releases/tag/v4.0.0.1</releaseNotes>
         <repository type="git" url="https://github.com/digitalcoyote/NuGetDefense.git"/>
         <license type="expression">MIT</license>
         <icon>images\icon.png</icon>
