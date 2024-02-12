@@ -23,7 +23,7 @@
         <Description>NuGetDefense ~ Check for Known Vulnerabilities at Build</Description>
         <PackageDescription>NuGetDefense was inspired by [OWASP SafeNuGet](https://nuget.org/packages/SafeNuGet/) but aims to check with multiple sources for known vulnerabilities.</PackageDescription>
         <Copyright>Curtis Carter 2023</Copyright>
-        <Version>4.0.0.1</Version>
+        <Version>4.0.1.0</Version>
         <RepositoryType>git</RepositoryType>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
