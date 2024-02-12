@@ -32,4 +32,9 @@
         <ProjectReference Include="..\NuGetDefense\NuGetDefense.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="TestFiles\*.*">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 </Project>

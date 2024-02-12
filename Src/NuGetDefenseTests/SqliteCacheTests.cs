@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Data.Sqlite;
-using NuGetDefense;
-using NuGetDefense.Core;
-using Xunit;
 
 namespace NuGetDefenseTests;
 
