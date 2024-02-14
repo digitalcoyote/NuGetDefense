@@ -3,7 +3,7 @@
     <metadata>
         <id>NuGetDefense</id>
         <title>NuGetDefense</title>
-        <version>3.2.0.0</version>
+        <version>3.2.1.0</version>
         <authors>Curtis Carter</authors>
         <owners>Curtis Carter</owners>
         <projectUrl>https://digitalcoyote.github.io/NuGetDefense/</projectUrl>
@@ -12,7 +12,7 @@
         <description>
             vulnerabilities.
         </description>
-        <releaseNotes>https://github.com/digitalcoyote/NuGetDefense/releases/tag/v3.2.0.0</releaseNotes>
+        <releaseNotes>https://github.com/digitalcoyote/NuGetDefense/releases/tag/v3.2.1.0</releaseNotes>
         <repository type="git" url="https://github.com/digitalcoyote/NuGetDefense.git"/>
         <license type="expression">MIT</license>
         <icon>images\icon.png</icon>
@@ -24,9 +24,7 @@
         <!-- <file src="Src/bin/Release/net461/NuGetDefense.exe" target="tools/net461/NuGetDefense.exe" /> -->
         <file src="build/nugetdefense.targets" target="build/nugetdefense.targets"/>
         <file src="icon.png" target="images\"/>
-        <file src="bin/Release/net6.0/**/*" target="tools/net6.0/"/>
+        <file src="bin/Release/net8.0/**/*" target="tools/net8.0/"/>
         <file src="..\..\README.md" target="\"/>
-        <!--    <file src="bin/Release/net6.0/System.Text.Json.dll" target="tools/net6.0/System.Text.Json.dll" /> Part of the Pre-installed Framework for .Net Core 3.0+-->
-        <!--        <file src="bin/Release/net6.0/VulnerabilityData.bin" target="tools/net6.0/VulnerabilityData.bin"/>-->
     </files>
 </package>

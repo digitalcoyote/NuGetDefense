@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,7 +22,7 @@ namespace NuGetDefense;
 
 public class Scanner
 {
-    public const string Version = "3.2.0.0";
+    public const string Version = "3.2.1.0";
     public const string UserAgentString = @$"NuGetDefense/{Version}";
     public const string DefaultSettingsFileName = "NuGetDefense.json";
     public const string DefaultVulnerabilityDataFileName = "VulnerabilityData.bin";
@@ -55,6 +56,8 @@ public class Scanner
     public int Scan(ScanOptions options)
     {
         int exitCode;
+        NumberOfVulnerabilities = 0;
+        _projects = new Dictionary<string, NuGetPackage[]>();
         try
         {
             LoadSettings(options);
@@ -62,9 +65,10 @@ public class Scanner
             ScanVulnerabilities(options);
             exitCode = _settings.WarnOnly ? 0 : NumberOfVulnerabilities;
         }
-        catch (Exception)
+        catch (Exception e)
         {
             exitCode = -1;
+            Debug.WriteLine(e);
         }
 
         return exitCode;
@@ -187,11 +191,20 @@ public class Scanner
             var nonSensitivePackageIDs = nonSensitivePackages.SelectMany(p => p.Value).ToArray();
             if (_settings.OssIndex.Enabled)
             {
-                const string OssIndexSourceID = "OSSIndex";
-                var uncachedPkgs = options.Cache.GetUncachedPackages(nonSensitivePackageIDs, TimeSpan.FromDays(1), OssIndexSourceID, out var cachedPackages);
-
+                const string ossIndexSourceId = "OSSIndex";
+                var uncachedPkgs = options.Cache.GetUncachedPackages(nonSensitivePackageIDs, TimeSpan.FromDays(1), ossIndexSourceId, out var cachedPackages);
+                var modUncached = uncachedPkgs.Count % 128;
+                if (modUncached > 0)
+                {
+                    for (var i = cachedPackages.Length - 1; i >= cachedPackages.Length - modUncached; i--)
+                    {
+                        uncachedPkgs.Add(cachedPackages[i]);
+                    }
+                    
+                    cachedPackages = cachedPackages[..^modUncached];
+                }
                 // Round out the calls to have a full set of packages each to refresh oldest cached packages
-                if (uncachedPkgs.Count > 0) uncachedPkgs.AddRange(cachedPackages.Take(128 - uncachedPkgs.Count % 128));
+                if (uncachedPkgs.Count > 0) uncachedPkgs.AddRange(cachedPackages.Take(uncachedPkgs.Count % 128));
 
                 Log.Logger.Verbose("Checking with OSSIndex for Vulnerabilities");
                 vulnDict =
@@ -201,10 +214,10 @@ public class Scanner
                     // If we failed to update the OSS Index data don't clear out old cached data as that will
                     // increase the number of requests next time, increasing the liklihood of further
                     // TooManyRequeusts responses.
-                    options.Cache.UpdateCache(vulnDict, uncachedPkgs, OssIndexSourceID);
+                    options.Cache.UpdateCache(vulnDict, uncachedPkgs, ossIndexSourceId);
 
                 // Skipping the packages we refreshed
-                options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages.Skip(128 - uncachedPkgs.Count % 128), OssIndexSourceID, ref vulnDict);
+                options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages.Skip(uncachedPkgs.Count % 128), ossIndexSourceId, ref vulnDict);
             }
 
             if (_settings.GitHubAdvisoryDatabase.Enabled)
@@ -218,20 +231,29 @@ public class Scanner
                 }
                 else
                 {
-                    const string GitHubAdvisoryDatabaseSourceId = "GitHubSecurityAdvisoryDatabase";
-                    var uncachedPkgs = options.Cache.GetUncachedPackages(nonSensitivePackageIDs, TimeSpan.FromDays(1), GitHubAdvisoryDatabaseSourceId, out var cachedPackages);
-
+                    const string gitHubAdvisoryDatabaseSourceId = "GitHubSecurityAdvisoryDatabase";
+                    var uncachedPkgs = options.Cache.GetUncachedPackages(nonSensitivePackageIDs, TimeSpan.FromDays(1), gitHubAdvisoryDatabaseSourceId, out var cachedPackages);
+                    var modUncached = uncachedPkgs.Count % 128;
+                    if (modUncached > 0)
+                    {
+                        for (var i = cachedPackages.Length - 1; i >= cachedPackages.Length - modUncached; i--)
+                        {
+                            uncachedPkgs.Add(cachedPackages[i]);
+                        }
+                    
+                        cachedPackages = cachedPackages[..^modUncached];
+                    }
                     Log.Logger.Verbose("Checking the GitHub Security Advisory Database for Vulnerabilities");
                     var ghsaVulnDict =
                         new GitHubAdvisoryDatabase.Scanner(_nuGetFile, _settings.GitHubAdvisoryDatabase.ApiToken, _settings.GitHubAdvisoryDatabase.BreakIfCannotRun)
                             .GetVulnerabilitiesForPackages(uncachedPkgs.ToArray());
-                    options.Cache.UpdateCache(ghsaVulnDict, uncachedPkgs, GitHubAdvisoryDatabaseSourceId);
+                    options.Cache.UpdateCache(ghsaVulnDict, uncachedPkgs, gitHubAdvisoryDatabaseSourceId);
 
                     if (vulnDict == null)
                         vulnDict = ghsaVulnDict;
                     else
                         MergeVulnDict(ref vulnDict, ref ghsaVulnDict);
-                    options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages, GitHubAdvisoryDatabaseSourceId, ref vulnDict);
+                    options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages, gitHubAdvisoryDatabaseSourceId, ref vulnDict);
                 }
             }
 

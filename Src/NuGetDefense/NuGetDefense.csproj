@@ -21,8 +21,9 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Nullable>enable</Nullable>
-        <AssemblyVersion>3.2.0.0</AssemblyVersion>
-        <FileVersion>3.2.0.0</FileVersion>
+        <AssemblyVersion>3.2.1.0</AssemblyVersion>
+        <FileVersion>3.2.1.0</FileVersion>
+        <PackageIcon>icon.png</PackageIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -36,7 +37,7 @@
         <PackageId>NuGetDefense.Tool</PackageId>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>nugetdefense</ToolCommandName>
-        <Version>3.2.0.0</Version>
+        <Version>3.2.1.0</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
     <ItemGroup>
@@ -63,12 +64,11 @@
 
     <ItemGroup>
         <None Remove="Tests\**"/>
-        <None Include="TestFiles\test.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
         <None Remove="NuGetDefense.nuspec"/>
-        <Content Condition="'$(Configuration)'=='DOTNETTOOL'" Include="bin\Release\net6.0\VulnerabilityData.bin">
+        <Content Condition="'$(Configuration)'=='DOTNETTOOL'" Include="bin\Release\net8.0\VulnerabilityData.bin">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
         <Content Include="NuGetDefense.nuspec"/>
