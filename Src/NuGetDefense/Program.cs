@@ -183,7 +183,7 @@ public static class Program
             new Dictionary<string, Dictionary<string, VulnerabilityEntry>>();
         await VulnerabilityDataUpdater.CreateNewVulnDataBin(vulnDataFile?.FullName ?? Scanner.DefaultVulnerabilityDataFileName, new (apiKey, Scanner.UserAgentString));
         vulnDict.MakeCorrections();
-
+        if(vulnDataFile?.Directory != null) Directory.CreateDirectory(vulnDataFile.Directory.FullName);
         VulnerabilityData.SaveToBinFile(vulnDict, vulnDataFile?.FullName ?? Scanner.DefaultVulnerabilityDataFileName, TimeSpan.FromMinutes(10));
     }
 

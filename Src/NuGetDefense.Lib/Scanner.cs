@@ -194,7 +194,7 @@ public class Scanner
                 const string ossIndexSourceId = "OSSIndex";
                 var uncachedPkgs = options.Cache.GetUncachedPackages(nonSensitivePackageIDs, TimeSpan.FromDays(1), ossIndexSourceId, out var cachedPackages);
                 var modUncached = uncachedPkgs.Count % 128;
-                if (modUncached > 0)
+                if (modUncached > 0 && cachedPackages.Length > 0)
                 {
                     for (var i = cachedPackages.Length - 1; i >= cachedPackages.Length - modUncached; i--)
                     {
@@ -234,7 +234,7 @@ public class Scanner
                     const string gitHubAdvisoryDatabaseSourceId = "GitHubSecurityAdvisoryDatabase";
                     var uncachedPkgs = options.Cache.GetUncachedPackages(nonSensitivePackageIDs, TimeSpan.FromDays(1), gitHubAdvisoryDatabaseSourceId, out var cachedPackages);
                     var modUncached = uncachedPkgs.Count % 128;
-                    if (modUncached > 0)
+                    if (modUncached > 0 && cachedPackages.Length > 0)
                     {
                         for (var i = cachedPackages.Length - 1; i >= cachedPackages.Length - modUncached; i--)
                         {
