@@ -211,11 +211,13 @@ public static class Program
             commandContext.ExitCode = new Scanner().Scan(new()
             {
                 CheckReferencedProjects = checkReferencedProjects,
-                CheckTransitiveDependencies = checkReferencedProjects,
+                CheckTransitiveDependencies = checkTransitiveDependencies,
                 IgnoreCves = ignoreCves,
                 IgnorePackages = ignorePackages,
                 ProjectFile = projectFile,
                 SettingsFile = settingsFile,
+                Tfm = tfm,
+                WarnOnly = warnOnly,
                 Cache = VulnerabilityCache.GetSqliteCache(cacheLocation)
             });
     }
