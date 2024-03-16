@@ -22,7 +22,7 @@ namespace NuGetDefense;
 
 public class Scanner
 {
-    public const string Version = "3.2.3.0";
+    public const string Version = "3.2.4.0";
     public const string UserAgentString = @$"NuGetDefense/{Version}";
     public const string DefaultSettingsFileName = "NuGetDefense.json";
     public const string DefaultVulnerabilityDataFileName = "VulnerabilityData.bin";
@@ -196,12 +196,13 @@ public class Scanner
                 var modUncached = uncachedPkgs.Count % 128;
                 if (modUncached > 0 && cachedPackages.Length > 0)
                 {
-                    for (var i = cachedPackages.Length - 1; i >= cachedPackages.Length - modUncached; i--)
+                    var rescanCount = Math.Min(128 - modUncached, cachedPackages.Length);
+                    for (var i = cachedPackages.Length - 1; i >= 0; i--)
                     {
                         uncachedPkgs.Add(cachedPackages[i]);
                     }
-                    
-                    cachedPackages = cachedPackages[..^modUncached];
+
+                    cachedPackages = cachedPackages[..^rescanCount];
                 }
                 // Round out the calls to have a full set of packages each to refresh oldest cached packages
                 if (uncachedPkgs.Count > 0) uncachedPkgs.AddRange(cachedPackages.Take(uncachedPkgs.Count % 128));
@@ -236,12 +237,13 @@ public class Scanner
                     var modUncached = uncachedPkgs.Count % 128;
                     if (modUncached > 0 && cachedPackages.Length > 0)
                     {
-                        for (var i = cachedPackages.Length - 1; i >= cachedPackages.Length - modUncached; i--)
+                        var rescanCount = Math.Min(128 - modUncached, cachedPackages.Length);
+                        for (var i = cachedPackages.Length - 1; i >= 0; i--)
                         {
                             uncachedPkgs.Add(cachedPackages[i]);
                         }
-                    
-                        cachedPackages = cachedPackages[..^modUncached];
+
+                        cachedPackages = cachedPackages[..^rescanCount];
                     }
                     Log.Logger.Verbose("Checking the GitHub Security Advisory Database for Vulnerabilities");
                     var ghsaVulnDict =
