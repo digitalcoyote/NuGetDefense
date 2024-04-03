@@ -277,11 +277,11 @@ public class Scanner
                                 vulnDict);
             }
 
-            if (_settings.ErrorSettings.IgnoredCvEs != null)
+            if (_settings.ErrorSettings.IgnoredCvEs is { Length: > 0 })
             {
-                Log.Logger.Information("ignoring {ignoredCVECount} Vulnerabilities", _settings.ErrorSettings.IgnoredCvEs.Length);
-                if (_settings.ErrorSettings.IgnoredCvEs.Length > 0)
-                    VulnerabilityData.IgnoreCVEs(vulnDict, _settings.ErrorSettings.IgnoredCvEs);
+                Log.Logger.Information("ignoring {ignoredCVECount} Vulnerabilities",
+                    _settings.ErrorSettings.IgnoredCvEs.Length);
+                VulnerabilityData.IgnoreCVEs(vulnDict, _settings.ErrorSettings.IgnoredCvEs);
             }
 
             if (vulnDict != null) ReportVulnerabilities(vulnDict);

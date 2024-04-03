@@ -32,7 +32,7 @@ public class SqliteCacheTests : IDisposable
         const string packageVersion = "1.2.3-123Test";
         var pkgs = new[]
         {
-            new NuGetPackage { Version = packageVersion, Dependencies = Array.Empty<string>(), Id = packageId }
+            new NuGetPackage { Version = packageVersion, Dependencies = [], Id = packageId }
         };
 
         cache.UpdateCache(new(), pkgs, TestSourceID);
@@ -52,8 +52,8 @@ public class SqliteCacheTests : IDisposable
         const string packageVersion = "1.2.3-123Test";
         var pkgs = new[]
         {
-            new NuGetPackage { Version = "4.5.2", Dependencies = Array.Empty<string>(), Id = "no_vulns" },
-            new NuGetPackage { Version = packageVersion, Dependencies = Array.Empty<string>(), Id = packageId }
+            new NuGetPackage { Version = "4.5.2", Dependencies = [], Id = "no_vulns" },
+            new NuGetPackage { Version = packageVersion, Dependencies = [], Id = packageId }
         };
 
         Dictionary<string, Dictionary<string, Vulnerability>> vulns = new()
@@ -96,8 +96,8 @@ public class SqliteCacheTests : IDisposable
         const string packageVersion = "1.2.3-123Test";
         var pkgs = new[]
         {
-            new NuGetPackage { Version = "4.5.2", Dependencies = Array.Empty<string>(), Id = "no_vulns" },
-            new NuGetPackage { Version = packageVersion, Dependencies = Array.Empty<string>(), Id = packageId }
+            new NuGetPackage { Version = "4.5.2", Dependencies = [], Id = "no_vulns" },
+            new NuGetPackage { Version = packageVersion, Dependencies = [], Id = packageId }
         };
 
         Dictionary<string, Dictionary<string, Vulnerability>> vulns = new()
@@ -133,8 +133,8 @@ public class SqliteCacheTests : IDisposable
         const string packageVersion = "1.2.3-123Test";
         var pkgs = new[]
         {
-            new NuGetPackage { Version = "4.5.2", Dependencies = Array.Empty<string>(), Id = "no_vulns" },
-            new NuGetPackage { Version = packageVersion, Dependencies = Array.Empty<string>(), Id = packageId }
+            new NuGetPackage { Version = "4.5.2", Dependencies = [], Id = "no_vulns" },
+            new NuGetPackage { Version = packageVersion, Dependencies = [], Id = packageId }
         };
 
         Dictionary<string, Dictionary<string, Vulnerability>> vulns = new()
