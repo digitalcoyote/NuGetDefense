@@ -22,7 +22,7 @@ namespace NuGetDefense;
 
 public class Scanner
 {
-    public const string Version = "4.0.4.0";
+    public const string Version = "4.1.0-pre0001";
     public const string UserAgentString = @$"NuGetDefense/{Version}";
     public const string DefaultSettingsFileName = "NuGetDefense.json";
     public const string DefaultVulnerabilityDataFileName = "VulnerabilityData.bin";
@@ -131,8 +131,8 @@ public class Scanner
     {
         try
         {
-            var projectFullName = options.ProjectFile.FullName;
-            if (options.ProjectFile.Extension.Equals(".sln", StringComparison.OrdinalIgnoreCase))
+            var projectFullName = options.ProjectFile?.FullName;
+            if (options.ProjectFile != null && options.ProjectFile.Extension.Equals(".sln", StringComparison.OrdinalIgnoreCase))
             {
                 var projects = DotNetSolution.Load(projectFullName).Projects.Where(p => !p.Type.IsSolutionFolder).Select(p => p.Path).ToArray();
                 var specificFramework = !string.IsNullOrWhiteSpace(options.Tfm);
@@ -176,7 +176,7 @@ public class Scanner
             }
 
             GetNonSensitivePackages(out var nonSensitivePackages);
-            if (_settings.ErrorSettings.IgnoredPackages.Length > 0)
+            if (_settings.ErrorSettings.IgnoredPackages is { Length: > 0 })
                 foreach (var (proj, packages) in _projects.ToArray())
                 {
                     UtilityMethods.IgnorePackages(in packages, _settings.ErrorSettings.IgnoredPackages, out var projPackages);
@@ -185,8 +185,8 @@ public class Scanner
 
             Log.Logger.Information("Loaded {packageCount} packages", _projects.Sum(p => p.Value.Length));
 
-            if (_settings.ErrorSettings.BlockedPackages.Length > 0) CheckBlockedPackages();
-            if (_settings.ErrorSettings.AllowedPackages.Length > 0) CheckAllowedPackages();
+            if (_settings.ErrorSettings.BlockedPackages is { Length: > 0 }) CheckBlockedPackages();
+            if (_settings.ErrorSettings.AllowedPackages is { Length: > 0 }) CheckAllowedPackages();
             Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null;
             var nonSensitivePackageIDs = nonSensitivePackages.SelectMany(p => p.Value).ToArray();
             if (_settings.OssIndex.Enabled)
