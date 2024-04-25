@@ -22,7 +22,7 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Nullable>enable</Nullable>
         <AssemblyVersion>4.1.0</AssemblyVersion>
-        <FileVersion>4.1.0-pre0001</FileVersion>
+        <FileVersion>4.1.0-pre0002</FileVersion>
         <PackageIcon>icon.png</PackageIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
@@ -37,7 +37,7 @@
         <PackageId>NuGetDefense.Tool</PackageId>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>nugetdefense</ToolCommandName>
-        <Version>4.1.0-pre0001</Version>
+        <Version>4.1.0-pre0002</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
     <ItemGroup>
