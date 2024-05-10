@@ -87,7 +87,7 @@ public class Scanner
                     // Check Project Directory First for Settings
                     if (File.Exists(projectSettingsPath))
                         settingsFilePath = projectSettingsPath;
-                    else if (File.Exists(Path.Combine(Directory.GetParent(projectSettingsPath)?.FullName ?? "", DefaultSettingsFileName)))
+                    else if (File.Exists(Path.Combine(Directory.GetParent(projectSettingsPath)?.Parent?.FullName ?? "", DefaultSettingsFileName)))
                         // Use Parent Directory of Project if the Settings File exists there instead
                         settingsFilePath = Path.Combine(Directory.GetParent(projectSettingsPath)?.FullName ?? "", DefaultSettingsFileName);
                 }
