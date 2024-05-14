@@ -22,7 +22,7 @@ namespace NuGetDefense;
 
 public class Scanner
 {
-    public const string Version = "4.2.2";
+    public const string Version = "4.1.1";
     public const string UserAgentString = @$"NuGetDefense/{Version}";
     public const string DefaultSettingsFileName = "NuGetDefense.json";
     public const string DefaultVulnerabilityDataFileName = "VulnerabilityData.bin";
@@ -80,7 +80,8 @@ public class Scanner
         {
             if (options.SettingsFile == null)
             {
-                Console.WriteLine("Determining settings file location");
+                
+                Log.Logger.Information("Determining settings file location");
                 string? settingsFilePath = null;
                 if (!string.IsNullOrWhiteSpace(options.ProjectFile?.DirectoryName))
                 {
@@ -88,14 +89,15 @@ public class Scanner
                     // Check Project Directory First for Settings
                     if (File.Exists(projectSettingsPath))
                     { 
-                        Console.WriteLine($"NuGetDefense: Using project level settings file at: {projectSettingsPath}");
+                        Log.Logger.Information($"NuGetDefense: Using project level settings file at: {projectSettingsPath}");
+
                         settingsFilePath = projectSettingsPath;
                     }
                     else if (File.Exists(Path.Combine(Directory.GetParent(projectSettingsPath)?.Parent?.FullName ?? "", DefaultSettingsFileName)))
                     { 
                         // Use Parent Directory of Project if the Settings File exists there instead
                         settingsFilePath = Path.Combine(Directory.GetParent(projectSettingsPath)?.FullName ?? "", DefaultSettingsFileName);
-                        Console.WriteLine($"NuGetDefense: Using project level settings file at parent folder: {settingsFilePath}");
+                        Log.Logger.Information($"NuGetDefense: Using project level settings file at parent folder: {settingsFilePath}");
                     }
                 }
 
@@ -103,7 +105,7 @@ public class Scanner
                 if (string.IsNullOrWhiteSpace(settingsFilePath)) 
                 {
 
-                    Console.WriteLine($"NuGetDefense: Using global level settings file at: {GlobalConfigFile}");
+                    Log.Logger.Information($"NuGetDefense: Using global level settings file at: {GlobalConfigFile}");
                     settingsFilePath = GlobalConfigFile;
                 }
 
@@ -111,7 +113,7 @@ public class Scanner
             }
             else
             {
-                Console.WriteLine($"NuGetDefense: Using argument-driven settings file at: {options.SettingsFile.FullName}");
+                Log.Logger.Information($"NuGetDefense: Using argument-driven settings file at: {options.SettingsFile.FullName}");
                 _settings = Settings.LoadSettingsFile(options.SettingsFile.FullName);
             }
 
