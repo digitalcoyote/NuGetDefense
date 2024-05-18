@@ -110,7 +110,7 @@ public static class Program
             }
             else
             {
-                Settings.LoadSettings();
+                Settings.CreateDefaultSettingsFile(Scanner.GlobalConfigFile);
             }
         }
         if (vulnDataFile == null)

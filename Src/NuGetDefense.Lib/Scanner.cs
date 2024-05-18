@@ -43,7 +43,7 @@ public class Scanner
     /// </summary>
     public static readonly string GlobalConfigFile = Path.Combine(NuGetDefenseFolder, DefaultSettingsFileName);
 
-    private string _nuGetFile;
+    private string? _nuGetFile;
     private string _projectFileName;
     private Dictionary<string, NuGetPackage[]> _projects;
     private Settings _settings;
@@ -85,7 +85,7 @@ public class Scanner
                 string? settingsFilePath = null;
                 if (!string.IsNullOrWhiteSpace(options.ProjectFile?.DirectoryName))
                 {
-                    var projectSettingsPath = Path.Combine(options.ProjectFile?.DirectoryName, DefaultSettingsFileName);
+                    var projectSettingsPath = Path.Combine(options.ProjectFile?.DirectoryName!, DefaultSettingsFileName);
                     // Check Project Directory First for Settings
                     if (File.Exists(projectSettingsPath))
                     { 
@@ -104,7 +104,6 @@ public class Scanner
                 // If SettingsPath is still not decided, use the global settings file or create it.
                 if (string.IsNullOrWhiteSpace(settingsFilePath)) 
                 {
-
                     Log.Logger.Information($"NuGetDefense: Using global level settings file at: {GlobalConfigFile}");
                     settingsFilePath = GlobalConfigFile;
                 }

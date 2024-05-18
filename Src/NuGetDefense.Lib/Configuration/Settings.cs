@@ -48,29 +48,8 @@ public class Settings
 
         try
         {
-            // Edit to allow it to repeatedly check if hte file exists prior to multiple instances trying to save over it.
-            if (File.Exists(settingsFilePath))
-            {
-                settings = LoadSettingsFile(settingsFilePath);
-            }
-            else
-            {
-                settings = new();
-                SpinWait.SpinUntil(() =>
-                {
-                    try
-                    {
-                        if (SaveSettings(settings, settingsFilePath)) return true;
-                        settings = LoadSettingsFile(settingsFilePath);
-
-                        return true;
-                    }
-                    catch
-                    {
-                        return false;
-                    }
-                }, TimeSpan.FromMinutes(5));
-            }
+            // Edit to allow it to repeatedly check if the file exists prior to multiple instances trying to save over it.
+            settings = File.Exists(settingsFilePath) ? LoadSettingsFile(settingsFilePath) : CreateDefaultSettingsFile(settingsFilePath);
         }
         catch (Exception e)
         {
@@ -82,18 +61,38 @@ public class Settings
 #pragma warning disable 618
         if (settings.ErrorSettings.BlacklistedPackages != null)
             settings.ErrorSettings.BlockedPackages =
-                settings.ErrorSettings.BlockedPackages.Concat(settings.ErrorSettings.BlacklistedPackages).ToArray();
+                settings.ErrorSettings.BlockedPackages?.Concat(settings.ErrorSettings.BlacklistedPackages).ToArray();
         if (settings.ErrorSettings.WhiteListedPackages != null)
             settings.ErrorSettings.AllowedPackages =
-                settings.ErrorSettings.AllowedPackages.Concat(settings.ErrorSettings.WhiteListedPackages).ToArray();
+                settings.ErrorSettings.AllowedPackages?.Concat(settings.ErrorSettings.WhiteListedPackages).ToArray();
 #pragma warning restore 618
 
         return settings;
     }
 
+    public static Settings CreateDefaultSettingsFile(string settingsFilePath)
+    {
+        var defaultSettings = new Settings();
+        SpinWait.SpinUntil(() =>
+        {
+            try
+            {
+                if (SaveSettings(defaultSettings, settingsFilePath)) return true;
+                // Assume it failed to save because the file exists and try to load it
+                defaultSettings = LoadSettingsFile(settingsFilePath);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }, TimeSpan.FromMinutes(5));
+        return defaultSettings;
+    }
+
     public static Settings LoadSettingsFile(string settingsFilePath)
     {
-        Settings settings;
         var settingsFileContents = ReadSettingsFileWhenAble(settingsFilePath, TimeSpan.FromMinutes(5));
 
         var ops = new JsonSerializerOptions
@@ -105,7 +104,7 @@ public class Settings
             Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
         };
 
-        settings = JsonSerializer.Deserialize<Settings>(settingsFileContents, ops)!;
+        var settings = JsonSerializer.Deserialize<Settings>(settingsFileContents, ops)!;
         return settings;
     }
 
