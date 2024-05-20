@@ -22,7 +22,7 @@ namespace NuGetDefense;
 
 public class Scanner
 {
-    public const string Version = "4.1.1";
+    public const string Version = "4.1.2";
     public const string UserAgentString = @$"NuGetDefense/{Version}";
     public const string DefaultSettingsFileName = "NuGetDefense.json";
     public const string DefaultVulnerabilityDataFileName = "VulnerabilityData.bin";
@@ -277,13 +277,9 @@ public class Scanner
             {
                 Log.Logger.Verbose("Checking the embedded NVD source for Vulnerabilities");
 
-                if (File.Exists(VulnerabilityDataBin))
-                {
-                }
-
                 foreach (var (_, pkgs) in _projects)
                     vulnDict =
-                        new NVD.Scanner(_nuGetFile, TimeSpan.FromSeconds(_settings.NVD.TimeoutInSeconds),
+                        new NVD.Scanner(_nuGetFile, VulnerabilityDataBin,TimeSpan.FromSeconds(_settings.NVD.TimeoutInSeconds),
                                 new(_settings.NvdApi.ApiToken, UserAgentString),
                                 new(),
                                 _settings.NVD.BreakIfCannotRun, _settings.NVD.SelfUpdate)
@@ -517,7 +513,7 @@ public class Scanner
 
         loggerConfiguration.WriteTo.Console();
         Log.Logger = loggerConfiguration.CreateLogger();
-        Log.Logger.Verbose("Logging Configured");
+        Log.Logger.Fatal("Logging Configured");
     }
 
     private void CheckBlockedPackages()

@@ -39,7 +39,7 @@
         <PackageReference Include="NuGet.Versioning" Version="6.9.1" />
         <PackageReference Include="NuGetDefense.Core" Version="2.0.11" />
         <PackageReference Include="NuGetDefense.GitHubAdvisoryDatabase" Version="2.0.6" />
-        <PackageReference Include="NuGetDefense.NVD" Version="2.1.3" />
+        <PackageReference Include="NuGetDefense.NVD" Version="2.1.4" />
         <PackageReference Include="NuGetDefense.OSSIndex" Version="2.1.3" />
         <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
