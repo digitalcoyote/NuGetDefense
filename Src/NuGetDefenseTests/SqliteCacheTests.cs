@@ -64,7 +64,7 @@ public class SqliteCacheTests : IDisposable
                 {
                     {
                         "TestCVE",
-                        new("TestCVE", 1.0, "test", "TestDescription", new[] { "ref1", "ref2" }, Vulnerability.AccessVectorType.NETWORK, "TestVendor")
+                        new("TestCVE", 1.0M, "test", "TestDescription", ["ref1", "ref2"], Vulnerability.AccessVectorType.NETWORK, "TestVendor")
                     }
                 }
             }
@@ -108,7 +108,7 @@ public class SqliteCacheTests : IDisposable
                 {
                     {
                         "TestCVE",
-                        new("TestCVE", 1.0, "test", "TestDescription", new[] { "ref1", "ref2" }, Vulnerability.AccessVectorType.NETWORK, "TestVendor")
+                        new("TestCVE", 1.0M, "test", "TestDescription", ["ref1", "ref2"], Vulnerability.AccessVectorType.NETWORK, "TestVendor")
                     }
                 }
             }
@@ -145,7 +145,7 @@ public class SqliteCacheTests : IDisposable
                 {
                     {
                         "TestCVE",
-                        new("TestCVE", 1.0, "test", "TestDescription", new[] { "ref1", "ref2" }, Vulnerability.AccessVectorType.NETWORK, "TestVendor")
+                        new("TestCVE", 1.0M, "test", "TestDescription", ["ref1", "ref2"], Vulnerability.AccessVectorType.NETWORK, "TestVendor")
                     }
                 }
             }

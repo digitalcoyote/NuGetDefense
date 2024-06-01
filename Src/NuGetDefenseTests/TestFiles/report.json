@@ -1,0 +1,45 @@
+{
+  "VulnerabilitiesCount": 4,
+  "Packages": [
+    {
+      "Id": "jQuery",
+      "Version": "3.3.1",
+      "Vulnerabilities": [
+        {
+          "Description": "jQuery before 3.4.0, as used in Drupal, Backdrop CMS, and other products, mishandles jQuery.extend(true, {}, ...) because of Object.prototype pollution. If an unsanitized source object contained an enumerable __proto__ property, it could extend the native Object.prototype.\n\nSonatype\u0027s research suggests that this CVE\u0027s details differ from those defined at NVD. See https://ossindex.sonatype.org/vulnerability/CVE-2019-11358 for details",
+          "Cve": "CVE-2019-11358",
+          "Cwe": "CWE-1321",
+          "CvssScore": 6.1,
+          "CvssVector": "NETWORK"
+        },
+        {
+          "Description": "In jQuery versions greater than or equal to 1.0.3 and before 3.5.0, passing HTML containing \u003Coption\u003E elements from untrusted sources - even after sanitizing it - to one of jQuery\u0027s DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code. This problem is patched in jQuery 3.5.0.",
+          "Cve": "CVE-2020-11023",
+          "Cwe": "CWE-79",
+          "CvssScore": 6.1,
+          "CvssVector": "NETWORK"
+        },
+        {
+          "Description": "Rejected reason: DO NOT USE THIS CANDIDATE NUMBER. ConsultIDs: CVE-2020-11023. Reason: This candidate is a duplicate of CVE-2020-11023. Notes: All CVE users should reference CVE-2020-11023 instead of this candidate. All references and descriptions in this candidate have been removed to prevent accidental usage.\n\nSonatype\u0027s research suggests that this CVE\u0027s details differ from those defined at NVD. See https://ossindex.sonatype.org/vulnerability/CVE-2020-23064 for details",
+          "Cve": "CVE-2020-23064",
+          "Cwe": "CWE-79",
+          "CvssScore": 6.1,
+          "CvssVector": "NETWORK"
+        }
+      ]
+    },
+    {
+      "Id": "jQuery.Validation",
+      "Version": "1.17.0",
+      "Vulnerabilities": [
+        {
+          "Description": "jquery-validation - Regular expression Denial of Service (ReDoS)\n\njquery-validation - Regular expression Denial of Service (ReDoS)",
+          "Cve": "CVE-2021-43306",
+          "Cwe": "CWE-1333",
+          "CvssScore": 5.9,
+          "CvssVector": "NETWORK"
+        }
+      ]
+    }
+  ]
+}

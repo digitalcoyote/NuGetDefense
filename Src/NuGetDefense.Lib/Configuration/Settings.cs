@@ -15,7 +15,7 @@ public class Settings
     public FileLogSettings? Log
     {
         get => Logs?.Length > 0 ? Logs[0] : null;
-        set { Logs = new[] { value }; }
+        set { Logs = [value]; }
     }
 
     public VulnerabilityReportsSettings VulnerabilityReports { get; set; } = new();
@@ -35,7 +35,7 @@ public class Settings
 
     public RemoteVulnerabilitySourceConfiguration NvdApi { get; set; } = new();
 
-    public string[] SensitivePackages { get; set; } = Array.Empty<string>();
+    public string[] SensitivePackages { get; set; } = [];
 
     public static Settings LoadSettings(string? settingsFilePath = "")
     {

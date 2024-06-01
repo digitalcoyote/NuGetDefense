@@ -17,6 +17,9 @@
     "Output": "~/nugetdefenseresult.json",
     "LogLevel": "Information"
   },
+  "VulnerabilityReports": {
+    "JsonReportPath": "/home/codingcoyote/RiderProjects/NuGetDefense/Src/NuGetDefenseTests/TestFiles/report.json"
+  },
   "OssIndex": {
     "Enabled": true,
     "BreakIfCannotRun": false

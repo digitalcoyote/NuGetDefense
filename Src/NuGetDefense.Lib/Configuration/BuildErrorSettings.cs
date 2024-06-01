@@ -8,9 +8,9 @@ public class BuildErrorSettings
     {
         get
         {
-            if (Cvss3Threshold > 8.9) return Severity.Critical;
-            if (Cvss3Threshold > 6.9) return Severity.High;
-            if (Cvss3Threshold > 3.9) return Severity.Medium;
+            if (Cvss3Threshold > 8.9M) return Severity.Critical;
+            if (Cvss3Threshold > 6.9M) return Severity.High;
+            if (Cvss3Threshold > 3.9M) return Severity.Medium;
             if (Cvss3Threshold > 0) return Severity.Low;
             return Cvss3Threshold < 0 ? Severity.Any : Severity.None;
         }
@@ -20,16 +20,16 @@ public class BuildErrorSettings
             {
                 Severity.Any => -1,
                 Severity.None => 0,
-                Severity.Low => 0.1,
-                Severity.Medium => 4.0,
-                Severity.High => 7.0,
-                Severity.Critical => 9.0,
+                Severity.Low => 0.1M,
+                Severity.Medium => 4.0M,
+                Severity.High => 7.0M,
+                Severity.Critical => 9.0M,
                 _ => Cvss3Threshold
             };
         }
     }
 
-    public double Cvss3Threshold { get; set; } = -1;
+    public decimal Cvss3Threshold { get; set; } = -1;
 
     /// <summary>
     ///     List Package Id and Version/Range to be ignored
@@ -37,30 +37,30 @@ public class BuildErrorSettings
     ///     Version is "any" if omitted
     /// </summary>
     public NuGetPackage[]? IgnoredPackages { get; set; } =
-    {
+    [
         new() { Id = "NugetDefense" }
-    };
+    ];
 
     /// <summary>
     ///     List CVE to be ignored
     ///     (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
     /// </summary>
     public string[]? IgnoredCvEs { get; set; } =
-    {
-    };
+    [
+    ];
 
     /// <summary>
     ///     List Package Id and Version/Range to be Allowed
     ///     (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
     ///     Version is "any" if omitted
     /// </summary>
-    public NuGetPackage[]? AllowedPackages { get; set; } = Array.Empty<NuGetPackage>();
+    public NuGetPackage[]? AllowedPackages { get; set; } = [];
 
     /// <summary>
     /// Old name for <see cref="AllowedPackages"/>.
     /// </summary>
     [Obsolete("Here for support of old config files")]
-    public NuGetPackage[]? WhiteListedPackages { get; set; } = Array.Empty<NuGetPackage>();
+    public NuGetPackage[]? WhiteListedPackages { get; set; } = [];
 
 
     /// <summary>
@@ -68,11 +68,11 @@ public class BuildErrorSettings
     ///     (https://docs.microsoft.com/en-us/nuget/concepts/package-versioning#version-ranges-and-wildcards)
     ///     Version is "any" if omitted
     /// </summary>
-    public BlockedPackage[]? BlockedPackages { get; set; } = Array.Empty<BlockedPackage>();
+    public BlockedPackage[]? BlockedPackages { get; set; } = [];
 
     /// <summary>
     /// Old name for <see cref="BlockedPackages"/>.
     /// </summary>
     [Obsolete("Here for support of old config files")]
-    public BlockedPackage[]? BlacklistedPackages { get; set; } = Array.Empty<BlockedPackage>();
+    public BlockedPackage[]? BlacklistedPackages { get; set; } = [];
 }
