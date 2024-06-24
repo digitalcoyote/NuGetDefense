@@ -42,7 +42,7 @@
         <PackageReference Include="NuGetDefense.NVD" Version="2.1.6" />
         <PackageReference Include="NuGetDefense.OSSIndex" Version="2.1.4" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-        <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
         <PackageReference Include="System.Text.Json" Version="8.0.3" />
     </ItemGroup>
 
