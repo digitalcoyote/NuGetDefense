@@ -8,11 +8,15 @@ public class BuildErrorSettings
     {
         get
         {
-            if (Cvss3Threshold > 8.9M) return Severity.Critical;
-            if (Cvss3Threshold > 6.9M) return Severity.High;
-            if (Cvss3Threshold > 3.9M) return Severity.Medium;
-            if (Cvss3Threshold > 0) return Severity.Low;
-            return Cvss3Threshold < 0 ? Severity.Any : Severity.None;
+            return Cvss3Threshold switch
+            {
+                > 8.9M => Severity.Critical,
+                > 6.9M => Severity.High,
+                > 3.9M => Severity.Medium,
+                > 0 => Severity.Low,
+                0 => Severity.None,
+                < 0 => Severity.Any
+            };
         }
         set
         {
