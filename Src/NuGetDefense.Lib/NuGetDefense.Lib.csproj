@@ -37,7 +37,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="NuGet.Versioning" Version="6.11.1" />
-        <PackageReference Include="NuGetDefense.Core" Version="2.0.13.2" />
+        <PackageReference Include="NuGetDefense.Core" Version="2.0.13.3" />
         <PackageReference Include="NuGetDefense.GitHubAdvisoryDatabase" Version="2.0.7.1" />
         <PackageReference Include="NuGetDefense.NVD" Version="2.1.6.1" />
         <PackageReference Include="NuGetDefense.OSSIndex" Version="2.1.4.1" />
