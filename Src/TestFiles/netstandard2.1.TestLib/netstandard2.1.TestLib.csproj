@@ -9,7 +9,7 @@
     <ItemGroup>
         <PackageReference Include="Bogus" Version="33.0.2" />
         <PackageReference Include="NuGetDefense" Version="2.1.2" />
-        <PackageReference Include="Bootstrap" Version="4.0.0-beta" />
+        <PackageReference Include="Bootstrap" Version="4.0.0-beta2" />
         <PackageReference Include="System.Net.Http" Version="4.3.4" />
     </ItemGroup>
 </Project>
