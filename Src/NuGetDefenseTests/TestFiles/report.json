@@ -1,6 +1,19 @@
 {
-  "VulnerabilitiesCount": 4,
+  "VulnerabilitiesCount": 5,
   "Packages": [
+    {
+      "Id": "bootstrap",
+      "Version": "4.4.1",
+      "Vulnerabilities": [
+        {
+          "Description": "A vulnerability has been identified in Bootstrap that exposes users to Cross-Site Scripting (XSS) attacks. The issue is present in the carousel component, where the data-slide and data-slide-to attributes can be exploited through the href attribute of an \u003Ca\u003E tag due to inadequate sanitization. This vulnerability could potentially enable attackers to execute arbitrary JavaScript within the victim\u0027s browser.\n\nSonatype\u0027s research suggests that this CVE\u0027s details differ from those defined at NVD. See https://ossindex.sonatype.org/vulnerability/CVE-2024-6484 for details",
+          "Cve": "CVE-2024-6484",
+          "Cwe": "CWE-79",
+          "CvssScore": 6.1,
+          "CvssVector": "NETWORK"
+        }
+      ]
+    },
     {
       "Id": "jQuery",
       "Version": "3.3.1",
