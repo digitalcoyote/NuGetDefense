@@ -359,11 +359,74 @@ public class Scanner
         {
             if (!projectList.Contains(referencedProj))
                 projectList.Add(referencedProj);
+
             GetProjectsReferenced(in referencedProj, in projectList);
         }
     }
+    //Kharkob is checking this code out 366-416
 
-    private Dictionary<string, NuGetPackage[]> LoadMultipleProjects(string topLevelProject, IReadOnlyList<string> projects, bool specificFramework, string targetFramework,
+    private Dictionary<string, NuGetPackage[]> LoadMultipleProjects(
+    string topLevelProject,
+    IReadOnlyList<string> projects,
+    bool specificFramework,
+    string targetFramework,
+    bool solutionFile = false)
+    {
+        var projectPackages = new Dictionary<string, NuGetPackage[]>();
+        var topLevelDir = Path.GetDirectoryName(topLevelProject)!;
+
+        foreach (var project in projects)
+        {
+            if (project.EndsWith(".dtproj")) continue;
+
+            var normalizedProjectPath = Path.Combine(
+                topLevelDir,
+                project.Replace('\\', Path.DirectorySeparatorChar)
+                       .Replace('/', Path.DirectorySeparatorChar));
+
+            var proj = DotNetProject.Load(normalizedProjectPath);
+            var nugetFile = new NuGetFile(normalizedProjectPath);
+            var pkgs = new List<NuGetPackage>();
+
+            if (!specificFramework && proj.Format == ProjectFormat.New)
+            {
+                if (proj.ProjectTargets.Any())
+                {
+                    var monikers = proj.ProjectTargets.Select(t => t.Moniker).ToArray();
+                    Log.Logger.Information("Target Frameworks for {project}: {frameworks}",
+                        project, string.Join(", ", monikers));
+
+                    var packages = monikers
+                        .SelectMany(m => nugetFile.LoadPackages(m, _settings.CheckTransitiveDependencies).Values);
+
+                    pkgs.AddDistinctPackages(packages);
+                }
+                else
+                {
+                    Log.Logger.Information("No Target Frameworks found in {project}", project);
+                }
+            }
+            else
+            {
+                pkgs.AddDistinctPackages(nugetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values);
+            }
+
+            projectPackages[normalizedProjectPath] = pkgs.ToArray();
+        }
+
+        var topLevelNuGetFile = new NuGetFile(topLevelProject);
+        _nuGetFile = topLevelNuGetFile.Path;
+
+        if (!solutionFile && !projectPackages.ContainsKey(topLevelProject))
+        {
+            var packages = topLevelNuGetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values;
+            projectPackages[topLevelProject] = packages.ToArray();
+        }
+
+        return projectPackages;
+    }
+
+    /* private Dictionary<string, NuGetPackage[]> LoadMultipleProjects(string topLevelProject, IReadOnlyList<string> projects, bool specificFramework, string targetFramework,
         bool solutionFile = false)
     {
         var projectPackages = new Dictionary<string, NuGetPackage[]>();
@@ -404,7 +467,7 @@ public class Scanner
 
             projectPackages.Add(path, pkgs.ToArray());
         }
-
+       
         var nuGetFile = new NuGetFile(topLevelProject);
         _nuGetFile = nuGetFile.Path;
 
@@ -412,7 +475,7 @@ public class Scanner
             projectPackages.Add(topLevelProject, nuGetFile.LoadPackages(targetFramework, _settings.CheckTransitiveDependencies).Values.ToArray());
 
         return projectPackages;
-    }
+    } */
 
     /// <summary>
     ///     Escapes all characters for Regex, then replaces '*' with '.*' (Regex wild Card for 0 or more of any character)
