@@ -18,7 +18,8 @@
     "LogLevel": "Information"
   },
   "VulnerabilityReports": {
-    "JsonReportPath": "/home/codingcoyote/RiderProjects/NuGetDefense/Src/NuGetDefenseTests/TestFiles/report.json"
+    //changed this to ./ - Kaharkob
+    "JsonReportPath": "/./././NuGetDefense/Src/NuGetDefenseTests/TestFiles/report.json"
   },
   "OssIndex": {
     "Enabled": true,

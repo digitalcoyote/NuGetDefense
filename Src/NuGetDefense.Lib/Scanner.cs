@@ -58,6 +58,7 @@ public class Scanner
         int exitCode;
         NumberOfVulnerabilities = 0;
         _projects = [];
+
         try
         {
             LoadSettings(options);
@@ -88,13 +89,13 @@ public class Scanner
                     var projectSettingsPath = Path.Combine(options.ProjectFile?.DirectoryName!, DefaultSettingsFileName);
                     // Check Project Directory First for Settings
                     if (File.Exists(projectSettingsPath))
-                    { 
+                    {
                         Log.Logger.Information($"NuGetDefense: Using project level settings file at: {projectSettingsPath}");
 
                         settingsFilePath = projectSettingsPath;
                     }
                     else if (File.Exists(Path.Combine(Directory.GetParent(projectSettingsPath)?.Parent?.FullName ?? "", DefaultSettingsFileName)))
-                    { 
+                    {
                         // Use Parent Directory of Project if the Settings File exists there instead
                         settingsFilePath = Path.Combine(Directory.GetParent(projectSettingsPath)?.FullName ?? "", DefaultSettingsFileName);
                         Log.Logger.Information($"NuGetDefense: Using project level settings file at parent folder: {settingsFilePath}");
@@ -225,24 +226,40 @@ public class Scanner
                 vulnDict =
                     new OSSIndex.Scanner(_nuGetFile, _settings.OssIndex.BreakIfCannotRun, UserAgentString, _settings.OssIndex.Username, _settings.OssIndex.ApiToken)
                         .GetVulnerabilitiesForPackages(uncachedPkgs.ToArray());
-                if (vulnDict != null)
+                if (vulnDict != null) { 
                     // If we failed to update the OSS Index data don't clear out old cached data as that will
                     // increase the number of requests next time, increasing the liklihood of further
-                    // TooManyRequeusts responses.
+                    // TooManyRequeusts responses
                     options.Cache.UpdateCache(vulnDict, uncachedPkgs, ossIndexSourceId);
-
-                // Skipping the packages we refreshed
-                options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages.Skip(uncachedPkgs.Count % 128), ossIndexSourceId, ref vulnDict);
+                } else 
+            {
+                    vulnDict = new();
             }
+            
+                // Skipping the packages we refreshed
+               options.Cache.GetPackagesCachedVulnerabilitiesForSource(cachedPackages.Skip(uncachedPkgs.Count % 128), ossIndexSourceId, ref vulnDict);
+            }
+  
 
             if (_settings.GitHubAdvisoryDatabase.Enabled)
             {
                 if (string.IsNullOrWhiteSpace(_settings.GitHubAdvisoryDatabase.ApiToken))
                 {
                     var msBuildMessage = MsBuild.Log(_nuGetFile, _settings.GitHubAdvisoryDatabase.BreakIfCannotRun ? MsBuild.Category.Error : MsBuild.Category.Warning,
-                        "GitHub Security Advisory Database Access Requires a GitHub Personal Access Toke (no special permissions): https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token");
+                        "No Github Token detected running Advisory scanner, GitHub Security Advisory Database Access Requires a GitHub Personal Access Toke (no special permissions): https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token");
                     Console.WriteLine(msBuildMessage);
-                    Log.Logger.Error(msBuildMessage);
+                    if (_settings.GitHubAdvisoryDatabase.BreakIfCannotRun)
+                    {
+                        Log.Logger.Error(msBuildMessage);
+                    }
+                    else
+                    {
+                        Log.Logger.Warning(msBuildMessage);
+                    }
+
+
+
+
                 }
                 else
                 {
@@ -521,13 +538,20 @@ public class Scanner
             foreach (var (project, packages) in _projects)
             {
                 //TODO: Losing the right file somewhere here
-                vulnReporter.BuildVulnerabilityTextReport(vulnDict, packages, project, _settings.WarnOnly,
+                //added something - Kharkob
+
+                    if (project.Contains("TestFiles", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Log.Logger.Warning("Skipping vulnerability scan for ignored project path: {project}", project);
+                        continue;
+                    }
+                    vulnReporter.BuildVulnerabilityTextReport(vulnDict, packages, project, _settings.WarnOnly,
                     _settings.ErrorSettings.Cvss3Threshold, out var projectNumberOfVulnerabilities);
 
-                NumberOfVulnerabilities += projectNumberOfVulnerabilities;
+                    NumberOfVulnerabilities += projectNumberOfVulnerabilities;
 
-                if (_settings.VulnerabilityReports.OutputTextReport) Log.Logger.Information(vulnReporter.VulnerabilityTextReport);
-                if (vulnReporter.MsBuildMessages == null) continue;
+                    if (_settings.VulnerabilityReports.OutputTextReport) Log.Logger.Information(vulnReporter.VulnerabilityTextReport);
+                    if (vulnReporter.MsBuildMessages == null) continue;
                 foreach (var msBuildMessage in vulnReporter.MsBuildMessages)
                 {
                     Console.WriteLine(msBuildMessage);
@@ -601,4 +625,7 @@ public class Scanner
             Log.Logger.Error(msBuildMessage);
         }
     }
+
+
+
 }
