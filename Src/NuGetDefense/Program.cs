@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
-using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
 using System.IO;
 using System.Threading.Tasks;
 using MessagePack;
 using NuGetDefense.Configuration;
 using NuGetDefense.NVD;
-using NugetDefense.NVD.API;
 
 namespace NuGetDefense;
 
@@ -21,39 +19,63 @@ public static class Program
     private static int Main(string[] args)
     {
         var projFileOption = new Option<FileInfo>("--project-file", "Project or Solution File to scan");
-        projFileOption.AddAlias("-p");
-        projFileOption.AddAlias("--project");
-        projFileOption.AddAlias("--solution");
+        projFileOption.Aliases.Add("-p");
+        projFileOption.Aliases.Add("--project");
+        projFileOption.Aliases.Add("--solution");
 
         var targetFrameworkMonikerOption = new Option<string>("--target-framework-moniker", "Framework to use when detecting versions for 'sdk style' projects");
-        targetFrameworkMonikerOption.AddAlias("--tfm");
-        targetFrameworkMonikerOption.AddAlias("--framework");
+        targetFrameworkMonikerOption.Aliases.Add("--tfm");
+        targetFrameworkMonikerOption.Aliases.Add("--framework");
 
-        var settingsOption = new Option<FileInfo?>("--settings-file", () => null, "Path to Settings File (ex. NuGetDefense.json)");
-        settingsOption.AddAlias("--nugetdefense-settings");
-        settingsOption.AddAlias("--nugetdefense-json");
+        var settingsOption = new Option<FileInfo?>("--settings-file")
+        {
+            Description = "Path to Settings File (ex. NuGetDefense.json)",
+            DefaultValueFactory = _ => null
+        };
+        settingsOption.Aliases.Add("--nugetdefense-settings");
+        settingsOption.Aliases.Add("--nugetdefense-json");
 
-        var warnOnlyOption = new Option<bool>("--warn-only", () => false, "Disables errors that would break a build, but outputs warnings for each report");
-        warnOnlyOption.AddAlias("--do-not-break");
-        warnOnlyOption.AddAlias("--warn");
+        var warnOnlyOption = new Option<bool>("--warn-only")
+        {
+            Description = "Disables errors that would break a build, but outputs warnings for each report",
+            DefaultValueFactory = _ => false
+        };
+        warnOnlyOption.Aliases.Add("--do-not-break");
+        warnOnlyOption.Aliases.Add("--warn");
 
-        var checkTransitiveDependenciesOption = new Option<bool>("--check-transitive-dependencies", () => true, "Enables scanning of transitive dependencies");
-        checkTransitiveDependenciesOption.AddAlias("--check-transitive");
-        checkTransitiveDependenciesOption.AddAlias("--transitive");
-        checkTransitiveDependenciesOption.AddAlias("--check-dependencies");
-        checkTransitiveDependenciesOption.AddAlias("--dependencies");
+        var checkTransitiveDependenciesOption = new Option<bool>("--check-transitive-dependencies")
+        {
+            Description = "Enables scanning of transitive dependencies",
+            DefaultValueFactory = _ => true
+        };
+        checkTransitiveDependenciesOption.Aliases.Add("--check-transitive");
+        checkTransitiveDependenciesOption.Aliases.Add("--transitive");
+        checkTransitiveDependenciesOption.Aliases.Add("--check-dependencies");
+        checkTransitiveDependenciesOption.Aliases.Add("--dependencies");
 
-        var checkProjectReferencesOption = new Option<bool>("--check-project-references", () => false, "Enables scanning projects referenced by the target project");
-        checkProjectReferencesOption.AddAlias("--check-referenced-projects");
-        checkProjectReferencesOption.AddAlias("--check-referenced");
-        checkProjectReferencesOption.AddAlias("--check-references");
-        checkProjectReferencesOption.AddAlias("--references");
-        checkProjectReferencesOption.AddAlias("--referenced-projects");
+        var checkProjectReferencesOption = new Option<bool>("--check-project-references")
+        {
+            Description = "Enables scanning projects referenced by the target project",
+            DefaultValueFactory = _ => false
+        };
+        checkProjectReferencesOption.Aliases.Add("--check-referenced-projects");
+        checkProjectReferencesOption.Aliases.Add("--check-referenced");
+        checkProjectReferencesOption.Aliases.Add("--check-references");
+        checkProjectReferencesOption.Aliases.Add("--references");
+        checkProjectReferencesOption.Aliases.Add("--referenced-projects");
 
-        var ignoredCvesOption = new Option<string[]>("--ignore-cves", Array.Empty<string>, "Adds listed vulnerabilities to a list that is ignored when reporting");
-        ignoredCvesOption.AddAlias("--ignore-vulns");
+        var ignoredCvesOption = new Option<string[]>("--ignore-cves")
+        {
+            Description = "Adds listed vulnerabilities to a list that is ignored when reporting",
+            DefaultValueFactory = _ => [],
+        };
+        ignoredCvesOption.Aliases.Add("--ignore-vulns");
 
-        var ignorePackagesOption = new Option<string[]>("--ignore-packages", Array.Empty<string>, "Adds names to a list of packages to ignore");
+        var ignorePackagesOption = new Option<string[]>("--ignore-packages")
+        {
+            Description = "Adds names to a list of packages to ignore",
+            DefaultValueFactory = _ => []
+        };
 
         var cacheLocationOption = new Option<string>("--cache-location", "location used to retrieve the cache");
 
@@ -79,23 +101,25 @@ public static class Program
             apiKeyOption,
             vulnDataFileOption,
         };
-        
+        nvdUpdateCommand.Action = CommandHandler.Create<FileInfo?, string, FileInfo?>(Update);
+
         var recreateNVDCommand = new Command("Recreate-NVD", "Recreates the Offline NVD Vulnerability source")
         {
             settingsOption,
             apiKeyOption,
             vulnDataFileOption,
         };
-        nvdUpdateCommand.Handler = CommandHandler.Create<FileInfo?, string, FileInfo?, InvocationContext>(Update);
-        recreateNVDCommand.Handler = CommandHandler.Create<FileInfo?, string, FileInfo?, InvocationContext>(RecreateNVDAsync);
+        recreateNVDCommand.Action = CommandHandler.Create<FileInfo?, string, FileInfo?>(RecreateNVDAsync);
+
         rootCommand.Add(nvdUpdateCommand);
         rootCommand.Add(recreateNVDCommand);
 
-        rootCommand.Handler = CommandHandler.Create<FileInfo, string, FileInfo, bool, bool, bool, string[], string[], string, InvocationContext>(Scan);
-        return rootCommand.InvokeAsync(args).Result;
+        rootCommand.Action = CommandHandler.Create<FileInfo, string, FileInfo, bool, bool, bool, string[], string[], string>(Scan);
+
+        return rootCommand.Parse(args).InvokeAsync().Result;
     }
 
-    private static async void Update(FileInfo? vulnDataFile, string? apiKey, FileInfo? settingsFile,  InvocationContext commandContext)
+    private static async void Update(FileInfo? vulnDataFile, string? apiKey, FileInfo? settingsFile)
     {
         
         if (string.IsNullOrWhiteSpace(apiKey)  )
@@ -126,14 +150,14 @@ public static class Program
             else
             {
                 // NVD Data was not specified and does not exist in global location or in current directory
-                await RecreateNVDAsync(new (Scanner.VulnerabilityDataBin), apiKey, settingsFile, commandContext);
+                await RecreateNVDAsync(new (Scanner.VulnerabilityDataBin), apiKey, settingsFile);
                 return;
             }
         }
         else if (!vulnDataFile.Exists)
         {
             // NVD Data does not exist, create it.
-            await RecreateNVDAsync(vulnDataFile, apiKey, settingsFile, commandContext);
+            await RecreateNVDAsync(vulnDataFile, apiKey, settingsFile);
             return;
         }
         
@@ -161,7 +185,7 @@ public static class Program
         VulnerabilityData.SaveToBinFile(nvdDict, Scanner.DefaultVulnerabilityDataFileName, TimeSpan.FromMinutes(5));
     }
 
-    public static async Task RecreateNVDAsync(FileInfo? vulnDataFile, string? apiKey, FileInfo? settingsFile,  InvocationContext commandContext)
+    public static async Task RecreateNVDAsync(FileInfo? vulnDataFile, string? apiKey, FileInfo? settingsFile)
     {
         if (string.IsNullOrWhiteSpace(apiKey)  )
         {
@@ -201,12 +225,11 @@ public static class Program
         bool checkReferencedProjects,
         string[] ignorePackages,
         string[] ignoreCves,
-        string? cacheLocation,
-        InvocationContext commandContext)
+        string? cacheLocation)
     {
         if (projectFile is null) Console.WriteLine("Run `nugetdefense -?` for usage information");
         else
-            commandContext.ExitCode = new Scanner().Scan(new()
+            Environment.ExitCode = new Scanner().Scan(new()
             {
                 CheckReferencedProjects = checkReferencedProjects,
                 CheckTransitiveDependencies = checkTransitiveDependencies,
