@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <RootNamespace>NuGetDefense</RootNamespace>
         <LangVersion>13</LangVersion>
         <Nullable>enable</Nullable>
-        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)'=='RELEASE'">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -31,19 +31,19 @@
     <ItemGroup>
         <None Include="../../README.md" Pack="true" PackagePath="\" />
         <PackageReference Include="ByteDev.DotNet" Version="7.2.1" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.5" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.1" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="NuGet.Versioning" Version="6.14.0" />
+        <PackageReference Include="NuGet.Versioning" Version="7.0.1" />
         <PackageReference Include="NuGetDefense.Core" Version="2.0.14" />
         <PackageReference Include="NuGetDefense.GitHubAdvisoryDatabase" Version="2.0.7.3" />
         <PackageReference Include="NuGetDefense.NVD" Version="2.1.6.4" />
         <PackageReference Include="NuGetDefense.OSSIndex" Version="2.1.4.4" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-        <PackageReference Include="System.Text.Json" Version="9.0.5" />
+        <PackageReference Include="System.Text.Json" Version="10.0.1" />
     </ItemGroup>
 
     <ItemGroup>

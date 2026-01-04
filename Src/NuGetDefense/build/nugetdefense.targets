@@ -2,8 +2,8 @@
     <PropertyGroup>
         <!-- <NuGetDefenseExe Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">"$(MSBuildThisFileDirectory)/net46/NuGetDefense.exe"</TsGenFileExe> -->
         <!-- <NuGetDefenseExe Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' OR '$(TargetFrameworkIdentifier)' == '.NETStandard'">dotnet "$(MSBuildThisFileDirectory)/net6.0/NuGetDefense.dll"</TsGenFileExe> -->
-        <NuGetDefenseExe Condition="'$(OS)' == Unix">dotnet "$(MSBuildThisFileDirectory)../tools/net8.0/NuGetDefense.dll"</NuGetDefenseExe>
-        <NuGetDefenseExe Condition="'$(OS)' == 'Windows_NT'">dotnet "$(MSBuildThisFileDirectory)..\tools\net8.0\NuGetDefense.dll"</NuGetDefenseExe>
+        <NuGetDefenseExe Condition="'$(OS)' == Unix">dotnet "$(MSBuildThisFileDirectory)../tools/net10.0/NuGetDefense.dll"</NuGetDefenseExe>
+        <NuGetDefenseExe Condition="'$(OS)' == 'Windows_NT'">dotnet "$(MSBuildThisFileDirectory)..\tools\net10.0\NuGetDefense.dll"</NuGetDefenseExe>
         <NugetDefenseTFM Condition="$(TargetFramework) != ''">--tfm $(TargetFramework)</NugetDefenseTFM>
     </PropertyGroup>
 
