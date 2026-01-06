@@ -18,58 +18,52 @@ public static class Program
     /// <param name="args"></param>
     private static int Main(string[] args)
     {
-        var projFileOption = new Option<FileInfo>("--project-file", "Project or Solution File to scan");
-        projFileOption.Aliases.Add("-p");
-        projFileOption.Aliases.Add("--project");
-        projFileOption.Aliases.Add("--solution");
+        var projFileOption = new Option<FileInfo>("--project-file", 
+            ["-p", "--project", "--solution"])
+        {
+            Description = "Project or Solution File to scan"
+        };
 
-        var targetFrameworkMonikerOption = new Option<string>("--target-framework-moniker", "Framework to use when detecting versions for 'sdk style' projects");
-        targetFrameworkMonikerOption.Aliases.Add("--tfm");
-        targetFrameworkMonikerOption.Aliases.Add("--framework");
+        var targetFrameworkMonikerOption = new Option<string>("--target-framework-moniker", 
+            ["--tfm", "--framework"])
+        {
+            Description = "Framework to use when detecting versions for 'sdk style' projects"
+        };
 
-        var settingsOption = new Option<FileInfo?>("--settings-file")
+        var settingsOption = new Option<FileInfo?>("--settings-file", 
+            ["--nugetdefense-settings", "--nugetdefense-json"])
         {
             Description = "Path to Settings File (ex. NuGetDefense.json)",
             DefaultValueFactory = _ => null
         };
-        settingsOption.Aliases.Add("--nugetdefense-settings");
-        settingsOption.Aliases.Add("--nugetdefense-json");
 
-        var warnOnlyOption = new Option<bool>("--warn-only")
+        var warnOnlyOption = new Option<bool>("--warn-only", 
+            ["--do-not-break", "--warn"])
         {
             Description = "Disables errors that would break a build, but outputs warnings for each report",
             DefaultValueFactory = _ => false
         };
-        warnOnlyOption.Aliases.Add("--do-not-break");
-        warnOnlyOption.Aliases.Add("--warn");
 
-        var checkTransitiveDependenciesOption = new Option<bool>("--check-transitive-dependencies")
+        var checkTransitiveDependenciesOption = new Option<bool>("--check-transitive-dependencies", 
+            ["--check-transitive", "--transitive", "--check-dependencies", "--dependencies"])
         {
             Description = "Enables scanning of transitive dependencies",
             DefaultValueFactory = _ => true
         };
-        checkTransitiveDependenciesOption.Aliases.Add("--check-transitive");
-        checkTransitiveDependenciesOption.Aliases.Add("--transitive");
-        checkTransitiveDependenciesOption.Aliases.Add("--check-dependencies");
-        checkTransitiveDependenciesOption.Aliases.Add("--dependencies");
 
-        var checkProjectReferencesOption = new Option<bool>("--check-project-references")
+        var checkProjectReferencesOption = new Option<bool>("--check-project-references", 
+            ["--check-referenced-projects", "--check-referenced", "--check-references", "--references", "--referenced-projects"])
         {
             Description = "Enables scanning projects referenced by the target project",
             DefaultValueFactory = _ => false
         };
-        checkProjectReferencesOption.Aliases.Add("--check-referenced-projects");
-        checkProjectReferencesOption.Aliases.Add("--check-referenced");
-        checkProjectReferencesOption.Aliases.Add("--check-references");
-        checkProjectReferencesOption.Aliases.Add("--references");
-        checkProjectReferencesOption.Aliases.Add("--referenced-projects");
 
-        var ignoredCvesOption = new Option<string[]>("--ignore-cves")
+        var ignoredCvesOption = new Option<string[]>("--ignore-cves",
+            ["--ignore-vulns"])
         {
             Description = "Adds listed vulnerabilities to a list that is ignored when reporting",
             DefaultValueFactory = _ => [],
         };
-        ignoredCvesOption.Aliases.Add("--ignore-vulns");
 
         var ignorePackagesOption = new Option<string[]>("--ignore-packages")
         {
@@ -77,11 +71,21 @@ public static class Program
             DefaultValueFactory = _ => []
         };
 
-        var cacheLocationOption = new Option<string>("--cache-location", "location used to retrieve the cache");
+        var cacheLocationOption = new Option<string>("--cache-location")
+        {
+            Description = "location used to retrieve the cache"
+        };
 
-        var apiKeyOption = new Option<string>("--api-key", "NVD API key");
+        var apiKeyOption = new Option<string>("--api-key")
+        {
+            Description = "NVD API key"
+        };
         
-        var vulnDataFileOption = new Option<FileInfo?>("--vuln-data-file", "Path to use for the vuln data file");
+        var vulnDataFileOption = new Option<FileInfo?>("--vuln-data-file")
+        {
+            Description = "Path to use for the vuln data file"
+        };
+
         var rootCommand = new RootCommand
         {
             projFileOption,
