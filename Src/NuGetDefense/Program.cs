@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
-using System.CommandLine.NamingConventionBinder;
 using System.IO;
 using System.Threading.Tasks;
 using MessagePack;
@@ -106,9 +105,14 @@ public static class Program
         {
             settingsOption,
             apiKeyOption,
-            vulnDataFileOption,
+            vulnDataFileOption
         };
-        nvdUpdateCommand.Action = CommandHandler.Create<FileInfo?, string, FileInfo?>(Update);
+        nvdUpdateCommand.SetAction(parseResult =>
+        {
+            Update(parseResult.GetValue(settingsOption),
+                parseResult.GetValue(apiKeyOption),
+                parseResult.GetValue(vulnDataFileOption));
+        });
 
         var recreateNVDCommand = new Command("Recreate-NVD", "Recreates the Offline NVD Vulnerability source")
         {
@@ -116,12 +120,28 @@ public static class Program
             apiKeyOption,
             vulnDataFileOption,
         };
-        recreateNVDCommand.Action = CommandHandler.Create<FileInfo?, string, FileInfo?>(RecreateNVDAsync);
+        recreateNVDCommand.SetAction(async parseResult =>
+        {
+            await RecreateNVDAsync(parseResult.GetValue(settingsOption),
+                parseResult.GetValue(apiKeyOption),
+                parseResult.GetValue(vulnDataFileOption));
+        });
 
         rootCommand.Add(nvdUpdateCommand);
         rootCommand.Add(recreateNVDCommand);
 
-        rootCommand.Action = CommandHandler.Create<FileInfo, string, FileInfo?, bool, bool, bool, string[], string[], string>(Scan);
+        rootCommand.SetAction(parseResult =>
+        {
+            Scan(parseResult.GetValue(projFileOption),
+                parseResult.GetValue(targetFrameworkMonikerOption)!,
+                parseResult.GetValue(settingsOption),
+                parseResult.GetValue(warnOnlyOption),
+                parseResult.GetValue(checkTransitiveDependenciesOption),
+                parseResult.GetValue(checkProjectReferencesOption),
+                parseResult.GetValue(ignorePackagesOption)!,
+                parseResult.GetValue(ignoredCvesOption)!,
+                parseResult.GetValue(cacheLocationOption));
+        });
 
         return rootCommand.Parse(args).InvokeAsync().Result;
     }
