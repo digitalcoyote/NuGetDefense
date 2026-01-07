@@ -63,12 +63,14 @@ public static class Program
         {
             Description = "Adds listed vulnerabilities to a list that is ignored when reporting",
             DefaultValueFactory = _ => [],
+            AllowMultipleArgumentsPerToken = true
         };
 
         var ignorePackagesOption = new Option<string[]>("--ignore-packages")
         {
             Description = "Adds names to a list of packages to ignore",
-            DefaultValueFactory = _ => []
+            DefaultValueFactory = _ => [],
+            AllowMultipleArgumentsPerToken = true
         };
 
         var cacheLocationOption = new Option<string>("--cache-location")
@@ -83,7 +85,8 @@ public static class Program
         
         var vulnDataFileOption = new Option<FileInfo?>("--vuln-data-file")
         {
-            Description = "Path to use for the vuln data file"
+            Description = "Path to use for the vuln data file",
+            DefaultValueFactory = _ => null
         };
 
         var rootCommand = new RootCommand
@@ -118,7 +121,7 @@ public static class Program
         rootCommand.Add(nvdUpdateCommand);
         rootCommand.Add(recreateNVDCommand);
 
-        rootCommand.Action = CommandHandler.Create<FileInfo, string, FileInfo, bool, bool, bool, string[], string[], string>(Scan);
+        rootCommand.Action = CommandHandler.Create<FileInfo, string, FileInfo?, bool, bool, bool, string[], string[], string>(Scan);
 
         return rootCommand.Parse(args).InvokeAsync().Result;
     }
