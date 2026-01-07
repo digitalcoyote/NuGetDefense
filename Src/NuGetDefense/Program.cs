@@ -132,7 +132,7 @@ public static class Program
 
         rootCommand.SetAction(parseResult =>
         {
-            Scan(parseResult.GetValue(projFileOption),
+            return Scan(parseResult.GetValue(projFileOption),
                 parseResult.GetValue(targetFrameworkMonikerOption)!,
                 parseResult.GetValue(settingsOption),
                 parseResult.GetValue(warnOnlyOption),
@@ -244,7 +244,7 @@ public static class Program
             vulnDict["twilio"].Remove("CVE-2014-9023");
     }
 
-    public static void Scan(FileInfo? projectFile,
+    public static int Scan(FileInfo? projectFile,
         string tfm,
         FileInfo? settingsFile,
         bool warnOnly,
@@ -254,9 +254,9 @@ public static class Program
         string[] ignoreCves,
         string? cacheLocation)
     {
-        if (projectFile is null) Console.WriteLine("Run `nugetdefense -?` for usage information");
+        if (projectFile is null) { Console.WriteLine("Run `nugetdefense -?` for usage information"); return -1; }
         else
-            Environment.ExitCode = new Scanner().Scan(new()
+            return new Scanner().Scan(new()
             {
                 CheckReferencedProjects = checkReferencedProjects,
                 CheckTransitiveDependencies = checkTransitiveDependencies,
