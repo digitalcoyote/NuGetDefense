@@ -18,11 +18,10 @@
     "LogLevel": "Information"
   },
   "VulnerabilityReports": {
-    //changed this to ./ - Kaharkob
-    "JsonReportPath": "/./././NuGetDefense/Src/NuGetDefenseTests/TestFiles/report.json"
+    "JsonReportPath": "report.json"
   },
   "OssIndex": {
-    "Enabled": true,
+    "Enabled": false,
     "BreakIfCannotRun": false
   },
   "NVD": {
